@@ -3,7 +3,7 @@
 # If not stated otherwise in this file or this component's LICENSE
 # file the following copyright and licenses apply:
 #
-# Copyright 2014 RDK Management
+# Copyright 2024 RDK Management
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -21,7 +21,20 @@
 # Save _TOPDIR
 _TOPDIR=`pwd`
 
+export RDK_BSP_LAYER=none
+
 #select filogic880-bpi-r4.conf for BPI R4
 if [ -e "${_TOPDIR}/meta-cmf-filogic/setup-environment-release" ]; then
 	source meta-cmf-filogic/setup-environment-release
 fi
+
+
+if [[ -z $(grep 'meta-cmf-bananapi' conf/bblayers.conf) ]] && [[ -d  ../meta-cmf-bananapi ]]
+then
+    cat >> conf/bblayers.conf <<EOF
+BBLAYERS =+ "\${RDKROOT}/meta-cmf-bananapi"
+EOF
+fi
+
+# default BSP layer is meta-cmf-bananapi for B-PI builds
+export RDK_BSP_LAYER=meta-cmf-bananapi
