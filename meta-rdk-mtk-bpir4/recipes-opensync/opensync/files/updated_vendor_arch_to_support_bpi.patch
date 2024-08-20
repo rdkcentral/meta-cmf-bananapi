@@ -1,0 +1,13 @@
+Source: [PATCH] To add BananaPi rdk broadband target to avoid compilation issues
+
+--- a/build/vendor-arch.mk	2024-08-08 08:32:12.339200250 +0000
++++ b/build/vendor-arch.mk	2024-08-07 05:42:19.142119030 +0000
+@@ -14,7 +14,7 @@
+ #WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ #See the License for the specific language governing permissions and
+ #limitations under the License.
+-RDK_TARGETS = RDKB raspberrypi4-rdk-broadband raspberrypi4-rdk-extender raspberrypi-rdk-broadband raspberrypi4-64-rdk-broadband
++RDK_TARGETS = RDKB raspberrypi4-rdk-broadband raspberrypi4-rdk-extender raspberrypi-rdk-broadband raspberrypi4-64-rdk-broadband bananapi4-rdk-broadband
+ 
+ ifneq ($(filter $(TARGET),$(RDK_TARGETS)),)
+ 

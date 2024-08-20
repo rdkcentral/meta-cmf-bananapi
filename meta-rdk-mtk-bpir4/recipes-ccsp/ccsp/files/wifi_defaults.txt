@@ -1,0 +1,5 @@
+radius_s_port=8000
+radius_s_ip=127.0.0.1
+radius_key=1234567
+wps_pin=1234567
+bpi_wifi_password=rdk@1234
