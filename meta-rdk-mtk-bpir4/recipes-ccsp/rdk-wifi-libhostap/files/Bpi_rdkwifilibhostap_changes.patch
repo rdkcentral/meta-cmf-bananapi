@@ -1,0 +1,25 @@
+--- git/source/hostap-2.10/src/ap/drv_callbacks.c	2023-06-08 11:27:27.645895606 +0000
++++ git/source/hostap-2.10/src/ap/drv_callbacks.c	2023-06-08 11:26:49.786465276 +0000
+@@ -772,6 +772,9 @@
+ 	wpa_auth_sm_event(sta->wpa_sm, WPA_DISASSOC);
+ 	sta->acct_terminate_cause = RADIUS_ACCT_TERMINATE_CAUSE_USER_REQUEST;
+ 	ieee802_1x_notify_port_enabled(sta->eapol_sm, 0);
++#ifdef _PLATFORM_BANANAPI_R4_
++	hostapd_drv_sta_disassoc(hapd, sta->addr, WLAN_REASON_DISASSOC_STA_HAS_LEFT);
++#endif	
+ 	ap_free_sta(hapd, sta);
+ }
+ 
+--- git/source/hostap-2.10/src/ap/hostapd.c	2023-06-10 18:14:04.381530228 +0000
++++ git/source/hostap-2.10/src/ap/hostapd.c	2023-06-10 18:14:25.597262764 +0000
+@@ -3321,6 +3321,10 @@
+ 	 * been authorized. */
+ 	if (!hapd->conf->ieee802_1x && !hapd->conf->wpa && !hapd->conf->osen) {
+ 		ap_sta_set_authorized(hapd, sta, 1);
++#ifdef _PLATFORM_BANANAPI_R4_
++		/*When Station is connected with OPEN Mode, need to authorize the station */
++		hostapd_set_authorized(hapd, sta, 1);
++#endif
+ 		os_get_reltime(&sta->connected_time);
+ 		accounting_sta_start(hapd, sta);
+ 	}
