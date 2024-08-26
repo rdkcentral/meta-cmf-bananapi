@@ -1,3 +1,3 @@
-include recipes-ccsp/ccsp/ccsp_common_bananapi.inc
+FILESEXTRAPATHS_prepend := "${THISDIR}/files:"
 
-CFLAGS_append  = " ${@bb.utils.contains('DISTRO_FEATURES', 'rdkb_wan_manager', '-DFEATURE_RDKB_WAN_MANAGER', '', d)}"
+SRC_URI_append += "file://Add_interface_Changes.patch"
