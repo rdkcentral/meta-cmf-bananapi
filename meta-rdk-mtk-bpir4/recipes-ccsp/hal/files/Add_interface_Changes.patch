@@ -1,3 +1,5 @@
+Source: Aishwarya Natarajan <aishwarya_natarajan2@comcast.com>
+Subject: Adding interface changes for Banana Pi R4
 Index: ethsw/rdkb_hal/src/ethsw/ccsp_hal_ethsw.c
 ===================================================================
 --- ethsw.orig/rdkb_hal/src/ethsw/ccsp_hal_ethsw.c
