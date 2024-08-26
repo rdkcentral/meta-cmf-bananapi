@@ -1,3 +1,6 @@
+Source: Aishwarya Natarajan <aishwarya_natarajan2@comcast.com>
+Subject: Functions required for getting Ipv6 for wan interface
+
 Index: platform/rdkb_hal/src/platform/platform_hal.c
 ===================================================================
 --- platform.orig/rdkb_hal/src/platform/platform_hal.c
