@@ -14,11 +14,22 @@ do_install_append_class-target() {
         rm ${D}${systemd_unitdir}/system/ccspwifiagent.service
    fi
    sed -i "s/wan-initialized.target/multi-user.target/g" ${D}${systemd_unitdir}/system/rfc.service
+
+   if ${@bb.utils.contains('DISTRO_FEATURES', 'webconfig_bin', 'true', 'false', d)}; then
+        install -D -m 0644 ${S}/systemd_units/webconfig.service ${D}${systemd_unitdir}/system/webconfig.service
+   fi
+   install -D -m 0644 ${S}/systemd_units/wan-initialized.target ${D}${systemd_unitdir}/system/wan-initialized.target
+   install -D -m 0644 ${S}/systemd_units/wan-initialized.path ${D}${systemd_unitdir}/system/wan-initialized.path
 }
 
 
 SYSTEMD_SERVICE_${PN}_remove_onewifi = " ccspwifiagent.service"
 SYSTEMD_SERVICE_${PN} += "${@bb.utils.contains('DISTRO_FEATURES', 'OneWifi', 'onewifi.service ', '', d)}"
+SYSTEMD_SERVICE_${PN} += "${@bb.utils.contains('DISTRO_FEATURES', 'webconfig_bin', 'webconfig.service', '', d)}"
 
 FILES_${PN}_remove_onewifi = "${systemd_unitdir}/system/ccspwifiagent.service"
 FILES_${PN}_append = "${@bb.utils.contains('DISTRO_FEATURES', 'OneWifi', ' ${systemd_unitdir}/system/onewifi.service ', '', d)}"
+FILES_${PN}_append = " \
+   ${systemd_unitdir}/system/wan-initialized.target \
+   ${systemd_unitdir}/system/wan-initialized.path \
+      "
