@@ -50,11 +50,8 @@
         <component>
 	        <name>com.cisco.spvtg.ccsp.fu</name> <version>1</version>
 	    </component>
--->
-        <component>
-            <name>com.cisco.spvtg.ccsp.ethagent</name> <version>1</version>
-        </component>		    
-       <component>
+-->		    
+    <component>
       <name>com.cisco.spvtg.ccsp.wanmanager</name>
       <version>1</version>
       <dependencies>
@@ -64,5 +61,8 @@
       </dependencies>
       <event>wan_ready_to_go</event>
     </component>
+    <component>
+       <name>com.cisco.spvtg.ccsp.ethagent</name> <version>1</version>
+    </component>    
     </components>    
 </deviceProfile>
