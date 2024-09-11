@@ -20,6 +20,14 @@ do_install_append_class-target() {
    fi
    install -D -m 0644 ${S}/systemd_units/wan-initialized.target ${D}${systemd_unitdir}/system/wan-initialized.target
    install -D -m 0644 ${S}/systemd_units/wan-initialized.path ${D}${systemd_unitdir}/system/wan-initialized.path
+   install -D -m 0644 ${S}/systemd_units/CcspEthAgent.service ${D}${systemd_unitdir}/system/CcspEthAgent.service
+   sed -i "s/CcspCrSsp.service CcspPandMSsp.service/CcspCrSsp.service RdkWanManager.service/g" ${D}${systemd_unitdir}/system/CcspEthAgent.service
+   DISTRO_WAN_ENABLED="${@bb.utils.contains('DISTRO_FEATURES','rdkb_wan_manager','true','false',d)}"
+   if [ $DISTRO_WAN_ENABLED = 'true' ]; then
+       install -D -m 0644 ${S}/systemd_units/RdkWanManager.service ${D}${systemd_unitdir}/system/RdkWanManager.service
+       sed -i "s/After=CcspCrSsp.service utopia.service PsmSsp.service CcspEthAgent.service/After=CcspCrSsp.service PsmSsp.service/g" ${D}${systemd_unitdir}/system/RdkWanManager.service
+     fi
+
 }
 
 
