@@ -13,6 +13,7 @@ do_install_append () {
     install -d ${D}${base_libdir_native}/rdk
     install -m 0644 ${S}/devices/broadband/parodus/systemd/parodus.service ${D}${systemd_unitdir}/system
     install -m 0755 ${S}/devices/broadband/parodus/scripts/parodus_start.sh ${D}${base_libdir_native}/rdk
+    sed -i "s/eth0/lan0/g" ${D}${base_libdir_native}/rdk/parodus_start.sh
 }
 
 SYSTEMD_SERVICE_${PN}_append = " parodus.service"
