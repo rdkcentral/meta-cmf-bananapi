@@ -13,4 +13,8 @@ CFLAGS_append  += " ${@bb.utils.contains('DISTRO_FEATURES', 'WanFailOverSupportE
 CFLAGS_append  += " ${@bb.utils.contains('DISTRO_FEATURES', 'WanManagerUnificationEnable', '-DWAN_MANAGER_UNIFICATION_ENABLED', '', d)}"
 CFLAGS_append += "${@bb.utils.contains('DISTRO_FEATURES', 'rdkb_wan_manager', ' -DFEATURE_RDKB_WAN_MANAGER ', '', d)}"
 
+DEPENDS += "breakpad-wrapper"
+LDFLAGS += "-lbreakpadwrapper"
+
+LDFLAGS_append = " -lpthread -lcrypto"
 
