@@ -26,18 +26,30 @@ do_install_append_class-target() {
    if [ $DISTRO_WAN_ENABLED = 'true' ]; then
        install -D -m 0644 ${S}/systemd_units/RdkWanManager.service ${D}${systemd_unitdir}/system/RdkWanManager.service
        sed -i "s/After=CcspCrSsp.service utopia.service PsmSsp.service CcspEthAgent.service/After=CcspCrSsp.service PsmSsp.service/g" ${D}${systemd_unitdir}/system/RdkWanManager.service
-     fi
+    fi
+    #Telemetry support
+   install -D -m 0644 ${S}/systemd_units/CcspTelemetry.service ${D}${systemd_unitdir}/system/CcspTelemetry.service
+   sed -i "/Type=oneshot/a EnvironmentFile=\/etc/\device.properties" ${D}${systemd_unitdir}/system/CcspTelemetry.service
+   sed -i "/EnvironmentFile=\/etc\/device.properties/a EnvironmentFile=\/etc\/dcm.properties" ${D}${systemd_unitdir}/system/CcspTelemetry.service
+   sed -i "/EnvironmentFile=\/etc\/dcm.properties/a ExecStartPre=\/bin\/sh -c '\/bin\/touch \/rdklogs\/logs\/dcmscript.log'" ${D}${systemd_unitdir}/system/CcspTelemetry.service
+   sed -i "s/ExecStart=\/bin\/sh -c '\/lib\/rdk\/dcm.service \&'/ExecStart=\/bin\/sh -c '\/lib\/rdk\/StartDCM.sh \>\> \/rdklogs\/logs\/telemetry.log \&'/g" ${D}${systemd_unitdir}/system/CcspTelemetry.service
+   sed -i "s/wan-initialized.target/multi-user.target/g" ${D}${systemd_unitdir}/system/CcspTelemetry.service
 
+   install -D -m 0644 ${S}/systemd_units/notifyComp.service ${D}${systemd_unitdir}/system/notifyComp.service
 }
 
 
 SYSTEMD_SERVICE_${PN}_remove_onewifi = " ccspwifiagent.service"
 SYSTEMD_SERVICE_${PN} += "${@bb.utils.contains('DISTRO_FEATURES', 'OneWifi', 'onewifi.service ', '', d)}"
 SYSTEMD_SERVICE_${PN} += "${@bb.utils.contains('DISTRO_FEATURES', 'webconfig_bin', 'webconfig.service', '', d)}"
+SYSTEMD_SERVICE_${PN} += " CcspTelemetry.service"
+SYSTEMD_SERVICE_${PN} += " notifyComp.service"
 
 FILES_${PN}_remove_onewifi = "${systemd_unitdir}/system/ccspwifiagent.service"
 FILES_${PN}_append = "${@bb.utils.contains('DISTRO_FEATURES', 'OneWifi', ' ${systemd_unitdir}/system/onewifi.service ', '', d)}"
 FILES_${PN}_append = " \
    ${systemd_unitdir}/system/wan-initialized.target \
    ${systemd_unitdir}/system/wan-initialized.path \
-      "
+   ${systemd_unitdir}/system/CcspTelemetry.service \
+   ${systemd_unitdir}/system/notifyComp.service \
+   "
