@@ -1,5 +1,9 @@
 include ccsp_common_bananapi.inc
 
+FILESEXTRAPATHS_prepend := "${THISDIR}/${PN}:${THISDIR}/files:"
+SRC_URI_append = " \
+                   file://gwprovapp.conf \
+                "
 CFLAGS_aarch64_append = " -Werror=format-truncation=1 "
 
 do_install_append_class-target() {
@@ -34,6 +38,11 @@ do_install_append_class-target() {
    sed -i "s/wan-initialized.target/multi-user.target/g" ${D}${systemd_unitdir}/system/CcspTelemetry.service
 
    install -D -m 0644 ${S}/systemd_units/notifyComp.service ${D}${systemd_unitdir}/system/notifyComp.service
+   install -D -m 0644 ${S}/systemd_units/gwprovapp.service ${D}${systemd_unitdir}/system/gwprovapp.service
+   sed -i "s/After=securemount.service/After=PsmSsp.service/g" ${D}${systemd_unitdir}/system/gwprovapp.service
+   install -D -m 0644 ${WORKDIR}/gwprovapp.conf ${D}${systemd_unitdir}/system/gwprovapp.service.d/gwprovapp.conf
+
+
 }
 
 
@@ -42,6 +51,7 @@ SYSTEMD_SERVICE_${PN} += "${@bb.utils.contains('DISTRO_FEATURES', 'OneWifi', 'on
 SYSTEMD_SERVICE_${PN} += "${@bb.utils.contains('DISTRO_FEATURES', 'webconfig_bin', 'webconfig.service', '', d)}"
 SYSTEMD_SERVICE_${PN} += " CcspTelemetry.service"
 SYSTEMD_SERVICE_${PN} += " notifyComp.service"
+SYSTEMD_SERVICE_${PN} += "gwprovapp.service"
 
 FILES_${PN}_remove_onewifi = "${systemd_unitdir}/system/ccspwifiagent.service"
 FILES_${PN}_append = "${@bb.utils.contains('DISTRO_FEATURES', 'OneWifi', ' ${systemd_unitdir}/system/onewifi.service ', '', d)}"
@@ -50,4 +60,6 @@ FILES_${PN}_append = " \
    ${systemd_unitdir}/system/wan-initialized.path \
    ${systemd_unitdir}/system/CcspTelemetry.service \
    ${systemd_unitdir}/system/notifyComp.service \
+   ${systemd_unitdir}/system/gwprovapp.service \
+   ${systemd_unitdir}/system/gwprovapp.service.d/gwprovapp.conf \
    "
