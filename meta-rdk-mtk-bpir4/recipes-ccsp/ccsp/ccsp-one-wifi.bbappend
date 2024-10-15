@@ -2,8 +2,7 @@ require ccsp_common_bananapi.inc
 
 FILESEXTRAPATHS_prepend := "${THISDIR}/files:"
 
-DEPENDS_remove = " opensync-2.4.1"
-DEPENDS_append = " opensync mesh-agent "
+DEPENDS_append = " mesh-agent "
 
 CFLAGS_append = " -DWIFI_HAL_VERSION_3 -Wno-unused-function "
 LDFLAGS_append = " -ldl"
