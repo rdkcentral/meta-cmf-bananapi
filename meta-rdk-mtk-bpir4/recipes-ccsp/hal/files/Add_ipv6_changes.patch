@@ -1,0 +1,246 @@
+Source: Aishwarya Natarajan <aishwarya_natarajan2@comcast.com>
+Subject: Functions required for getting Ipv6 for wan interface
+
+Index: platform/rdkb_hal/src/platform/platform_hal.c
+===================================================================
+--- platform.orig/rdkb_hal/src/platform/platform_hal.c
++++ platform/rdkb_hal/src/platform/platform_hal.c
+@@ -20,6 +20,7 @@
+ #include <stdio.h>
+ #include <stdlib.h>
+ #include <string.h>
++#include <unistd.h>
+ 
+ #include "platform_hal.h" 
+ 
+@@ -28,6 +29,22 @@
+ /* Note that 0 == RETURN_OK == STATUS_OK    */
+ /* Note that -1 == RETURN_ERR == STATUS_NOK */
+ 
++#define DHCP_VENDOR_OPTION_FILE         "/etc/udhcpc.vendor_specific"
++#define DHCPV6_OPT_VAL_16               "0x0000118b000a65526f75746572312e30"
++#define DHCPV6_OPT_VAL_17               "0x0000118b000100020026"
++#define V6_PREFIX_CONFIG                "\n{ prefix ::/64 }"
++#define CONSOLE_LOG_FILE "/rdklogs/logs/WANMANAGERLog.txt.0"
++
++#define DHCP_DBG_PRINT(fmt ...)     {\
++	    FILE     *fp        = NULL;\
++	    fp = fopen ( CONSOLE_LOG_FILE, "a+");\
++	    if (fp)\
++	    {\
++		            fprintf(fp,fmt);\
++		            fclose(fp);\
++		        }\
++}\
++
+ 
+ INT platform_hal_PandMDBInit(void) { return RETURN_OK; }
+ INT platform_hal_DocsisParamsDBInit(void) { return RETURN_OK; }
+@@ -993,12 +1010,188 @@ char *get_current_wan_ifname()
+ 
+ 
+ 
++/*
++ * add_dhcp_opt_to_list ()
++ * @description: This function add DHCP SEND/REQUEST option and option value
++                 to the to a list that is passed to this function as argument.
++ * @params     : opt_list - input list to add a node
++               : opt - DHCP option tag eg: 43, 60
++               : opt_val - DHCP option value
++ * @return     : RETURN_OK or RETURN_ERR
++ *
++ */
++static int add_dhcp_opt_to_list (dhcp_opt_list ** opt_list, int opt, char * opt_val)
++{
++    if ((opt_list == NULL) || (opt <= 0) ||(opt >= DHCPV4_OPT_END) )
++    {
++        return RETURN_ERR;
++    }
++
++    dhcp_opt_list * new_dhcp_opt = malloc (sizeof(dhcp_opt_list));
++    if (new_dhcp_opt == NULL)
++    {
++        return RETURN_ERR;
++    }
++    memset (new_dhcp_opt, 0, sizeof(dhcp_opt_list));
++
++    new_dhcp_opt->dhcp_opt = opt;
++    new_dhcp_opt->dhcp_opt_val = opt_val;
++
++    if (*opt_list != NULL)
++    {
++        new_dhcp_opt->next = *opt_list;
++    }
++    *opt_list = new_dhcp_opt;
++
++    DHCP_DBG_PRINT("%s %d: Added %d to list\n", __FUNCTION__, __LINE__, opt);
++    dhcp_opt_list * t = *opt_list;
++    while(t)
++    {
++        DHCP_DBG_PRINT("%d ", t->dhcp_opt);
++        t = t->next;
++    }
++    DHCP_DBG_PRINT("\n");
++
++    return RETURN_OK;
++}
++/*
++ * free_dhcp_opt_list ()
++ * @description: This function is to free all nodes in linked list created to hold dhcp options.
++ * @params     : opt_list - list to free
++ * @return     : no return
++ *
++ */
++void free_dhcp_opt_list (dhcp_opt_list * opt_list)
++{
++    dhcp_opt_list * tmp_node = NULL;
++
++    if (opt_list == NULL)
++        return;
++
++    while (opt_list)
++    {
++        tmp_node = opt_list;
++        opt_list = opt_list->next;
++        if (tmp_node->dhcp_opt_val)
++        {
++            // DHCP opt will have opt_val
++            free(tmp_node->dhcp_opt_val);
++        }
++        free(tmp_node);
++    }
++
++}
++
++int ascii_to_hex (char *in, char *out, int size)
++{
++    int i = 0;
++
++    if (size < (strlen(in) * 2) + 2)
++        return 0;
++
++    memset (out, 0, size);
++    for (i = 0; *in; i++, in++)
++    {
++        snprintf((out+i*2), size-i*2, "%02X", *in);
++    }
++
++    return i*2;
++}
++
++/*
++ * add_dhcpv6_option_17 ()
++ * @description: This function add DHCP SEND option 17
++                 to the to a list that is passed to this function as argument.
++ * @params     : v4_send_opt_list - list to update option 17
++ * @return     : RETURN_OK or RETURN_ERR
++ *
++ */
++static int add_dhcpv6_option_17 (dhcp_opt_list **send_opt_list)
++{
++    char buff[512], line[128], mode[16], subop[32], value[64], *opt_val;
++    char tmp[256], hex[128];
++    int len;
++    FILE *fp;
++
++    if(!(fp = fopen(DHCP_VENDOR_OPTION_FILE, "r")))
++    {
++        DHCP_DBG_PRINT("returning since vendor option file is not present %s.\n", __FUNCTION__);
++        return RETURN_OK;
++    }
++
++    //Using default Option17 value
++    strcpy(buff, DHCPV6_OPT_VAL_17);
++
++    while (fgets(line, sizeof(line), fp))
++    {
++        sscanf(line, "%s  %s %s", mode, subop, value);
++
++        memset (tmp, 0, sizeof(tmp));
++        if (!strncmp(subop, "SUBOPTION2", 10))
++        {
++            len = ascii_to_hex(value, hex, sizeof(hex));
++            snprintf(tmp, sizeof(tmp), "0002%04X%s", len, hex);
++            strcat(buff, tmp);
++        }
++        else if (!strncmp(subop, "SUBOPTION3", 10))
++        {
++            if (!strcmp(mode, "ETHWAN"))
++            {
++                len = ascii_to_hex(value, hex, sizeof(hex));
++                snprintf(tmp, sizeof(tmp), "0002%04X%s", len, hex);
++                strcat(buff, tmp);
++            }
++        }
++    }
++
++    fclose(fp);
++
++    if(!(opt_val = malloc(strlen(buff) + 1)))
++        return RETURN_ERR;
++
++    memset (opt_val, 0, strlen(buff) + 1);
++    strncpy(opt_val, buff, strlen(buff));
++
++    if (add_dhcp_opt_to_list(send_opt_list, DHCPV6_OPT_17, opt_val) != RETURN_OK)
++        return RETURN_ERR;
++
++    return RETURN_OK;
++}
++
+ INT platform_hal_GetDhcpv6_Options ( dhcp_opt_list ** req_opt_list, dhcp_opt_list ** send_opt_list)
+ {
+-	if ((req_opt_list == NULL) || (send_opt_list == NULL))    
+-	{
+-		return RETURN_ERR;
+-	}
++    int ret;
++
++    if (!req_opt_list || !send_opt_list)
++        return RETURN_ERR;
++
++    do
++    {
++        // Request options
++        if ((ret=add_dhcp_opt_to_list(req_opt_list, DHCPV6_OPT_5, NULL)) != RETURN_OK)     // IA Address Option
++            break;
++        if ((ret=add_dhcp_opt_to_list(req_opt_list, DHCPV6_OPT_23, NULL)) != RETURN_OK)    // DNS
++            break;
++        if ((ret=add_dhcp_opt_to_list(req_opt_list, DHCPV6_OPT_24, NULL)) != RETURN_OK)    // Optional Domain Name List
++            break;
++
++        // SEND OPTION addition
++        if ((ret=add_dhcp_opt_to_list(send_opt_list, DHCPV6_OPT_25, strdup(V6_PREFIX_CONFIG))) != RETURN_OK)    // Prefix Delegation Option
++            break;
++        if ((ret=add_dhcp_opt_to_list(send_opt_list, DHCPV6_OPT_16, strdup(DHCPV6_OPT_VAL_16))) != RETURN_OK)    // Vendor Class Option
++            break;
++        if ((ret=add_dhcpv6_option_17(send_opt_list)) != RETURN_OK)  // OPTION_VENDOR_OPTS
++            break;
++    }while(0);
++
++    if(ret!=RETURN_OK)
++    {
++        free_dhcp_opt_list (*req_opt_list);
++        *req_opt_list = NULL;
++        free_dhcp_opt_list (*send_opt_list);
++        *send_opt_list = NULL;
++         return RETURN_ERR;
++    }
+ 
+ 	return RETURN_OK;
+ }
+@@ -1015,6 +1208,7 @@ INT platform_hal_GetDhcpv4_Options ( dhc
+ 	return RETURN_OK;
+ }
+ 
++
+ INT platform_hal_GetFirmwareBankInfo(FW_BANK bankIndex, PFW_BANK_INFO pFW_Bankinfo)
+ {
+     return RETURN_OK;
+@@ -1023,4 +1217,4 @@ INT platform_hal_GetFirmwareBankInfo(FW_
+ INT platform_hal_GetInterfaceStats(const char *ifname,PINTF_STATS pIntfStats)
+ {
+     return RETURN_OK;
+-}
+\ No newline at end of file
++}
