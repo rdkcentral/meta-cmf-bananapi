@@ -24,3 +24,5 @@ DISTRO_FEATURES_append = " no_moca_support"
 DISTRO_FEATURES_append = " referencepltfm "
 
 MACHINEOVERRIDES_append =. "${@bb.utils.contains('DISTRO_FEATURES', 'OneWifi', ':onewifi', '' ,d)}"
+
+DISTRO_FEATURES_append = " CPUPROCANALYZER_BROADBAND"
