@@ -1,0 +1,19 @@
+Source: Aishwarya Natarajan <aishwarya_natarajan2@comcast.com>
+Subject: Adding interface changes for Banana Pi R4
+
+Index: ethsw/rdkb_hal/src/ethsw/ccsp_hal_ethsw.c
+===================================================================
+--- ethsw.orig/rdkb_hal/src/ethsw/ccsp_hal_ethsw.c
++++ ethsw/rdkb_hal/src/ethsw/ccsp_hal_ethsw.c
+@@ -40,7 +40,11 @@
+ #define LM_ARP_ENTRY_FORMAT  "%63s %63s %63s %63s %17s %63s"
+
+ #define ETH_WAN_INTERFACE  "erouter0"
++#if defined(_PLATFORM_BANANAPI_R4_)
++#define ETH_WAN_IFNAME   "lan0"
++#else
+ #define ETH_WAN_IFNAME   "eth2"
++#endif
+ #if defined(FEATURE_RDKB_WAN_MANAGER)
+ static pthread_t ethsw_tid;
+ static int hal_init_done = 0;
