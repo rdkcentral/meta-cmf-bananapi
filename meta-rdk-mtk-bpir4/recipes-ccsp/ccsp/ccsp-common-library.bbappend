@@ -53,6 +53,8 @@ SYSTEMD_SERVICE_${PN} += "${@bb.utils.contains('DISTRO_FEATURES', 'webconfig_bin
 SYSTEMD_SERVICE_${PN} += " CcspTelemetry.service"
 SYSTEMD_SERVICE_${PN} += " notifyComp.service"
 SYSTEMD_SERVICE_${PN} += "gwprovapp.service"
+SYSTEMD_SERVICE_${PN} += "wan-initialized.target"
+SYSTEMD_SERVICE_${PN} += "wan-initialized.path"
 SYSTEMD_SERVICE_${PN}_remove = " utopia.service"
 
 FILES_${PN}_remove_onewifi = "${systemd_unitdir}/system/ccspwifiagent.service"
