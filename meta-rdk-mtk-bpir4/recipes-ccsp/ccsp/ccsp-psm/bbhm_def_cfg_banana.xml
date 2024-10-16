@@ -1221,4 +1221,6 @@
    <Record name="dmsb.wanmanager.if.1.VirtualInterface.1.Timeout" type="astr">20</Record> 
    <Record name="dmsb.wanmanager.if.1.VirtualInterface.1.VlanCount" type="astr">0</Record> 
    <Record name="dmsb.wanmanager.if.1.VirtualInterface.1.MarkingCount" type="astr">0</Record>
+   <!-- Webconfig.service auto start record -->
+   <Record name="eRT.com.cisco.spvtg.ccsp.webpa.WebConfigRfcEnable" type="astr">true</Record>
 </Provision>
