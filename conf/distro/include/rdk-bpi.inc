@@ -26,3 +26,6 @@ DISTRO_FEATURES_append = " referencepltfm "
 MACHINEOVERRIDES_append =. "${@bb.utils.contains('DISTRO_FEATURES', 'OneWifi', ':onewifi', '' ,d)}"
 
 DISTRO_FEATURES_append = " CPUPROCANALYZER_BROADBAND"
+
+# RDKB-51565,RDKB-50795: [HAL] Cellular Hal Implementation
+DISTRO_FEATURES_append = " rdkb_cellular_manager_mm"
