@@ -1,0 +1,91 @@
+From f370093e488a8a687ebde7c356953e280049dae5 Mon Sep 17 00:00:00 2001
+From: cpokur625 <chandrakanth_pokuru2@comcast.com>
+Date: Mon, 14 Oct 2024 22:33:59 +0000
+Subject: [PATCH 1/2] RDKBACCL-275 : Review generic rdk-b code and introduce
+ platform specific flags
+
+Reason for change: Build fails if MOCA not enabled
+Test Procedure: Build and test wan connectivity
+Risks: Low
+
+Change-Id: Ib0044f72b6661b1640a3cbee7d05195349c2c7e2
+Signed-off-by: cpokur625 <chandrakanth_pokuru2@comcast.com>
+---
+ source/TR-181/board_sbapi/cosa_dhcpv4_apis.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/source/TR-181/board_sbapi/cosa_dhcpv4_apis.c b/source/TR-181/board_sbapi/cosa_dhcpv4_apis.c
+index a9d52d9..f0d8805 100644
+--- a/source/TR-181/board_sbapi/cosa_dhcpv4_apis.c
++++ b/source/TR-181/board_sbapi/cosa_dhcpv4_apis.c
+@@ -592,8 +592,9 @@ int usg_get_cpe_associate_interface(char *pMac, char ifname[64])
+             rc = strcpy_s(ifname, 64, "Device.MoCA.Interface.1");
+             ERR_CHK(rc);
+         }
+-        else {
++        else
+ #endif
++	{
+             rc = strcpy_s(ifname, 64, "Device.Ethernet.Interface.x");
+             ERR_CHK(rc);
+         }
+-- 
+2.47.0
+
+
+From dac8aa66364cc2f0724ffcc923f95452947bd090 Mon Sep 17 00:00:00 2001
+From: aishwarya_natarajan2 <aishwarya_natarajan2@comcast.com>
+Date: Thu, 10 Oct 2024 07:32:57 +0000
+Subject: [PATCH 2/2] RDKBACCL-275 :  Review generic rdk-b code and introduce
+ platform specific flags
+
+Reason for change : Changes for DhcpManager for BananaPi R4
+Test Procedure: Build and flash the image.erouter0 should get ip
+Risks: None
+
+Change-Id: I2275b65e84004989d271db84a22e46ef3109865b
+Signed-off-by: aishwarya_natarajan2 <aishwarya_natarajan2@comcast.com>
+---
+ source/TR-181/board_sbapi/cosa_dhcpv6_apis.c                  | 3 +++
+ .../TR-181/board_sbapi/cosa_x_cisco_com_devicecontrol_apis.c  | 4 ++--
+ 2 files changed, 5 insertions(+), 2 deletions(-)
+
+diff --git a/source/TR-181/board_sbapi/cosa_dhcpv6_apis.c b/source/TR-181/board_sbapi/cosa_dhcpv6_apis.c
+index 74eaf76..4b4c1da 100644
+--- a/source/TR-181/board_sbapi/cosa_dhcpv6_apis.c
++++ b/source/TR-181/board_sbapi/cosa_dhcpv6_apis.c
+@@ -2906,6 +2906,9 @@ CosaDmlDhcpv6cGetEnabled
+     BOOL dibblerEnabled = FALSE;
+ #elif defined(_PLATFORM_RASPBERRYPI_) && defined (FEATURE_RDKB_WAN_MANAGER)
+     BOOL dibblerEnabled = FALSE;
++#elif defined(_PLATFORM_BANANAPI_R4_) && defined (FEATURE_RDKB_WAN_MANAGER)
++    BOOL dibblerEnabled = FALSE;
++    
+ #endif
+ 
+ // For XB3, AXB6 if dibbler flag enabled, check dibbler-client process status
+diff --git a/source/TR-181/board_sbapi/cosa_x_cisco_com_devicecontrol_apis.c b/source/TR-181/board_sbapi/cosa_x_cisco_com_devicecontrol_apis.c
+index 84934bf..e71b391 100755
+--- a/source/TR-181/board_sbapi/cosa_x_cisco_com_devicecontrol_apis.c
++++ b/source/TR-181/board_sbapi/cosa_x_cisco_com_devicecontrol_apis.c
+@@ -213,7 +213,7 @@ void* WebGuiRestart( void *arg )
+ }
+ 
+ 
+-#if defined(_PLATFORM_RASPBERRYPI_) || defined(_PLATFORM_TURRIS_)
++#if defined(_PLATFORM_RASPBERRYPI_) || defined(_PLATFORM_TURRIS_)  || defined(_PLATFORM_BANANAPI_R4_)
+ static int
+ DmSetBool(const char *param, BOOL value)
+ {
+@@ -1084,7 +1084,7 @@ CosaDmlLanMngm_SetConf(ULONG ins, PCOSA_DML_LAN_MANAGEMENT pLanMngm)
+     }
+ #endif
+ 
+-#if defined(_PLATFORM_RASPBERRYPI_) || defined(_PLATFORM_TURRIS_)
++#if defined(_PLATFORM_RASPBERRYPI_) || defined(_PLATFORM_TURRIS_) || defined(_PLATFORM_BANANAPI_R4_)
+     char buf[7] = {0};
+     BOOL value;
+     snprintf(buf,sizeof(buf),"%d",bridge_info.mode);
+-- 
+2.47.0
+
