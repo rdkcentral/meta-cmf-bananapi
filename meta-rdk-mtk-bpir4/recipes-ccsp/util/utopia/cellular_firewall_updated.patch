@@ -1,0 +1,18 @@
+--- a/source/firewall/firewall.c	2024-10-23 05:38:28.364833637 +0000
++++ b/source/firewall/firewall.c	2024-10-18 10:08:06.156549415 +0000
+@@ -13363,6 +13363,7 @@
+ void  redirect_dns_to_extender(FILE *nat_fp,int family)
+ {
+    FIREWALL_DEBUG("Entering redirect_dns_to_extender,current_wan_ifname is %s , default wan is %s\n" COMMA current_wan_ifname COMMA default_wan_ifname);
++#if !defined(_PLATFORM_RASPBERRYPI_) && !defined(_PLATFORM_BANANAPI_R4_)
+    errno_t safec_rc = -1;
+     char* tok = NULL;
+     char net_query[MAX_QUERY] = {0};
+@@ -13455,6 +13456,7 @@
+       }
+ 
+     }
++#endif   //(_PLATFORM_RASPBERRYPI_) && (_PLATFORM_BANANAPI_R4_) 
+    FIREWALL_DEBUG("Exiting redirect_dns_to_extender\n");
+    return ;
+ }

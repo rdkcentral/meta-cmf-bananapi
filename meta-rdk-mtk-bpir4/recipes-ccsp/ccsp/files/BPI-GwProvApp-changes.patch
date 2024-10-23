@@ -1,0 +1,457 @@
+From 9144851550c8a8c497fd8c81f4b86c56bac2e53e Mon Sep 17 00:00:00 2001
+From: aishwarya_natarajan2 <aishwarya_natarajan2@comcast.com>
+Date: Wed, 9 Oct 2024 10:06:16 +0000
+Subject: [PATCH] RDKBACCL-275 :  Review generic rdk-b code and introduce
+ platform specific flags
+
+Reason for change : Changes for GwpRovApp for BananaPi R4
+Test Procedure: Build and flash the image.erouter0 should get ip
+Risks: None
+
+Change-Id: I09a1f32cbfbc3381d9a2546bc4e4cc57321bf011
+---
+ source/autowan.c                 |  2 +-
+ source/gw_prov_sm.c              | 80 ++++++++++++++++----------------
+ source/gw_prov_sm_generic.c      | 12 ++---
+ source/gw_prov_sm_generic_main.c |  2 +-
+ 4 files changed, 48 insertions(+), 48 deletions(-)
+
+diff --git a/source/autowan.c b/source/autowan.c
+index 97afb8c..8b90e45 100644
+--- a/source/autowan.c
++++ b/source/autowan.c
+@@ -942,7 +942,7 @@ CosaDmlEthWanSetEnable
+         BOOL                       bEnable
+     )
+ {
+-#if ((defined (_COSA_BCM_ARM_) && !defined(_CBR_PRODUCT_REQ_) && !defined(_PLATFORM_RASPBERRYPI_) && !defined(_PLATFORM_TURRIS_)) || defined(INTEL_PUMA7) || defined(_CBR2_PRODUCT_REQ_) || defined(_COSA_QCA_ARM_))
++#if ((defined (_COSA_BCM_ARM_) && !defined(_CBR_PRODUCT_REQ_) && !defined(_PLATFORM_RASPBERRYPI_) && !defined(_PLATFORM_TURRIS_) && !defined(_PLATFORM_BANANAPI_R4_)) || defined(INTEL_PUMA7) || defined(_CBR2_PRODUCT_REQ_) || defined(_COSA_QCA_ARM_) ) 
+ 
+ #if !defined(AUTO_WAN_ALWAYS_RECONFIG_EROUTER)
+     {
+diff --git a/source/gw_prov_sm.c b/source/gw_prov_sm.c
+index b7d56cb..a3648c7 100644
+--- a/source/gw_prov_sm.c
++++ b/source/gw_prov_sm.c
+@@ -56,7 +56,7 @@
+ #include <sys/socket.h>
+ #include <sys/stat.h>
+ #include <fcntl.h>
+-#if !defined(_PLATFORM_RASPBERRYPI_)
++#if !defined(_PLATFORM_RASPBERRYPI_) && !defined(_PLATFORM_BANANAPI_R4_)
+ #include <sys/types.h>
+ #endif
+ #include <unistd.h>
+@@ -77,7 +77,7 @@
+ #include "autowan.h"
+ #include "gw_prov_sm.h"
+ #endif
+-#if !defined(_PLATFORM_RASPBERRYPI_)
++#if !defined(_PLATFORM_RASPBERRYPI_) && !defined(_PLATFORM_BANANAPI_R4_)
+ #if !defined (_COSA_BCM_ARM_)
+ #include "docsis_esafe_db.h"
+ #endif
+@@ -104,7 +104,7 @@
+ #include "platform_hal.h"
+ #endif
+ //Added for lxcserver thread function
+-#if defined(_PLATFORM_RASPBERRYPI_)
++#if defined(_PLATFORM_RASPBERRYPI_) || defined(_PLATFORM_BANANAPI_R4_)
+ #define PORT 8081
+ #endif
+ 
+@@ -362,7 +362,7 @@ int sysevent_fd_gs;
+ token_t sysevent_token_gs;
+ #endif
+ static pthread_t sysevent_tid;
+-#if defined(_PLATFORM_RASPBERRYPI_)
++#if defined(_PLATFORM_RASPBERRYPI_) || defined(_PLATFORM_BANANAPI_R4_)
+ static pthread_t linkstate_tid;
+ static pthread_t lxcserver_tid;
+ #endif
+@@ -460,7 +460,7 @@ static int getSyseventBridgeMode(int erouterMode, int bridgeMode) {
+ }
+ 
+ 
+-#if !defined(_PLATFORM_RASPBERRYPI_)
++#if !defined(_PLATFORM_RASPBERRYPI_) && !defined(_PLATFORM_BANANAPI_R4_)
+ /**************************************************************************/
+ /*! \fn STATUS GW_TlvParserInit(void)
+  **************************************************************************
+@@ -1020,7 +1020,7 @@ static int GWP_SysCfgSetInt(const char *name, int int_value)
+    return syscfg_set_u(NULL, name, int_value);
+ }
+ 
+-#if !defined(_PLATFORM_RASPBERRYPI_)
++#if !defined(_PLATFORM_RASPBERRYPI_) && !defined(_PLATFORM_BANANAPI_R4_)
+ /**************************************************************************/
+ /*! \fn static STATUS GWP_UpdateEsafeAdminMode()
+  **************************************************************************
+@@ -1076,7 +1076,7 @@ static void validate_mode(int *bridge_mode, int *eRouterMode)
+ 	GWPROV_PRINT(" %s : bridge_mode = %d , eRouterMode = %d \n", __FUNCTION__, *bridge_mode, *eRouterMode);
+  }
+ 
+-#if !defined(_PLATFORM_RASPBERRYPI_)
++#if !defined(_PLATFORM_RASPBERRYPI_) && !defined(_PLATFORM_BANANAPI_R4_)
+ void docsis_gotEnable_callback(unsigned char state)
+ {
+ 	GWPROV_PRINT(" Entry %s , state = %d \n", __FUNCTION__, state);
+@@ -1155,7 +1155,7 @@ static void GWP_DocsisInited(void)
+ **************************************************************************/
+ static void GWP_EnableERouter(void)
+ {
+-#if !defined(_PLATFORM_RASPBERRYPI_)
++#if !defined(_PLATFORM_RASPBERRYPI_) && !defined(_PLATFORM_BANANAPI_R4_)
+ 	GWPROV_PRINT(" Entry %s \n", __FUNCTION__);
+     /* Update ESAFE state */
+     GWP_UpdateEsafeAdminMode(eRouterMode);
+@@ -1223,7 +1223,7 @@ static void GWP_EnterRouterMode(void)
+ **************************************************************************/
+ static void GWP_DisableERouter(void)
+ {
+-#if !defined(_PLATFORM_RASPBERRYPI_)
++#if !defined(_PLATFORM_RASPBERRYPI_) && !defined(_PLATFORM_BANANAPI_R4_)
+ 	GWPROV_PRINT(" Entry %s \n", __FUNCTION__);
+     /* Update ESAFE state */
+     GWP_UpdateEsafeAdminMode(eRouterMode);
+@@ -1382,7 +1382,7 @@ static void GWP_UpdateERouterMode(void)
+             }
+             else  // remain enabled, switch mode
+             {
+-#if !defined(_PLATFORM_RASPBERRYPI_)
++#if !defined(_PLATFORM_RASPBERRYPI_) && !defined(_PLATFORM_BANANAPI_R4_)
+                 /* Update ESAFE state */
+                 GWP_UpdateEsafeAdminMode(eRouterMode);
+ #endif
+@@ -1457,7 +1457,7 @@ static void GWP_ProcessUtopiaRestart(void)
+ //     }
+ }
+ 
+-#if !defined(_PLATFORM_RASPBERRYPI_)
++#if !defined(_PLATFORM_RASPBERRYPI_) && !defined(_PLATFORM_BANANAPI_R4_)
+ /**************************************************************************/
+ /*! \fn int GWP_ProcessIpv4Down();
+  **************************************************************************
+@@ -1690,7 +1690,7 @@ static void check_lan_wan_ready()
+ 		}
+ 	}
+ }
+-#if defined(_PLATFORM_RASPBERRYPI_)
++#if defined(_PLATFORM_RASPBERRYPI_) || defined(_PLATFORM_BANANAPI_R4_)
+ /**************************************************************************/
+ /*! \fn void *GWP_lxcserver_threadfunc(void *data)
+  **************************************************************************
+@@ -1920,7 +1920,7 @@ static void *GWP_sysevent_threadfunc(void *data)
+                 ERR_CHK(rc);
+                 if ((ind == 0) && (rc == EOK))
+                 {
+-#if !defined(_PLATFORM_RASPBERRYPI_)
++#if !defined(_PLATFORM_RASPBERRYPI_) && !defined(_PLATFORM_BANANAPI_R4_)
+                     GWP_ProcessIpv4Up();
+ #endif
+                 }
+@@ -1930,7 +1930,7 @@ static void *GWP_sysevent_threadfunc(void *data)
+                     ERR_CHK(rc);
+                     if ((ind == 0) && (rc == EOK))
+                     {
+-#if !defined(_PLATFORM_RASPBERRYPI_)
++#if !defined(_PLATFORM_RASPBERRYPI_) && !defined(_PLATFORM_BANANAPI_R4_)
+                          GWP_ProcessIpv4Down();
+ #endif
+                     }
+@@ -1942,7 +1942,7 @@ static void *GWP_sysevent_threadfunc(void *data)
+                 ERR_CHK(rc);
+                 if ((ind == 0) && (rc == EOK))
+                 {
+-#if !defined(_PLATFORM_RASPBERRYPI_)
++#if !defined(_PLATFORM_RASPBERRYPI_) && !defined(_PLATFORM_BANANAPI_R4_)
+                     GWP_ProcessIpv6Up();
+ #endif
+                 }
+@@ -1952,7 +1952,7 @@ static void *GWP_sysevent_threadfunc(void *data)
+                     ERR_CHK(rc);
+                     if ((ind == 0) && (rc == EOK))
+                     {
+-#if !defined(_PLATFORM_RASPBERRYPI_)
++#if !defined(_PLATFORM_RASPBERRYPI_) && !defined(_PLATFORM_BANANAPI_R4_)
+                         GWP_ProcessIpv6Down();
+ #endif
+                      }
+@@ -2151,7 +2151,7 @@ static void *GWP_sysevent_threadfunc(void *data)
+                 ERR_CHK(rc);
+                 if ((ind == 0) && (rc == EOK)){
+                     if (!webui_started) { 
+-#if defined(_PLATFORM_RASPBERRYPI_)
++#if defined(_PLATFORM_RASPBERRYPI_) || defined(_PLATFORM_BANANAPI_R4_)
+ 
+                        rc = strcmp_s("bridge-status", strlen("bridge-status"),name, &ind);
+                        ERR_CHK(rc);
+@@ -2239,7 +2239,7 @@ static void *GWP_sysevent_threadfunc(void *data)
+                 /* Coverity Issue Fix - CID:79291 : UnInitialised varible  */
+                 unsigned char soladdr[ NETUTILS_IPv6_GLOBAL_ADDR_LEN ] = {0} ;
+                 inet_pton(AF_INET6, val, v6addr);
+-#if !defined(_PLATFORM_RASPBERRYPI_)
++#if !defined(_PLATFORM_RASPBERRYPI_) && !defined(_PLATFORM_BANANAPI_R4_)
+                 getMultiCastGroupAddress(v6addr,soladdr);
+ #endif
+                 inet_ntop(AF_INET6, soladdr, val, sizeof(val));
+@@ -2451,7 +2451,7 @@ static int GWP_act_DocsisLinkUp_callback()
+ #endif
+ 
+     
+-#if defined(_PLATFORM_RASPBERRYPI_)
++#if defined(_PLATFORM_RASPBERRYPI_) || defined(_PLATFORM_BANANAPI_R4_)
+      char *temp;
+      char wanPhyName[20];
+      char out_value[20];
+@@ -2537,7 +2537,7 @@ static int GWP_act_DocsisLinkUp_callback()
+ }
+ 
+ 
+-#if defined(_PLATFORM_RASPBERRYPI_)
++#if defined(_PLATFORM_RASPBERRYPI_) || defined(_PLATFORM_BANANAPI_R4_)
+ /**************************************************************************/
+ /*! \fn void *GWP_linkstate_threadfunc(void *)
+  **************************************************************************
+@@ -2676,7 +2676,7 @@ void GWP_Util_get_shell_output( char *cmd, char *out, int len )
+ }
+ 
+ /* GWP_UpdateTr069CfgThread() */
+-#if !defined(_PLATFORM_RASPBERRYPI_)
++#if !defined(_PLATFORM_RASPBERRYPI_) && !defined(_PLATFORM_BANANAPI_R4_)
+ static void *GWP_UpdateTr069CfgThread( void *data )
+ {
+ 	int 	IsNeedtoProceedFurther    = TRUE;
+@@ -2799,7 +2799,7 @@ static void *GWP_UpdateTr069CfgThread( void *data )
+ 	return data;
+ }
+ #endif
+-#if !defined(_PLATFORM_RASPBERRYPI_)
++#if !defined(_PLATFORM_RASPBERRYPI_) && !defined(_PLATFORM_BANANAPI_R4_)
+ /**************************************************************************/
+ /*! \fn int GWP_act_DocsisCfgfile(SME_APP_T *app, SME_EVENT_T *event);
+  **************************************************************************
+@@ -3060,7 +3060,7 @@ static int GWP_act_DocsisInited_callback (void)
+ {
+     esafeErouterOperModeExtIf_e operMode;
+     //DOCSIS_Esafe_Db_Enable_e eRouterModeTmp; 
+-#if !defined(_PLATFORM_RASPBERRYPI_)
++#if !defined(_PLATFORM_RASPBERRYPI_) && !defined(_PLATFORM_BANANAPI_R4_)
+     DOCSIS_Esafe_Db_extIf_e eRouterModeTmp;
+ #endif
+     unsigned char lladdr[ NETUTILS_IPv6_GLOBAL_ADDR_LEN ] = {0};
+@@ -3070,7 +3070,7 @@ static int GWP_act_DocsisInited_callback (void)
+     /* Coverity Issue Fix - CID:73933 : UnInitialised variable */
+     char soladdrStr[64] = {0};
+     GWPROV_PRINT(" Entry %s \n", __FUNCTION__);
+-#if !defined(_PLATFORM_RASPBERRYPI_) && !defined(INTEL_PUMA7) && !defined(_COSA_BCM_ARM_) && !defined(_COSA_QCA_ARM_)
++#if !defined(_PLATFORM_RASPBERRYPI_) && !defined(INTEL_PUMA7) && !defined(_COSA_BCM_ARM_) && !defined(_COSA_QCA_ARM_) && !defined(_PLATFORM_BANANAPI_R4_)
+     /* Docsis initialized */
+     printf("Got DOCSIS Initialized\n");
+ 
+@@ -3115,7 +3115,7 @@ static int GWP_act_DocsisInited_callback (void)
+ //     }
+ #if !defined(INTEL_PUMA7) && !defined(_COSA_BCM_MIPS_) && !defined(_COSA_BCM_ARM_) && !defined(_COSA_QCA_ARM_)
+ 	printf("Not Initializing bridge_mode and eRouterMode for XB3\n");
+-#elif defined(_PLATFORM_RASPBERRYPI_)
++#elif defined(_PLATFORM_RASPBERRYPI_) || defined(_PLATFORM_BANANAPI_R4_)
+     printf("Not Initializing bridge_mode and eRouterMode for Raspberry Pi\n");
+ #else
+     bridge_mode = GWP_SysCfgGetInt("bridge_mode");
+@@ -3128,7 +3128,7 @@ static int GWP_act_DocsisInited_callback (void)
+     sysevent_set(sysevent_fd_gs, sysevent_token_gs, "bridge_mode", BridgeMode, 0);
+ #endif
+   
+-#if !defined(_PLATFORM_RASPBERRYPI_)
++#if !defined(_PLATFORM_RASPBERRYPI_) && !defined(_PLATFORM_BANANAPI_R4_)
+     GWP_DocsisInited();
+ #endif
+ 
+@@ -3145,7 +3145,7 @@ static int GWP_act_DocsisInited_callback (void)
+ #endif
+ 
+       sysevent_set(sysevent_fd_gs, sysevent_token_gs, "docsis-initialized", "1", 0);
+-#if !defined(_PLATFORM_RASPBERRYPI_)
++#if !defined(_PLATFORM_RASPBERRYPI_) && !defined(_PLATFORM_BANANAPI_R4_)
+ 
+     /* Must set the ESAFE Enable state before replying to the DocsisInit event */
+     eRouterModeTmp = eRouterMode;
+@@ -3216,7 +3216,7 @@ static int GWP_act_DocsisInited_callback (void)
+     }
+ 
+     //calculate cm base solicited node address
+-#if !defined(_PLATFORM_RASPBERRYPI_)
++#if !defined(_PLATFORM_RASPBERRYPI_) && !defined(_PLATFORM_BANANAPI_R4_)
+     getInterfaceLinkLocalAddress(IFNAME_WAN_0, lladdr);
+     
+    
+@@ -3246,7 +3246,7 @@ static int GWP_act_DocsisInited_callback (void)
+ static int GWP_act_ProvEntry_callback (void)
+ {
+     char BridgeMode[2] = {0};
+-#if defined(_PLATFORM_RASPBERRYPI_)
++#if defined(_PLATFORM_RASPBERRYPI_) || defined(_PLATFORM_BANANAPI_R4_)
+     int uid = 0;
+     uid = getuid();
+ #endif
+@@ -3254,7 +3254,7 @@ static int GWP_act_ProvEntry_callback (void)
+ #ifdef MULTILAN_FEATURE
+     macaddr_t macAddr;
+ #endif
+-#if !defined(_PLATFORM_RASPBERRYPI_)
++#if !defined(_PLATFORM_RASPBERRYPI_) && !defined(_PLATFORM_BANANAPI_R4_)
+     GWPROV_PRINT("Entry %s \n", __FUNCTION__);
+     //v_secure_system("sysevent set lan-start");
+    
+@@ -3323,7 +3323,7 @@ static int GWP_act_ProvEntry_callback (void)
+     printf("************************value of command = ifconfig %s up ***********************\n", wanPhyName);
+     v_secure_system("ifconfig %s up", wanPhyName);
+ #endif
+-#if defined(_PLATFORM_RASPBERRYPI_)
++#if defined(_PLATFORM_RASPBERRYPI_) || defined(_PLATFORM_BANANAPI_R4_)
+ if( uid == 0 )
+ {
+ #endif
+@@ -3344,20 +3344,20 @@ if( uid == 0 )
+ 	AutoWAN_main();
+ #endif
+ #endif
+-#if defined(_PLATFORM_RASPBERRYPI_)
++#if defined(_PLATFORM_RASPBERRYPI_) || defined(_PLATFORM_BANANAPI_R4_)
+ }
+ #endif      
+     //Make another connection for gets/sets
+-#if defined(_PLATFORM_RASPBERRYPI_)
++#if defined(_PLATFORM_RASPBERRYPI_) || defined(_PLATFORM_BANANAPI_R4_)
+ if ( uid == 0 )
+ {
+ #endif
+     sysevent_fd_gs = sysevent_open("127.0.0.1", SE_SERVER_WELL_KNOWN_PORT, SE_VERSION, "gw_prov-gs", &sysevent_token_gs);
+-#if defined(_PLATFORM_RASPBERRYPI_)
++#if defined(_PLATFORM_RASPBERRYPI_) || defined(_PLATFORM_BANANAPI_R4_)
+ }
+ #endif
+ // rdkb rpi container :: lxcserver funbction is needed to run in host for listening event from ccsppandm
+-#if defined(_PLATFORM_RASPBERRYPI_)
++#if defined(_PLATFORM_RASPBERRYPI_) || defined(_PLATFORM_BANANAPI_R4_)
+     if( uid == 0 )
+     {
+         //rdkb rpi container :: lxc-server thread create
+@@ -3391,14 +3391,14 @@ if ( uid == 0 )
+ 
+     /* Now that we have the ICC que (SME) and we are registered on the docsis INIT    */
+     /* event, we can notify PCD to continue                                           */
+-#if !defined(_PLATFORM_RASPBERRYPI_) && !defined(INTEL_PUMA7)
++#if !defined(_PLATFORM_RASPBERRYPI_) && !defined(INTEL_PUMA7) && !defined(_PLATFORM_BANANAPI_R4_)
+     sendProcessReadySignal();
+ #endif
+ 
+     /* Initialize Switch */
+     // VEN_SWT_InitSwitch();
+ 
+-#if defined(_PLATFORM_RASPBERRYPI_)
++#if defined(_PLATFORM_RASPBERRYPI_) || defined(_PLATFORM_BANANAPI_R4_)
+     printf("Thread to monitor link status \n");
+     pthread_create(&linkstate_tid, NULL, GWP_linkstate_threadfunc, NULL);
+ #endif
+@@ -3440,7 +3440,7 @@ if ( uid == 0 )
+     return 0;
+ }
+ 
+-#if !defined(_PLATFORM_RASPBERRYPI_)
++#if !defined(_PLATFORM_RASPBERRYPI_) && !defined(_PLATFORM_BANANAPI_R4_)
+ static int GWP_act_DocsisTftpOk_callback(){
+ 	GWPROV_PRINT(" Entry %s \n", __FUNCTION__);
+     gDocTftpOk = 1;
+@@ -3604,7 +3604,7 @@ void low_latency_docsis_status_check(void)
+  **************************************************************************/
+ int main(int argc, char *argv[])
+ {
+-#if defined(_PLATFORM_RASPBERRYPI_)
++#if defined(_PLATFORM_RASPBERRYPI_) || defined(_PLATFORM_BANANAPI_R4_)
+      int uid = 0;
+      uid = getuid();
+ #endif
+@@ -3620,7 +3620,7 @@ int main(int argc, char *argv[])
+ 
+     t2_init("ccsp-gwprovapp");
+ 
+-#if !defined(_PLATFORM_RASPBERRYPI_)
++#if !defined(_PLATFORM_RASPBERRYPI_) && !defined(_PLATFORM_BANANAPI_R4_)
+ 
+     #ifdef FEATURE_SUPPORT_RDKLOG
+        rdk_logger_init(DEBUG_INI_NAME);
+diff --git a/source/gw_prov_sm_generic.c b/source/gw_prov_sm_generic.c
+index 8aacb9d..85fb935 100644
+--- a/source/gw_prov_sm_generic.c
++++ b/source/gw_prov_sm_generic.c
+@@ -56,7 +56,7 @@
+ #include <sys/socket.h>
+ #include <sys/stat.h>
+ #include <fcntl.h>
+-#if !defined(_PLATFORM_RASPBERRYPI_)
++#if !defined(_PLATFORM_RASPBERRYPI_) && !defined(_PLATFORM_BANANAPI_R4_)
+ #include <sys/types.h>
+ #endif
+ #include <unistd.h>
+@@ -94,7 +94,7 @@
+ #include "platform_hal.h"
+ #endif
+ //Added for lxcserver thread function
+-#if defined(_PLATFORM_RASPBERRYPI_)
++#if defined(_PLATFORM_RASPBERRYPI_) || defined(_PLATFORM_BANANAPI_R4_)
+ #define PORT 8081
+ #endif
+ 
+@@ -213,7 +213,7 @@ void GWPROV_PRINT(const char *format, ...)
+ #define ETHWAN_FILE     "/nvram/ETHWAN_ENABLE"
+ #endif
+ 
+-#if !defined(_PLATFORM_RASPBERRYPI_)
++#if !defined(_PLATFORM_RASPBERRYPI_) && !defined(_PLATFORM_BANANAPI_R4_)
+ static void _get_shell_output (FILE *fp, char *buf, int len);
+ #endif
+ 
+@@ -1202,7 +1202,7 @@ static void *GWP_sysevent_threadfunc(void *data)
+                   ERR_CHK(rc);
+                   if ((ind == 0) && (rc == EOK)){
+                       if (!webui_started) { 
+-#if defined(_PLATFORM_RASPBERRYPI_)
++#if defined(_PLATFORM_RASPBERRYPI_) || defined(_PLATFORM_BANANAPI_R4_)
+                           GWPROV_PRINT(" bridge-status = %s start webgui.sh \n", val );
+                           v_secure_system("/bin/sh /etc/webgui.sh &");
+ #elif  defined(_CBR2_PRODUCT_REQ_)
+@@ -1311,7 +1311,7 @@ static void *GWP_sysevent_threadfunc(void *data)
+                   /* Coverity Issue Fix - CID:79291 : UnInitialised varible  */
+                   unsigned char soladdr[ NETUTILS_IPv6_GLOBAL_ADDR_LEN / sizeof(unsigned char) ] = {0} ;
+                   inet_pton(AF_INET6, val, v6addr);
+-#if !defined(_PLATFORM_RASPBERRYPI_)
++#if !defined(_PLATFORM_RASPBERRYPI_) && !defined(_PLATFORM_BANANAPI_R4_)
+                   getMultiCastGroupAddress(v6addr,soladdr);
+ #endif
+                   inet_ntop(AF_INET6, soladdr, val, sizeof(val));
+@@ -1586,7 +1586,7 @@ STATIC void LAN_start(void)
+    return;
+ }
+ 
+-#if !defined(_PLATFORM_RASPBERRYPI_)
++#if !defined(_PLATFORM_RASPBERRYPI_) && !defined(_PLATFORM_BANANAPI_R4_)
+ static void _get_shell_output (FILE *fp, char *buf, int len)
+ {
+     if (fp == NULL)
+diff --git a/source/gw_prov_sm_generic_main.c b/source/gw_prov_sm_generic_main.c
+index 89696b5..7d9052b 100644
+--- a/source/gw_prov_sm_generic_main.c
++++ b/source/gw_prov_sm_generic_main.c
+@@ -35,7 +35,7 @@
+ #include <sys/socket.h>
+ #include <sys/stat.h>
+ #include <fcntl.h>
+-#if !defined(_PLATFORM_RASPBERRYPI_)
++#if !defined(_PLATFORM_RASPBERRYPI_) || !defined(_PLATFORM_BANANAPI_R4_)
+ #include <sys/types.h>
+ #endif
+ #include <unistd.h>
+-- 
+2.47.0
+
