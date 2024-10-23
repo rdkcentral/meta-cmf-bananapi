@@ -1,0 +1,40 @@
+From 1fcea51f89210e2efc8a4dd1cc1cc50e7d90cfa0 Mon Sep 17 00:00:00 2001
+From: "keerthana.p" <keerthana_pandurangan@comcast.com>
+Date: Fri, 16 Aug 2024 09:27:52 +0000
+Subject: [PATCH] RDKBACCL-403,RDKBDEV-2853 : Bringup onewifi in reference
+ platform of BPI R4
+
+Reason for change:  Added Onewifi integration with BPI flags to resolve
+issues .
+Test Procedure: wifi sanity test cases(2G) are passed.
+Risks: Low
+
+Change-Id: I761a03382ea67d76fc79a62052d36d975308f2f1
+Signed-off-by: keerthana.p <keerthana_pandurangan@comcast.com>
+---
+ source/core/wifi_easy_connect.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/source/core/wifi_easy_connect.c b/source/core/wifi_easy_connect.c
+index c05ad49..8b8bfde 100644
+--- a/source/core/wifi_easy_connect.c
++++ b/source/core/wifi_easy_connect.c
+@@ -50,7 +50,7 @@
+ #include "wifi_util.h"
+ 
+ #if !defined(_BWG_PRODUCT_REQ_)
+-#if !defined(_XF3_PRODUCT_REQ_) && !defined(_CBR_PRODUCT_REQ_) && !defined(_HUB4_PRODUCT_REQ_) && !defined(_XB7_PRODUCT_REQ_) && !defined(_PLATFORM_TURRIS_) && !defined(_PLATFORM_RASPBERRYPI_) && !defined(_WNXL11BWL_PRODUCT_REQ_) && !defined(_XER5_PRODUCT_REQ_) && !defined(_SCER11BEL_PRODUCT_REQ_)
++#if !defined(_XF3_PRODUCT_REQ_) && !defined(_CBR_PRODUCT_REQ_) && !defined(_HUB4_PRODUCT_REQ_) && !defined(_XB7_PRODUCT_REQ_) && !defined(_PLATFORM_TURRIS_) && !defined(_PLATFORM_RASPBERRYPI_) && !defined(_WNXL11BWL_PRODUCT_REQ_) && !defined(_XER5_PRODUCT_REQ_) && !defined(_SCER11BEL_PRODUCT_REQ_) && !defined(_PLATFORM_BANANAPI_R4_)
+ static const char *wifi_health_log = "/rdklogs/logs/wifihealth.txt";
+ 
+ extern bool is_device_associated(int ap_index, char *mac);
+@@ -851,5 +851,5 @@ get_easy_connect_best_enrollee_channels	(unsigned int ap_index)
+     return &g_easy_connect.channels_on_ap[ap_index];
+ }
+ 
+-#endif //#if !defined(_XF3_PRODUCT_REQ_) && !defined(_CBR_PRODUCT_REQ_) && !defined(_HUB4_PRODUCT_REQ_) && !defined(_XB7_PRODUCT_REQ_) && !defined(_PLATFORM_TURRIS_) && !defined(_PLATFORM_RASPBERRYPI_) && !defined(_WNXL11BWL_PRODUCT_REQ_) && !defined(_XER5_PRODUCT_REQ_)  && !defined(_SCER11BEL_PRODUCT_REQ_)
++#endif //#if !defined(_XF3_PRODUCT_REQ_) && !defined(_CBR_PRODUCT_REQ_) && !defined(_HUB4_PRODUCT_REQ_) && !defined(_XB7_PRODUCT_REQ_) && !defined(_PLATFORM_TURRIS_) && !defined(_PLATFORM_RASPBERRYPI_) && !defined(_WNXL11BWL_PRODUCT_REQ_) && !defined(_XER5_PRODUCT_REQ_)  && !defined(_SCER11BEL_PRODUCT_REQ_) && !defined(_PLATFORM_BANANAPI_R4_)
+ #endif //#if !defined(_BWG_PRODUCT_REQ_)
+-- 
+2.25.1
+

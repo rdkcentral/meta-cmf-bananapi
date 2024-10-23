@@ -1,6 +1,19 @@
 require ccsp_common_bananapi.inc
 
-FILESEXTRAPATHS_prepend := "${THISDIR}/files:"
+FILESEXTRAPATHS_prepend := "${THISDIR}/files:${THISDIR}/${PN}:"
+
+SRC_URI += " file://0001-RDKBACCL-403-RDKBDEV-2853-Bringup-onewifi-in-referen.patch;apply=no "
+
+do_bananapi_patches() {
+    cd ${S}
+    if [ ! -e bananapi_patch_applied ]; then
+        bbnote "Patching 0001-RDKBACCL-403-RDKBDEV-2853-Bringup-onewifi-in-referen.patch"
+        patch -p1 < ${WORKDIR}/0001-RDKBACCL-403-RDKBDEV-2853-Bringup-onewifi-in-referen.patch
+    touch bananapi_patch_applied
+    fi
+}
+
+addtask bananapi_patches after do_unpack before do_compile
 
 DEPENDS_append = " mesh-agent "
 
