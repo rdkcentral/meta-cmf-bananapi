@@ -1,0 +1,221 @@
+From 9080b2f64de78f7f4e0c54090ec1b09c58889c51 Mon Sep 17 00:00:00 2001
+From: aishwarya_natarajan2 <aishwarya_natarajan2@comcast.com>
+Date: Wed, 9 Oct 2024 15:09:47 +0000
+Subject: [PATCH] RDKBACCL-275 :  Review generic rdk-b code and introduce
+ platform specific flags
+
+Reason for change : Changes for Ethagent for BananaPi R4
+Test Procedure: Build and flash the image.erouter0 should get ip
+Risks: None
+
+Change-Id: Ib70edb5ff889df18a21ae70535d37154f088da23
+Signed-off-by: aishwarya_natarajan2 <aishwarya_natarajan2@comcast.com>
+---
+ source/EthSsp/ssp_main.c                      |  2 +-
+ .../TR-181/board_sbapi/cosa_ethernet_apis.c   | 29 ++++++++++++++++---
+ .../board_sbapi/cosa_ethernet_manager.c       |  2 +-
+ .../middle_layer_src/cosa_ethernet_internal.c |  4 +--
+ .../middle_layer_src/cosa_rbus_handler_apis.c |  6 ++--
+ .../middle_layer_src/cosa_rbus_handler_apis.h |  4 +--
+ .../middle_layer_src/plugin_main_apis.c       |  2 +-
+ 7 files changed, 35 insertions(+), 14 deletions(-)
+
+diff --git a/source/EthSsp/ssp_main.c b/source/EthSsp/ssp_main.c
+index 24b265e..d2fdf66 100644
+--- a/source/EthSsp/ssp_main.c
++++ b/source/EthSsp/ssp_main.c
+@@ -52,7 +52,7 @@
+ #include <syscfg/syscfg.h>
+ #include "cap.h"
+ #include "safec_lib_common.h"
+-#if defined(_HUB4_PRODUCT_REQ_) || defined(_PLATFORM_RASPBERRYPI_)
++#if defined(_HUB4_PRODUCT_REQ_) || defined(_PLATFORM_RASPBERRYPI_) || defined(_PLATFORM_BANANAPI_R4_)
+ #include "cosa_rbus_handler_apis.h"
+ #include "cosa_apis_util.h"
+ #endif
+diff --git a/source/TR-181/board_sbapi/cosa_ethernet_apis.c b/source/TR-181/board_sbapi/cosa_ethernet_apis.c
+index b6fa3bb..00027f6 100755
+--- a/source/TR-181/board_sbapi/cosa_ethernet_apis.c
++++ b/source/TR-181/board_sbapi/cosa_ethernet_apis.c
+@@ -586,6 +586,8 @@ COSA_DML_IF_STATUS getIfStatus(const PUCHAR name, struct ifreq *pIfr)
+ #define ETHWAN_DEF_INTF_NAME "nsgmii0"
+ #elif defined (_PLATFORM_TURRIS_)
+ #define ETHWAN_DEF_INTF_NAME "eth2"
++#elif defined (_PLATFORM_BANANAPI_R4_)
++#define ETHWAN_DEF_INTF_NAME "lan0"
+ #else
+ #define ETHWAN_DEF_INTF_NAME "eth0"
+ #endif
+@@ -2751,7 +2753,8 @@ CosaDmlEthInit(
+         }
+     }
+ #else
+-    #if defined(_PLATFORM_RASPBERRYPI_) || defined(_PLATFORM_TURRIS_)
++    #if defined(_PLATFORM_RASPBERRYPI_) || defined(_PLATFORM_TURRIS_) || defined(_PLATFORM_BANANAPI_R4_)
++
+     char wanPhyName[20] = {0},out_value[20] = {0};
+ 
+     if (!syscfg_get(NULL, "wan_physical_ifname", out_value, sizeof(out_value)))
+@@ -2942,7 +2945,11 @@ CosaDmlEthPortInit(
+         pETHlinkTemp[iLoopCount].LinkStatus = ETH_LINK_STATUS_DOWN;
+         pETHlinkTemp[iLoopCount].ulInstanceNumber = iLoopCount + 1;
+         // Get  Name.
+-        snprintf(pETHlinkTemp[iLoopCount].Name, sizeof(pETHlinkTemp[iLoopCount].Name), "eth%d", iLoopCount);
++	#if defined (_PLATFORM_BANANAPI_R4_)
++		snprintf(pETHlinkTemp[iLoopCount].Name, sizeof(pETHlinkTemp[iLoopCount].Name), "lan%d", iLoopCount);
++	#else	
++                snprintf(pETHlinkTemp[iLoopCount].Name, sizeof(pETHlinkTemp[iLoopCount].Name), "eth%d", iLoopCount);
++	#endif		
+         snprintf(pETHlinkTemp[iLoopCount].Path, sizeof(pETHlinkTemp[iLoopCount].Path), "%s%d", ETHERNET_IF_PATH, iLoopCount + 1);
+         pETHlinkTemp[iLoopCount].Upstream = FALSE;
+         pETHlinkTemp[iLoopCount].WanValidated = FALSE;
+@@ -3022,6 +3029,9 @@ CosaDmlEthPortInit(
+                 snprintf(pETHTemp->Name, sizeof(pETHTemp->Name), "sw_%d", iLoopCount + 1);
+             }
+             CcspTraceWarning(("\n ifname copied %s index %d\n",pETHTemp->Name,iLoopCount));
++#elif defined (_PLATFORM_BANANAPI_R4_)	    
++
++	    snprintf(pETHTemp->Name, sizeof(pETHTemp->Name), "lan%d", iLoopCount);
+ #else
+             // Generate Name.
+             snprintf(pETHTemp->Name, sizeof(pETHTemp->Name), "eth%d", iLoopCount);
+@@ -3118,7 +3128,11 @@ ANSC_STATUS CosDmlEthPortUpdateGlobalInfo(PANSC_HANDLE phContext, char *ifname,
+         gpstEthGInfo[newIndex].LinkStatus = ETH_LINK_STATUS_DOWN;
+         gpstEthGInfo[newIndex].WanValidated = TRUE; //Make default as True.
+         gpstEthGInfo[newIndex].Enable = FALSE; //Make default as False.
+-        snprintf(gpstEthGInfo[newIndex].Name, sizeof(gpstEthGInfo[newIndex].Name), "eth%d", newIndex);
++        #if defined(_PLATFORM_BANANAPI_R4_)
++		snprintf(gpstEthGInfo[newIndex].Name, sizeof(gpstEthGInfo[newIndex].Name), "lan%d", newIndex);
++        #else	
++        	snprintf(gpstEthGInfo[newIndex].Name, sizeof(gpstEthGInfo[newIndex].Name), "eth%d", newIndex);
++	#endif		
+         snprintf(gpstEthGInfo[newIndex].Path, sizeof(gpstEthGInfo[newIndex].Path), "%s%d", ETHERNET_IF_PATH, newIndex + 1 );
+         snprintf(gpstEthGInfo[newIndex].LowerLayers, sizeof(gpstEthGInfo[newIndex].LowerLayers), "%s%d", ETHERNET_IF_LOWERLAYERS, newIndex + 1 );
+         pthread_mutex_unlock(&gmEthGInfo_mutex);
+@@ -3256,7 +3270,12 @@ ANSC_STATUS CosaDmlEthGetPortCfg(INT nIndex, PCOSA_DML_ETH_PORT_CONFIG pEthLink)
+         pEthLink->WanStatus = wan_status;
+     }
+ 
+-    snprintf(pEthLink->Name, sizeof(pEthLink->Name), "eth%d", nIndex);
++#if defined(_PLATFORM_BANANAPI_R4_)
++    	 snprintf(pEthLink->Name, sizeof(pEthLink->Name), "lan%d", nIndex);
++#else	 
++
++    	 snprintf(pEthLink->Name, sizeof(pEthLink->Name), "eth%d", nIndex);
++#endif	 
+ #else
+     UNREFERENCED_PARAMETER(nIndex);
+     UNREFERENCED_PARAMETER(pEthLink);
+@@ -3724,6 +3743,8 @@ static ANSC_STATUS CosDmlEthPortPrepareGlobalInfo()
+                 snprintf(gpstEthGInfo[iLoopCount].Name, sizeof(gpstEthGInfo[iLoopCount].Name), "sw_%d", iLoopCount+1);
+             }
+             CcspTraceWarning(("\n ifname copied %s index %d\n",gpstEthGInfo[iLoopCount].Name,iLoopCount));
++#elif defined (_PLATFORM_BANANAPI_R4_)
++	    snprintf(gpstEthGInfo[iLoopCount].Name, sizeof(gpstEthGInfo[iLoopCount].Name), "lan%d", iLoopCount);
+ #else
+             snprintf(gpstEthGInfo[iLoopCount].Name, sizeof(gpstEthGInfo[iLoopCount].Name), "eth%d", iLoopCount);
+ #endif
+diff --git a/source/TR-181/board_sbapi/cosa_ethernet_manager.c b/source/TR-181/board_sbapi/cosa_ethernet_manager.c
+index 7274316..fe97d7f 100644
+--- a/source/TR-181/board_sbapi/cosa_ethernet_manager.c
++++ b/source/TR-181/board_sbapi/cosa_ethernet_manager.c
+@@ -375,7 +375,7 @@ static ethSmState_t Transition_EthWanLinkFound(PETH_SM_PRIVATE_INFO pstInfo)
+ #if defined(FEATURE_RDKB_WAN_AGENT)
+     if (ANSC_STATUS_SUCCESS != CosaDmlEthCreateEthLink(pstInfo->Name, stGlobalInfo.Path))
+ #elif defined(FEATURE_RDKB_WAN_MANAGER)
+-    #if defined(_PLATFORM_RASPBERRYPI_) || defined(_PLATFORM_TURRIS_)    
++    #if defined(_PLATFORM_RASPBERRYPI_) || defined(_PLATFORM_TURRIS_) || defined(_PLATFORM_BANANAPI_R4_)
+     CHAR wanPhyName[20] = {0},out_value[20] = {0};
+     if (!syscfg_get(NULL, "wan_physical_ifname", out_value, sizeof(out_value)))
+     {
+diff --git a/source/TR-181/middle_layer_src/cosa_ethernet_internal.c b/source/TR-181/middle_layer_src/cosa_ethernet_internal.c
+index e9ea8ad..9adef2b 100644
+--- a/source/TR-181/middle_layer_src/cosa_ethernet_internal.c
++++ b/source/TR-181/middle_layer_src/cosa_ethernet_internal.c
+@@ -83,7 +83,7 @@
+ #endif
+ #endif //#if defined (FEATURE_RDKB_WAN_MANAGER)
+ 
+-#if defined (WAN_FAILOVER_SUPPORTED)  ||  defined(RBUS_BUILD_FLAG_ENABLE) || defined (_HUB4_PRODUCT_REQ_) || defined(_PLATFORM_RASPBERRYPI_)
++#if defined (WAN_FAILOVER_SUPPORTED)  ||  defined(RBUS_BUILD_FLAG_ENABLE) || defined (_HUB4_PRODUCT_REQ_) || defined(_PLATFORM_RASPBERRYPI_) || defined(_PLATFORM_BANANAPI_R4_)
+ #include "cosa_rbus_handler_apis.h"
+ #endif
+ 
+@@ -370,7 +370,7 @@ CosaEthernetInitialize
+ 
+ #if defined(FEATURE_RDKB_WAN_MANAGER)
+ 
+-#if defined (WAN_FAILOVER_SUPPORTED) || defined(RBUS_BUILD_FLAG_ENABLE) || defined (_HUB4_PRODUCT_REQ_) || defined(_PLATFORM_RASPBERRYPI_)
++#if defined (WAN_FAILOVER_SUPPORTED) || defined(RBUS_BUILD_FLAG_ENABLE) || defined (_HUB4_PRODUCT_REQ_) || defined(_PLATFORM_RASPBERRYPI_) || defined(_PLATFORM_BANANAPI_R4_)
+ 	ethAgentRbusInit();
+ #endif
+ 
+diff --git a/source/TR-181/middle_layer_src/cosa_rbus_handler_apis.c b/source/TR-181/middle_layer_src/cosa_rbus_handler_apis.c
+index d592618..b26c67b 100644
+--- a/source/TR-181/middle_layer_src/cosa_rbus_handler_apis.c
++++ b/source/TR-181/middle_layer_src/cosa_rbus_handler_apis.c
+@@ -23,7 +23,7 @@
+ #include "ccsp_trace.h"
+ #include "cosa_rbus_handler_apis.h"
+ 
+-#if  defined  (WAN_FAILOVER_SUPPORTED) ||  defined(RBUS_BUILD_FLAG_ENABLE) || defined (_HUB4_PRODUCT_REQ_) || defined (_PLATFORM_RASPBERRYPI_)
++#if  defined  (WAN_FAILOVER_SUPPORTED) ||  defined(RBUS_BUILD_FLAG_ENABLE) || defined (_HUB4_PRODUCT_REQ_) || defined (_PLATFORM_RASPBERRYPI_) ||  defined(_PLATFORM_BANANAPI_R4_)
+ rbusHandle_t handle;
+ #endif
+ 
+@@ -187,7 +187,7 @@ void publishEWanLinkStatus(bool link_status)
+ }
+ #endif //WAN_FAILOVER_SUPPORTED
+ 
+-#if defined (_HUB4_PRODUCT_REQ_) || defined (_PLATFORM_RASPBERRYPI_)
++#if defined (_HUB4_PRODUCT_REQ_) || defined (_PLATFORM_RASPBERRYPI_) ||  defined(_PLATFORM_BANANAPI_R4_)
+ BOOL EthAgent_Rbus_discover_components(char const *pModuleList)
+ {
+     rbusError_t rc = RBUS_ERROR_SUCCESS;
+@@ -245,7 +245,7 @@ BOOL EthAgent_Rbus_discover_components(char const *pModuleList)
+ 
+ #endif //_HUB4_PRODUCT_REQ_
+ 
+-#if  defined  (WAN_FAILOVER_SUPPORTED) ||  defined(RBUS_BUILD_FLAG_ENABLE) || defined (_HUB4_PRODUCT_REQ_) || defined(_PLATFORM_RASPBERRYPI_)
++#if  defined  (WAN_FAILOVER_SUPPORTED) ||  defined(RBUS_BUILD_FLAG_ENABLE) || defined (_HUB4_PRODUCT_REQ_) || defined(_PLATFORM_RASPBERRYPI_) ||  defined(_PLATFORM_BANANAPI_R4_)
+ /***********************************************************************
+ 
+   ethAgentRbusInit(): Initialize Rbus and data elements
+diff --git a/source/TR-181/middle_layer_src/cosa_rbus_handler_apis.h b/source/TR-181/middle_layer_src/cosa_rbus_handler_apis.h
+index 1e1257a..35b89fa 100644
+--- a/source/TR-181/middle_layer_src/cosa_rbus_handler_apis.h
++++ b/source/TR-181/middle_layer_src/cosa_rbus_handler_apis.h
+@@ -20,7 +20,7 @@
+ #ifndef  RBUS_HANDLER_APIS_H
+ #define  RBUS_HANDLER_APIS_H
+ 
+-#if defined (WAN_FAILOVER_SUPPORTED) ||  defined(RBUS_BUILD_FLAG_ENABLE) || defined (_HUB4_PRODUCT_REQ_) || defined (_PLATFORM_RASPBERRYPI_)
++#if defined (WAN_FAILOVER_SUPPORTED) ||  defined(RBUS_BUILD_FLAG_ENABLE) || defined (_HUB4_PRODUCT_REQ_) || defined (_PLATFORM_RASPBERRYPI_) ||  defined(_PLATFORM_BANANAPI_R4_)
+ #include <stdbool.h>
+ #include <rbus/rbus.h>
+ 
+@@ -49,7 +49,7 @@ void publishEWanLinkStatus(bool link_status);
+ 
+ #endif //WAN_FAILOVER_SUPPORTED
+ rbusError_t ethAgentRbusInit();
+-#if defined (_HUB4_PRODUCT_REQ_) || defined (_PLATFORM_RASPBERRYPI_)
++#if defined (_HUB4_PRODUCT_REQ_) || defined (_PLATFORM_RASPBERRYPI_) ||  defined(_PLATFORM_BANANAPI_R4_)
+ BOOL EthAgent_Rbus_discover_components(char const *pModuleList);
+ #endif //_HUB4_PRODUCT_REQ_
+ #endif // WAN_FAILOVER_SUPPORTED RBUS_BUILD_FLAG_ENABLE _HUB4_PRODUCT_REQ_
+diff --git a/source/TR-181/middle_layer_src/plugin_main_apis.c b/source/TR-181/middle_layer_src/plugin_main_apis.c
+index 2dc30da..9961260 100644
+--- a/source/TR-181/middle_layer_src/plugin_main_apis.c
++++ b/source/TR-181/middle_layer_src/plugin_main_apis.c
+@@ -73,7 +73,7 @@
+ #include "cosa_common_util.h"
+ #endif
+ 
+-#if defined(_PLATFORM_RASPBERRYPI_)
++#if defined(_PLATFORM_RASPBERRYPI_) || defined(_PLATFORM_BANANAPI_R4_)
+ extern int sock;
+ #endif
+ 
+-- 
+2.47.0
+

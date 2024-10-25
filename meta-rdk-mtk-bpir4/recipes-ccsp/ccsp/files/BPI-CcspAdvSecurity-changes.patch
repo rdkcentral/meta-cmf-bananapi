@@ -1,0 +1,32 @@
+From 49cc24ad50be159b69b8cf463510c7f672086807 Mon Sep 17 00:00:00 2001
+From: aishwarya_natarajan2 <aishwarya_natarajan2@comcast.com>
+Date: Tue, 13 Aug 2024 10:33:57 +0000
+Subject: [PATCH] RDKBACCL-275 :  Review generic rdk-b code and introduce
+ platform specific flags
+
+Reason for change : Changes for PandM
+Test Procedure: Build and flash the image.erouter0 should get ip
+Risks: None
+
+Change-Id: I5c025e1bd53a9633451dbce10fd6721b874c3990
+Signed-off-by: aishwarya_natarajan2 <aishwarya_natarajan2@comcast.com>
+---
+ source/AdvSecurityDml/cosa_adv_security_internal.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/source/AdvSecurityDml/cosa_adv_security_internal.c b/source/AdvSecurityDml/cosa_adv_security_internal.c
+index da74bc8..aaf057c 100644
+--- a/source/AdvSecurityDml/cosa_adv_security_internal.c
++++ b/source/AdvSecurityDml/cosa_adv_security_internal.c
+@@ -101,7 +101,7 @@
+ 
+ #define NUM_SYSEVENT_TYPES (sizeof(advSysEvent_type_table)/sizeof(advSysEvent_type_table[0]))
+ 
+-#if defined(_PLATFORM_RASPBERRYPI_) || defined(_PLATFORM_TURRIS_) || defined(_XER5_PRODUCT_REQ_)
++#if defined(_PLATFORM_RASPBERRYPI_) || defined(_PLATFORM_TURRIS_) || defined(_XER5_PRODUCT_REQ_) || defined(_PLATFORM_BANANAPI_R4_)
+ #include "ccsp_vendor.h"
+ #endif
+ 
+-- 
+2.47.0
+

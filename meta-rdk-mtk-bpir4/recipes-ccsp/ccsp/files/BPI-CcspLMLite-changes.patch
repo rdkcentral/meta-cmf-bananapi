@@ -1,0 +1,32 @@
+From 04e7e0b27f636fb1a74bc2c205df0a4d65f75c39 Mon Sep 17 00:00:00 2001
+From: aishwarya_natarajan2 <aishwarya_natarajan2@comcast.com>
+Date: Wed, 14 Aug 2024 07:22:25 +0000
+Subject: [PATCH] RDKBACCL-275 :  Review generic rdk-b code and introduce
+ platform specific flags
+
+Reason for change : Changes for PandM
+Test Procedure: Build and flash the image.erouter0 should get ip
+Risks: None
+
+Change-Id: I3273cc719b58c12cc85755810ac68ee7148994d6
+Signed-off-by: aishwarya_natarajan2 <aishwarya_natarajan2@comcast.com>
+---
+ source/lm/lm_main.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/source/lm/lm_main.c b/source/lm/lm_main.c
+index f3b3093..a007d3e 100644
+--- a/source/lm/lm_main.c
++++ b/source/lm/lm_main.c
+@@ -2726,7 +2726,7 @@ static void *Hosts_StatSyncThreadFunc(void *args)
+         }
+         else
+         {
+-#if !defined(_PLATFORM_RASPBERRYPI_) && !defined(_PLATFORM_TURRIS_)
++#if !defined(_PLATFORM_RASPBERRYPI_) && !defined(_PLATFORM_TURRIS_) && !defined(_PLATFORM_BANANAPI_R4_)
+             if(bridgemode)
+             {
+                 Send_Eth_Host_Sync_Req(); 
+-- 
+2.47.0
+

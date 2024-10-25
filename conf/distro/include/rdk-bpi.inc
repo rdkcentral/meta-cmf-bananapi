@@ -13,7 +13,7 @@ DISTRO_FEATURES_append = " halVersion3"
 DISTRO_FEATURES_append = " HOSTAPD_2_10"
 
 # OneWifi feature
-#DISTRO_FEATURES_append = " OneWifi"
+DISTRO_FEATURES_append = " OneWifi"
 
 # MacFilter Feature
 DISTRO_FEATURES_append = " acl_nl_support"

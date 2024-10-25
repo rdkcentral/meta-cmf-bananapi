@@ -1,0 +1,290 @@
+From c1b427719825394547806d0bc091687df9bccc8d Mon Sep 17 00:00:00 2001
+From: aishwarya_natarajan2 <aishwarya_natarajan2@comcast.com>
+Date: Wed, 9 Oct 2024 09:47:03 +0000
+Subject: [PATCH] RDKBACCL-275 :  Review generic rdk-b code and introduce
+ platform specific flags
+
+Reason for change : Changes for PandM for BananaPiR4
+Test Procedure: Build and flash the image.erouter0 should get ip
+Risks: None
+
+Change-Id: I12705a7bb377bd390aa8ffff265e88c92ffa2ea8
+---
+ .../custom_ml/cosa_deviceinfo_dml_custom.c     |  6 +++---
+ .../TR-181/board_sbapi/cosa_deviceinfo_apis.c  | 12 +++++++++---
+ source-arm/TR-181/board_sbapi/cosa_ip_apis.c   |  2 ++
+ .../TR-181/board_sbapi/cosa_users_apis.c       |  4 ++--
+ source/PandMSsp/ssp_main.c                     |  8 ++++----
+ .../middle_layer_src/cosa_deviceinfo_dml.c     | 18 +++++++++---------
+ .../middle_layer_src/cosa_users_internal.c     |  2 +-
+ .../cosa_x_cisco_com_devicecontrol_dml.c       |  2 +-
+ 8 files changed, 31 insertions(+), 23 deletions(-)
+
+diff --git a/custom/comcast/source/TR-181/custom_ml/cosa_deviceinfo_dml_custom.c b/custom/comcast/source/TR-181/custom_ml/cosa_deviceinfo_dml_custom.c
+index 2504dd67..88e337b1 100644
+--- a/custom/comcast/source/TR-181/custom_ml/cosa_deviceinfo_dml_custom.c
++++ b/custom/comcast/source/TR-181/custom_ml/cosa_deviceinfo_dml_custom.c
+@@ -340,7 +340,7 @@ DeviceInfo_GetParamStringValue_Custom
+ 
+ 	if (strcmp(ParamName, "X_COMCAST-COM_MTA_MAC") == 0)
+ 	{
+-#if !defined(_PLATFORM_RASPBERRYPI_) && !defined(_PLATFORM_TURRIS_)
++#if !defined(_PLATFORM_RASPBERRYPI_) && !defined(_PLATFORM_TURRIS_) && !defined(_PLATFORM_BANANAPI_R4_)
+   	   CosaDmlDiGetMTAMacAddress(NULL, pValue,pulSize);
+ #endif
+ 	   return 0;
+@@ -383,7 +383,7 @@ DeviceInfo_GetParamStringValue_Custom
+ 
+ 	if (strcmp(ParamName, "X_COMCAST-COM_MTA_IP") == 0)
+ 	{
+-#if !defined(_PLATFORM_RASPBERRYPI_) && !defined(_PLATFORM_TURRIS_)
++#if !defined(_PLATFORM_RASPBERRYPI_) && !defined(_PLATFORM_TURRIS_) && !defined(_PLATFORM_BANANAPI_R4_)
+    	   CosaDmlDiGetMTAIPAddress(NULL, pValue,pulSize);
+ #endif
+ 	   return 0;
+@@ -391,7 +391,7 @@ DeviceInfo_GetParamStringValue_Custom
+ 
+ 	if (strcmp(ParamName, "X_COMCAST-COM_MTA_IPV6") == 0)
+ 	{
+-#if !defined(_PLATFORM_RASPBERRYPI_)
++#if !defined(_PLATFORM_RASPBERRYPI_) && !defined(_PLATFORM_BANANAPI_R4_)
+    	   CosaDmlDiGetMTAIPV6Address(NULL, pValue,pulSize);
+ #endif
+ 	   return 0;
+diff --git a/source-arm/TR-181/board_sbapi/cosa_deviceinfo_apis.c b/source-arm/TR-181/board_sbapi/cosa_deviceinfo_apis.c
+index a02a4fd6..e99079a8 100644
+--- a/source-arm/TR-181/board_sbapi/cosa_deviceinfo_apis.c
++++ b/source-arm/TR-181/board_sbapi/cosa_deviceinfo_apis.c
+@@ -123,6 +123,12 @@ static int writeToJson(char *data, char *file);
+ #include "ccsp_vendor.h"
+ #endif
+ 
++#ifdef _PLATFORM_BANANAPI_R4_
++#include "ccsp_vendor.h"
++#endif
++
++
++
+ #ifdef _COSA_SIM_
+ 
+ #elif defined(_COSA_INTEL_USG_ARM_) || defined(_COSA_BCM_ARM_) || defined(_COSA_BCM_MIPS_) || defined(_PLATFORM_IPQ_) || defined(_XER5_PRODUCT_REQ_)
+@@ -1351,7 +1357,7 @@ isValidInput
+   return returnStatus;
+ }
+ /* Maitenance window can be customized for bci routers */
+-#if defined(_COSA_BCM_MIPS_) || defined(_PLATFORM_RASPBERRYPI_)
++#if defined(_COSA_BCM_MIPS_) || defined(_PLATFORM_RASPBERRYPI_) || defined(_PLATFORM_BANANAPI_R4_)
+ ANSC_STATUS
+ CosaDmlDiGetFirmwareUpgradeStartTime
+     (
+@@ -1441,7 +1447,7 @@ CosaDmlDiGetFirmwareUpgradeStartTime
+ }
+ #endif
+ 
+-#if defined(_COSA_BCM_MIPS_) || defined(_PLATFORM_RASPBERRYPI_)
++#if defined(_COSA_BCM_MIPS_) || defined(_PLATFORM_RASPBERRYPI_) || defined(_PLATFORM_BANANAPI_R4_)
+ ANSC_STATUS
+ CosaDmlDiGetFirmwareUpgradeEndTime
+     (
+@@ -4003,7 +4009,7 @@ void FillPartnerIDValues(cJSON *json , char *partnerID , PCOSA_DATAMODEL_RDKB_UI
+ 					v_secure_system("sh /lib/rdk/wan_ssh.sh disable &");
+ 				}
+ 
+-#if defined(_COSA_BCM_ARM_) && !defined(_CBR_PRODUCT_REQ_) && !defined(_PLATFORM_RASPBERRYPI_) && !defined(_ENABLE_DSL_SUPPORT_)
++#if defined(_COSA_BCM_ARM_) && !defined(_CBR_PRODUCT_REQ_) && !defined(_PLATFORM_RASPBERRYPI_) && !defined(_ENABLE_DSL_SUPPORT_) && !defined(_PLATFORM_BANANAPI_R4_)
+                                 paramObjVal = cJSON_GetObjectItem(cJSON_GetObjectItem( partnerObj, "Device.DeviceInfo.X_RDKCENTRAL-COM_Syndication.CMVoiceImageSelect"), "ActiveValue");
+                                 if ( paramObjVal != NULL )
+                                 {
+diff --git a/source-arm/TR-181/board_sbapi/cosa_ip_apis.c b/source-arm/TR-181/board_sbapi/cosa_ip_apis.c
+index b4669693..0a92b26b 100644
+--- a/source-arm/TR-181/board_sbapi/cosa_ip_apis.c
++++ b/source-arm/TR-181/board_sbapi/cosa_ip_apis.c
+@@ -337,10 +337,12 @@ static USG_IF_CFG_T g_usg_if_cfg[] =
+ #if defined(_COSA_INTEL_USG_ARM_) && !defined(_ENABLE_DSL_SUPPORT_)
+ #ifndef _PLATFORM_RASPBERRYPI_
+ #ifndef _PLATFORM_TURRIS_
++#ifndef _PLATFORM_BANANAPI_R4_    
+     {"wan0",        COSA_DML_LINK_TYPE_DOCSIS,  TRUE},  /*DH  wan0 should never appear here -- CM extensions are for DOCSIS interfaces */
+ #endif
+ #endif
+ #endif
++#endif      
+     {"lo",          COSA_DML_LINK_TYPE_EthLink, FALSE}, /*DH  change the value of gDmsbIpIfLoopbackInstNum too, if "lo" is moved to a different location */
+     /*
+      *  Multi-LAN -- still have to keep primary LAN interface for IPv6 settings -- overlapping with MLAN configuration
+diff --git a/source-arm/TR-181/board_sbapi/cosa_users_apis.c b/source-arm/TR-181/board_sbapi/cosa_users_apis.c
+index 01bb7cfd..4f29e592 100644
+--- a/source-arm/TR-181/board_sbapi/cosa_users_apis.c
++++ b/source-arm/TR-181/board_sbapi/cosa_users_apis.c
+@@ -570,7 +570,7 @@ user_validatepwd
+ 
+    if(fromDB[0] == '\0')
+    {
+-#if defined(_HUB4_PRODUCT_REQ_) || defined(_PLATFORM_RASPBERRYPI_) || defined(_PLATFORM_TURRIS_)
++#if defined(_HUB4_PRODUCT_REQ_) || defined(_PLATFORM_RASPBERRYPI_) || defined(_PLATFORM_TURRIS_) || defined(_PLATFORM_BANANAPI_R4_)
+          user_hashandsavepwd(hContext,pEntry->Password,pEntry);
+ #else
+          FILE *fptr;
+@@ -719,7 +719,7 @@ CosaDmlUserResetPassword
+ 
+    if(!strcmp(pEntry->Username,"admin"))
+    {
+-#if defined(_HUB4_PRODUCT_REQ_) || defined(_PLATFORM_RASPBERRYPI_) || defined(_PLATFORM_TURRIS_)
++#if defined(_HUB4_PRODUCT_REQ_) || defined(_PLATFORM_RASPBERRYPI_) || defined(_PLATFORM_TURRIS_)  || defined(_PLATFORM_BANANAPI_R4_)
+          //TODO: Avoid the hardcoded password.        
+          errno_t safec_rc = -1;
+          safec_rc = strcpy_s(defPassword,sizeof(defPassword),"password");
+diff --git a/source/PandMSsp/ssp_main.c b/source/PandMSsp/ssp_main.c
+index 03e3fc0f..e6653587 100644
+--- a/source/PandMSsp/ssp_main.c
++++ b/source/PandMSsp/ssp_main.c
+@@ -59,7 +59,7 @@
+ #include <semaphore.h>
+ #include <fcntl.h>
+ 
+-#if defined(_PLATFORM_RASPBERRYPI_)
++#if defined(_PLATFORM_RASPBERRYPI_) || defined(_PLATFORM_BANANAPI_R4_)
+ #include <stdio.h>
+ #include <sys/socket.h>
+ #include <stdlib.h>
+@@ -477,7 +477,7 @@ static int is_core_dump_opened(void)
+ }
+ #endif
+ 
+-#if defined(_PLATFORM_RASPBERRYPI_)
++#if defined(_PLATFORM_RASPBERRYPI_) || defined(_PLATFORM_BANANAPI_R4_)
+ int sock = 0;
+ #endif
+ 
+@@ -506,7 +506,7 @@ int main(int argc, char* argv[])
+     RDK_LOGGER_INIT();
+ #endif
+ 
+-#if defined(_PLATFORM_RASPBERRYPI_)
++#if defined(_PLATFORM_RASPBERRYPI_) || defined(_PLATFORM_BANANAPI_R4_)
+ 	int id=0;
+ 	id=getuid();
+ #endif
+@@ -531,7 +531,7 @@ int main(int argc, char* argv[])
+     pComponentName = gpPnmStartCfg->ComponentName;
+ 
+ //REFPLTV-5 : RDKB Container lxcclient code to send events from pandm to host
+-#if defined(_PLATFORM_RASPBERRYPI_)
++#if defined(_PLATFORM_RASPBERRYPI_) || defined(_PLATFORM_BANANAPI_R4_)
+ if(id != 0)
+ {
+     struct sockaddr_in serv_addr;
+diff --git a/source/TR-181/middle_layer_src/cosa_deviceinfo_dml.c b/source/TR-181/middle_layer_src/cosa_deviceinfo_dml.c
+index 9f9b9483..3ddf933d 100644
+--- a/source/TR-181/middle_layer_src/cosa_deviceinfo_dml.c
++++ b/source/TR-181/middle_layer_src/cosa_deviceinfo_dml.c
+@@ -96,7 +96,7 @@
+ #include "cm_hal_oem.h"
+ #endif
+ 
+-#if defined(_PLATFORM_RASPBERRYPI_)
++#if defined(_PLATFORM_RASPBERRYPI_) || defined(_PLATFORM_BANANAPI_R4_)
+ #include <unistd.h>
+ #include <sys/types.h>
+ #endif
+@@ -206,7 +206,7 @@ static const char *atomIp = ATOM_IP;
+     #define BLOCKLIST_FILE "/opt/secure/Blocklist_file.txt"
+ #endif
+ 
+-#if defined(_PLATFORM_RASPBERRYPI_)
++#if defined(_PLATFORM_RASPBERRYPI_) || defined(_PLATFORM_BANANAPI_R4_)
+ int sock;
+ int id = 0;
+ #endif
+@@ -1158,7 +1158,7 @@ DeviceInfo_SetParamBoolValue
+ {
+     PCOSA_DATAMODEL_DEVICEINFO      pMyObject = (PCOSA_DATAMODEL_DEVICEINFO)g_pCosaBEManager->hDeviceInfo;
+     BOOL                            bReturnValue;
+-#if defined(_PLATFORM_RASPBERRYPI_)
++#if defined(_PLATFORM_RASPBERRYPI_) || defined(_PLATFORM_BANANAPI_R4_)
+     id =getuid();    
+ #endif
+     
+@@ -1180,7 +1180,7 @@ DeviceInfo_SetParamBoolValue
+         {
+ 		/* Restart Firewall */
+ 		v_secure_system("sysevent set firewall-restart");
+-#if defined(_PLATFORM_RASPBERRYPI_)
++#if defined(_PLATFORM_RASPBERRYPI_) || defined(_PLATFORM_BANANAPI_R4_)
+                if(id!=0)
+                {
+                        char *lxcevt = "sysevent set firewall-restart";
+@@ -7846,7 +7846,7 @@ Iot_SetParamBoolValue
+     /* check the parameter name and set the corresponding value */
+     if (strcmp(ParamName, "X_RDKCENTRAL-COM_ENABLEIOT") == 0)
+     {
+-#if defined(_PLATFORM_RASPBERRYPI_)
++#if defined(_PLATFORM_RASPBERRYPI_) || defined(_PLATFORM_BANANAPI_R4_)
+        id=getuid();
+ #endif
+ 
+@@ -7859,7 +7859,7 @@ Iot_SetParamBoolValue
+                 if(bValue){
+                    AnscTraceWarning(("IOT_LOG : Raise IOT event up from DML\n"));
+                    v_secure_system("sysevent set iot_status up");
+-#if defined(_PLATFORM_RASPBERRYPI_)
++#if defined(_PLATFORM_RASPBERRYPI_) || defined(_PLATFORM_BANANAPI_R4_)
+                if(id!=0)
+                {
+                  char *lxcevt = "sysevent set iot_status up";
+@@ -7870,7 +7870,7 @@ Iot_SetParamBoolValue
+                 else{
+                    AnscTraceWarning(("IOT_LOG : Raise IOT event down from DML\n"));
+                    v_secure_system("sysevent set iot_status down");
+-#if defined(_PLATFORM_RASPBERRYPI_)
++#if defined(_PLATFORM_RASPBERRYPI_) || defined(_PLATFORM_BANANAPI_R4_)
+                 if(id!=0)
+                  {
+                    char *lxcevt = "sysevent set iot_status down";
+@@ -11863,7 +11863,7 @@ AllowOpenPorts_SetParamBoolValue
+ 
+             // restart firewall
+             v_secure_system("sysevent set firewall-restart");
+-#if defined(_PLATFORM_RASPBERRYPI_)
++#if defined(_PLATFORM_RASPBERRYPI_) || defined(_PLATFORM_BANANAPI_R4_)
+       if(id!=0)
+        {
+ 		   char *lxcevt = "sysevent set firewall-restart";
+@@ -23940,7 +23940,7 @@ SelfHeal_SetParamUlongValue
+ 	    AnscTraceWarning(("Minimum interval is 2 for %s !\n", ParamName));
+ 	    return FALSE;
+ 	}
+-#if defined(_ARRIS_XB6_PRODUCT_REQ_) || defined(_CBR_PRODUCT_REQ_) || defined(_PLATFORM_RASPBERRYPI_) || defined(_PLATFORM_TURRIS_) || \
++#if defined(_ARRIS_XB6_PRODUCT_REQ_) || defined(_CBR_PRODUCT_REQ_) || defined(_PLATFORM_RASPBERRYPI_) || defined(_PLATFORM_TURRIS_) || defined(_PLATFORM_BANANAPI_R4_) || \
+ (defined(_XB6_PRODUCT_REQ_) && defined(_COSA_BCM_ARM_))
+ 	syscfg_get( NULL, "resource_monitor_interval", buf, sizeof(buf));
+         if( 0 == strlen(buf) )
+diff --git a/source/TR-181/middle_layer_src/cosa_users_internal.c b/source/TR-181/middle_layer_src/cosa_users_internal.c
+index 99a47045..4a62d9bf 100644
+--- a/source/TR-181/middle_layer_src/cosa_users_internal.c
++++ b/source/TR-181/middle_layer_src/cosa_users_internal.c
+@@ -171,7 +171,7 @@ CosaUsersInitialize
+     errno_t safec_rc = -1;
+     int res;
+     
+-    #if defined(_HUB4_PRODUCT_REQ_) || defined(_PLATFORM_RASPBERRYPI_) || defined(_PLATFORM_TURRIS_)
++    #if defined(_HUB4_PRODUCT_REQ_) || defined(_PLATFORM_RASPBERRYPI_) || defined(_PLATFORM_TURRIS_) || defined(_PLATFORM_BANANAPI_R4_)
+         //No need to remove any hardcoded passwords
+     #else
+         /* Remove hardcoded passwords*/
+diff --git a/source/TR-181/middle_layer_src/cosa_x_cisco_com_devicecontrol_dml.c b/source/TR-181/middle_layer_src/cosa_x_cisco_com_devicecontrol_dml.c
+index 402ac67a..e22eb941 100644
+--- a/source/TR-181/middle_layer_src/cosa_x_cisco_com_devicecontrol_dml.c
++++ b/source/TR-181/middle_layer_src/cosa_x_cisco_com_devicecontrol_dml.c
+@@ -2114,7 +2114,7 @@ LanMngm_SetParamUlongValue
+             return FALSE;
+         #endif
+ 
+-	#if !defined(_PLATFORM_RASPBERRYPI_)
++	#if !defined(_PLATFORM_RASPBERRYPI_) || !defined(_PLATFORM_BANANAPI_R4_)
+ 	//RDKB-27656 : Bridge Mode must not set to true using WEBPA & dmcli in ETHWAN mode
+ 	#if 0
+         char buf[16] = {0};
+-- 
+2.47.0
+
