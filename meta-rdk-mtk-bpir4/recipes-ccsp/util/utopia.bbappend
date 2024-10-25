@@ -42,4 +42,7 @@ fi
 \$T2Enable=true
 \$T2Version=2.0.1
 \$T2ConfigURL=https://xconf.rdkcentral.com:19092/loguploader/getT2Settings"  >> ${D}${sysconfdir}/utopia/system_defaults
+
+#lan0 is used for WAN connection
+sed -i "s/\$\$lan_ethernet_physical_ifnames=lan0 lan1 lan2 lan3 lan4/\$\$lan_ethernet_physical_ifnames=lan1 lan2 lan3 lan4/g" ${D}${sysconfdir}/utopia/system_defaults
 }
