@@ -1,5 +1,19 @@
 include meta-rdk-mtk-bpir4/recipes-ccsp/ccsp/ccsp_common_bananapi.inc
 
+FILESEXTRAPATHS_prepend := "${THISDIR}/${PN}:"
+SRC_URI += " file://cellular_firewall_updated.patch;apply=no "
+SRC_URI += " file://BPI-Utopia-changes.patch;apply=no "
+
+do_filogic_patches_append() {
+    cd ${S}
+    if [ ! -e bananapi_patch_applied ]; then
+        bbnote "Patching BPI-Utopia-changes.patch"
+        patch -p1 < ${WORKDIR}/BPI-Utopia-changes.patch
+        bbnote "Patching cellular_firewall_updated.patch"
+        patch -p1 < ${WORKDIR}/cellular_firewall_updated.patch
+    touch bananapi_patch_applied
+    fi
+}
 
 do_install_append() {
 
@@ -28,4 +42,7 @@ fi
 \$T2Enable=true
 \$T2Version=2.0.1
 \$T2ConfigURL=https://xconf.rdkcentral.com:19092/loguploader/getT2Settings"  >> ${D}${sysconfdir}/utopia/system_defaults
+
+#lan0 is used for WAN connection
+sed -i "s/\$\$lan_ethernet_physical_ifnames=lan0 lan1 lan2 lan3 lan4/\$\$lan_ethernet_physical_ifnames=lan1 lan2 lan3 lan4/g" ${D}${sysconfdir}/utopia/system_defaults
 }

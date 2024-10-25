@@ -1,0 +1,27 @@
+--- a/rdkb_hal/src/platform/platform_hal_o.c	2024-10-25 05:55:10.854662219 +0000
++++ b/rdkb_hal/src/platform/platform_hal.c	2024-10-25 05:56:52.705396106 +0000
+@@ -106,7 +106,8 @@
+ 	if (pValue != NULL)
+ 	{
+ 		INT arr[6] = {0};
+-		const char *path = "/sys/class/net/eth1/address";
++		const char *path = "/etc/machine-id";
++		//const char *path = "/sys/class/net/eth1/address";
+ 		FILE *fp = fopen(path, "r");
+ 		if (fp != NULL)
+ 		{
+@@ -114,11 +115,12 @@
+ 			char buf[64] = {0};
+ 			fgets(buf, sizeof(buf), fp);
+ 			fclose(fp);
+-			if(6  == sscanf(buf, "%02x:%02x:%02x:%02x:%02x:%02x",&arr[0],&arr[1],&arr[2],&arr[3],&arr[4],&arr[5]))
++			sprintf(pValue,"%s",buf);
++			/*if(6  == sscanf(buf, "%02x:%02x:%02x:%02x:%02x:%02x",&arr[0],&arr[1],&arr[2],&arr[3],&arr[4],&arr[5]))
+ 			{
+ 				sprintf(pValue,"%02x%02x%02x%02x%02x%02x",arr[0],arr[1],arr[2],arr[3],arr[4],arr[5]);
+ 				return RETURN_OK;
+-			}	
++			}*/
+ 		}
+ 	}
+ 	return RETURN_ERR;
