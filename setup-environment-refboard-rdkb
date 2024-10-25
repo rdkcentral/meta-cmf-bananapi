@@ -38,3 +38,27 @@ fi
 
 # default BSP layer is meta-cmf-bananapi for B-PI builds
 export RDK_BSP_LAYER=meta-cmf-bananapi
+
+echo "#########################################################"
+echo "### Which Format image you want to generate for BPIR4 ###"
+echo "#########################################################"
+
+PS3="Choose image format(1-SD, 2-EMMC, 3-NOR): "
+select opt in SD EMMC NOR
+        do
+                case $opt in
+                SD)
+                        echo "DISTRO_FEATURES_append =\" sdmmc\"" >> conf/local.conf
+                        break
+                        ;;
+                EMMC)
+                        echo "DISTRO_FEATURES_append =\" emmc\"" >> conf/local.conf
+                        break
+                        ;;
+                NOR)
+                        break
+                        ;;
+                esac
+        done
+        echo ""
+        unset PS3 opt
