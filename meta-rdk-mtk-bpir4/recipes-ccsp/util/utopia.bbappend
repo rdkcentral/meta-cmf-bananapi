@@ -38,4 +38,35 @@ $custom_data_model_file_name=/usr/ccsp/tr069pa/custom_mapper.xml"  >> ${D}${sysc
 
 #lan0 used for WAN Connectivity
 sed -i "s/\$\$lan_ethernet_physical_ifnames=lan0 lan1 lan2 lan3 lan4/\$\$lan_ethernet_physical_ifnames=lan1 lan2 lan3 lan4/g" ${D}${sysconfdir}/utopia/system_defaults
+
+#Adding self heal defaults
+echo "#SelfHeal
+\$ConnTest_PingInterval=60
+\$ConnTest_NumPingsPerServer=3
+\$ConnTest_MinNumPingServer=1
+\$ConnTest_PingRespWaitTime=1000
+\$ConnTest_CorrectiveAction=false
+\$Ipv4PingServer_Count=0
+\$Ipv6PingServer_Count=0
+\$resource_monitor_interval=15
+\$avg_cpu_threshold=100
+\$avg_memory_threshold=100
+\$selfheal_enable=true
+\$max_reboot_count=3
+\$max_reset_count=3
+\$todays_reboot_count=0
+\$todays_reset_count=0
+\$lastActiontakentime=0
+\$process_memory_log_count=0
+\$todays_atom_reboot_count=0
+\$selfheal_dns_pingtest_enable=false
+\$selfheal_dns_pingtest_url=www.google.com
+\$highloadavg_reboot_count=0
+\$selfheal_ping_DataBlockSize=56
+\$Selfheal_DiagnosticMode=false
+\$diagMode_LogUploadFrequency=1440
+\$router_reboot_Interval=28800
+\$last_router_reboot_time=0
+\$AggressiveInterval=5"   >> ${D}${sysconfdir}/utopia/system_defaults
+
 }
