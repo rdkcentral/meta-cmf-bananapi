@@ -24,6 +24,7 @@ do_install_append_class-target() {
    fi
    install -D -m 0644 ${S}/systemd_units/wan-initialized.target ${D}${systemd_unitdir}/system/wan-initialized.target
    install -D -m 0644 ${S}/systemd_units/wan-initialized.path ${D}${systemd_unitdir}/system/wan-initialized.path
+   sed -i "/tcp\:192.168.254.253\:705/a  ExecStart=\/usr\/bin\/snmp_subagent \&" ${D}${systemd_unitdir}/system/snmpSubAgent.service
    sed -i "s/CcspCrSsp.service CcspPandMSsp.service/CcspCrSsp.service RdkWanManager.service/g" ${D}${systemd_unitdir}/system/CcspEthAgent.service
    DISTRO_WAN_ENABLED="${@bb.utils.contains('DISTRO_FEATURES','rdkb_wan_manager','true','false',d)}"
    if [ $DISTRO_WAN_ENABLED = 'true' ]; then
@@ -42,8 +43,6 @@ do_install_append_class-target() {
    sed -i "s/After=securemount.service/After=PsmSsp.service/g" ${D}${systemd_unitdir}/system/gwprovapp.service
    install -D -m 0644 ${WORKDIR}/gwprovapp.conf ${D}${systemd_unitdir}/system/gwprovapp.service.d/gwprovapp.conf
    rm ${D}${systemd_unitdir}/system/utopia.service
-
-
 }
 
 
