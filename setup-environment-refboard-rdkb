@@ -38,3 +38,9 @@ fi
 
 # default BSP layer is meta-cmf-bananapi for B-PI builds
 export RDK_BSP_LAYER=meta-cmf-bananapi
+
+
+# Enabling distro features as part of the build
+if [ "X$BPI_IMG_TYPE" != "X" ]; then
+    echo "DISTRO_FEATURES_append =\" $BPI_IMG_TYPE\"" >> conf/local.conf
+fi
