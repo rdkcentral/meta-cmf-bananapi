@@ -1,6 +1,7 @@
-DESCRIPTION = "prebuild bl2.img and fip.bin inclusion"
-LICENSE = "RDK"
-LIC_FILES_CHKSUM = "file://${THISDIR}/../../../LICENSE;md5=64353adbfffd1ac1a6a1f78d6b5f48a1"
+DESCRIPTION = "Inclusion of prebuild bl2.img and fip.bin firmware"
+
+#Made a configuration changes in firmware to load rdkb stack.
+LICENSE = "CLOSED"
 
 COMPATIBLE_MACHINE  = "^filogic$"
 
