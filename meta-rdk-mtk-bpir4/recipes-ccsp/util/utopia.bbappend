@@ -1,5 +1,7 @@
 include meta-rdk-mtk-bpir4/recipes-ccsp/ccsp/ccsp_common_bananapi.inc
+FILESEXTRAPATHS_prepend := "${THISDIR}/${PN}:"
 
+SRC_URI += "file://service_bridge_bpi.sh"
 
 do_install_append() {
 
@@ -30,7 +32,14 @@ fi
 \$T2ConfigURL=https://xconf.rdkcentral.com:19092/loguploader/getT2Settings"  >> ${D}${sysconfdir}/utopia/system_defaults
 
 #lan0 used for WAN Connectivity
-sed -i "s/\$\$lan_ethernet_physical_ifnames=lan0 lan1 lan2 lan3 lan4/\$\$lan_ethernet_physical_ifnames=lan1 lan2 lan3 lan4/g" ${D}${sysconfdir}/utopia/system_defaults
+sed -i "s/\$\$lan_ethernet_physical_ifnames=lan0 lan1 lan2 lan3 lan4/\$\$lan_ethernet_physical_ifnames=lan1 lan2 lan3/g" ${D}${sysconfdir}/utopia/system_defaults
+
+#Bridge-mode virtual interface net0 instead of lan0
+sed -i "s/\$\$cmdiag_ifname=lan0$/\$\$cmdiag_ifname=net0/g" ${D}${sysconfdir}/utopia/system_defaults
+
+#Script for enabling bridge mode in BPIR4.
+install -m 755 ${WORKDIR}/service_bridge_bpi.sh ${D}${sysconfdir}/utopia/service.d/
+install -m 755 ${WORKDIR}/service_bridge_bpi.sh ${D}${sysconfdir}/utopia/service.d/service_bridge.sh
 
 #Adding self heal defaults
 echo "#SelfHeal
