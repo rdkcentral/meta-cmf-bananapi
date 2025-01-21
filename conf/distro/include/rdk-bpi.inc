@@ -34,3 +34,6 @@ DISTRO_FEATURES_append = " rdkb_cellular_manager_mm"
 DISTRO_FEATURES_append = " dac"
 
 DISTRO_FEATURES_append = " partner_default_ext"
+
+#NAND image is default image. Uncomment the following line for SDcard image
+#DISTRO_FEATURES_append = " sdmmc"
