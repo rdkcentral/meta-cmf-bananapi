@@ -49,6 +49,9 @@ if [ ! -e ${_TOPDIR}/meta-cmf-filogic/recipes-ccsp/util/utopia_changes_applied ]
 sed -i '19 s/^/#/' ${_TOPDIR}/meta-cmf-filogic/recipes-ccsp/util/utopia.bbappend
 sed -i '39 s/^/#/' ${_TOPDIR}/meta-cmf-filogic/recipes-ccsp/util/utopia.bbappend
 sed -i '40 s/^/#/' ${_TOPDIR}/meta-cmf-filogic/recipes-ccsp/util/utopia.bbappend
-mv ${_TOPDIR}/meta-cmf-filogic/recipes-ccsp/util/utopia/0002-fix-swctl-missing-api.patch ${_TOPDIR}/meta-cmf-filogic/recipes-ccsp/util/utopia/0002-fix-swctl-missing-api_old.patch
+sed -i '8 s/^/#/' ${_TOPDIR}/meta-cmf-filogic/recipes-ccsp/util/utopia.bbappend
+sed -i '42 s/^/#/' ${_TOPDIR}/meta-cmf-filogic/recipes-ccsp/util/utopia.bbappend
+sed -i '43 s/^/#/' ${_TOPDIR}/meta-cmf-filogic/recipes-ccsp/util/utopia.bbappend
+sed -i '21 s/^/#/' ${_TOPDIR}/meta-cmf-filogic/recipes-ccsp/util/utopia.bbappend
 touch ${_TOPDIR}/meta-cmf-filogic/recipes-ccsp/util/utopia_changes_applied
 fi
