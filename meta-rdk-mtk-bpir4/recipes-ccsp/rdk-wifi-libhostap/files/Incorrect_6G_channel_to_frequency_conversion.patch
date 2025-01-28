@@ -1,0 +1,35 @@
+From 47c3897b3c92b3db6dfbf3635e9ba80a0793ac55 Mon Sep 17 00:00:00 2001
+From: Amarnath Hullur Subramanyam <amarnath_hullursubramanyam@comcast.com>
+Date: Wed, 8 Jan 2025 20:56:01 +0000
+Subject: [PATCH 1/8] RDKB-58363: Correct the 6G chan to freq conversion change
+
+Reason for change: The 6G chan to freq conversion change is incorrect
+and not required. The current change will not work when CONFIG_DRIVER_BRCM
+flag is not defined. Also, the change present in Upstream will work
+for all the cases including the CONFIG_DRIVER_BRCM case, thus removing the change.
+
+Test Procedure: Tested 6G AP bringup and connection.
+
+Priority: P1
+Risks: Med
+Signed-off-by: Amarnath Hullur Subramanyam <amarnath_hullursubramanyam@comcast.com>
+Change-Id: Ia0b7889fceca21fc604a54ddcc60dcaa127e1373
+
+
+--- git/source/hostap-2.10/src/common/ieee802_11_common.c	2025-01-27 09:16:39.807325699 +0000
++++ git/source/hostap-2.10/src/common/ieee802_11_common.c	2025-01-27 09:16:30.315442640 +0000
+@@ -1454,13 +1454,7 @@
+ 	case 135: /* UHB channels, 80+80 MHz: 7, 23, 39.. */
+ 		if (chan < 1 || chan > 233)
+ 			return -1;
+-#ifndef CONFIG_DRIVER_BRCM
+-		return 5940 + chan * 5;
+-#else
+-		/* New 6GHz channelization - May 2020 */
+-		if (chan == 2) return 5935;
+-		else return 5950 + chan * 5;
+-#endif /* CONFIG_DRIVER_BRCM */
++		return 5950 + chan * 5;
+ 	case 136: /* UHB channels, 20 MHz: 2 */
+ 		if (chan == 2)
+ 			return 5935;

@@ -3,6 +3,61 @@
         {
             "Index": 0,
             "RadioList": [
+                 {
+                    "Index": 2,
+                    "RadioName": "wifi2",
+                    "InterfaceList": [
+                        {
+                            "InterfaceName": "wifi23",
+                            "Bridge": "brlan2",
+                            "vlanId": 0,
+                            "vapIndex": 23,
+                            "vapName": "mesh_sta_6g"
+                        },
+                        {
+                            "InterfaceName": "wifi22",
+                            "Bridge": "brlan2",
+                            "vlanId": 0,
+                            "vapIndex": 22,
+                            "vapName": "mesh_backhaul_6g"
+                        },
+                        {                                 
+                            "InterfaceName": "wifi20",    
+                            "Bridge": "brlan4",           
+                            "vlanId": 0,                  
+                            "vapIndex": 20,               
+                            "vapName": "hotspot_secure_6g"
+                        },                            
+                        {                                 
+                            "InterfaceName": "wifi19",    
+                            "Bridge": "brlan6",           
+                            "vlanId": 0,                  
+                            "vapIndex": 19,               
+                            "vapName": "lnf_psk_6g"      
+                        },       
+                        {                                
+                            "InterfaceName": "wifi18",  
+                            "Bridge": "brlan2",         
+                            "vlanId": 0,                
+                            "vapIndex": 18,             
+                            "vapName": "hotspot_open_6g"
+                        },                                
+                        {                                 
+                            "InterfaceName": "wifi17",    
+                            "Bridge": "brlan1",           
+                            "vlanId": 0,                  
+                            "vapIndex": 17,               
+                            "vapName": "iot_ssid_6g"      
+                        },
+                        {
+                            "InterfaceName": "wifi2",
+                            "Bridge": "brlan0",
+                            "vlanId": 0,
+                            "vapIndex": 16,
+                            "vapName": "private_ssid_6g"
+                        }
+                    ]
+                },
                 {
                     "Index": 1,
                     "RadioName": "wifi1",
@@ -113,7 +168,7 @@
                             "vapName": "hotspot_open_2g"
                         },
                         {
-                            "InterfaceName": "wifi2",
+                            "InterfaceName": "wifi25",
                             "Bridge": "brlan1",
                             "vlanId": 0,
                             "vapIndex": 2,

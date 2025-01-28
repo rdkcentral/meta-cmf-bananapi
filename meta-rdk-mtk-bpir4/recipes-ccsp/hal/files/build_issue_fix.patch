@@ -1,0 +1,13 @@
+diff --git a/wifi_hal_generic.h b/wifi_hal_generic.h
+index 5ae40bf..0b82cb1 100644
+--- a/wifi_hal_generic.h
++++ b/wifi_hal_generic.h
+@@ -133,7 +133,7 @@ extern "C"{
+ #define WIFI_HAL_UNSUPPORTED        -3
+ #define WIFI_HAL_INVALID_ARGUMENTS  -4
+ #define WIFI_HAL_INVALID_VALUE      -5
+-
++#define WIFI_HAL_NOT_READY          -6
+ 
+ #ifndef RADIO_INDEX_1
+ #define RADIO_INDEX_1 1

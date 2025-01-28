@@ -1,0 +1,657 @@
+##########################################
+From 7452e5447764e38a648ef41424bed326cef7ee08 Mon Sep 17 00:00:00 2001
+From: Aloka Dixit <quic_alokad@quicinc.com>
+Date: Wed, 30 Nov 2022 19:18:33 -0800
+Subject: [PATCH] mbssid: Add new configuration option
+
+Add configuration option 'mbssid' used to enable multiple BSSID (MBSSID)
+and enhanced multiple BSSID advertisements (EMA) features.
+
+Reject the configuration if any of the BSSes have hidden SSID enabled.
+
+Signed-off-by: Aloka Dixit <quic_alokad@quicinc.com>
+Co-developed-by: John Crispin <john@phrozen.org>
+Signed-off-by: John Crispin <john@phrozen.org>
+
+
+From 78d0b989956aa934603705354ca42008642c79fa Mon Sep 17 00:00:00 2001
+From: Aloka Dixit <quic_alokad@quicinc.com>
+Date: Wed, 30 Nov 2022 19:18:34 -0800
+Subject: [PATCH] mbssid: Retrieve driver capabilities
+
+Retrieve driver capabilities for the maximum number of interfaces for
+MBSSID and the maximum allowed profile periodicity for enhanced MBSSID
+advertisement.
+
+Signed-off-by: Aloka Dixit <quic_alokad@quicinc.com>
+
+
+From 920b56322da984e5ecb344b571e3262d333c902e Mon Sep 17 00:00:00 2001
+From: Aloka Dixit <quic_alokad@quicinc.com>
+Date: Wed, 30 Nov 2022 19:18:36 -0800
+Subject: [PATCH] mbssid: Functions for building Multiple BSSID elements
+
+Add Multiple BSSID element data per IEEE Std 802.11ax-2021, 9.4.2.45.
+Split the BSSes into multiple elements if the data does not fit in
+the 255 bytes allowed for a single element.
+
+Store the total count of elements created and the offset to the start
+of each element in the provided buffer.
+
+Set the DTIM periods of non-transmitted profiles equal to the EMA
+profile periodicity if those are not a multiple of the latter already as
+recommended in IEEE Std 802.11ax-2021, Annex AA (Multiple BSSID
+configuration examples).
+
+Signed-off-by: Aloka Dixit <quic_alokad@quicinc.com>
+Co-developed-by: John Crispin <john@phrozen.org>
+Signed-off-by: John Crispin <john@phrozen.org>
+
+
+From a004bf2cd09bda397ca8bf8f2fd33616da991ab6 Mon Sep 17 00:00:00 2001
+From: Aloka Dixit <quic_alokad@quicinc.com>
+Date: Wed, 30 Nov 2022 19:18:38 -0800
+Subject: [PATCH] mbssid: Configure parameters and element data
+
+Add helper functions to retrieve the context for the transmitting
+interfaces of the MBSSID set and the index of a given BSS.
+
+Set device parameters: BSS index and the transmitting BSS.
+
+Include Multiple BSSID elements in Beacon and Probe Response frames.
+
+Signed-off-by: Aloka Dixit <quic_alokad@quicinc.com>
+Co-developed-by: John Crispin <john@phrozen.org>
+Signed-off-by: John Crispin <john@phrozen.org>
+
+
+From fc2e4bac5a374d10d147bf301bd1f4703d1a6ed9 Mon Sep 17 00:00:00 2001
+From: Aloka Dixit <quic_alokad@quicinc.com>
+Date: Wed, 30 Nov 2022 19:18:39 -0800
+Subject: [PATCH] mbssid: Set extended capabilities
+
+Set extended capabilities as described in IEEE Std 802.11ax-2021,
+9.4.2.26. Reset the capability bits to 0 explicitly if MBSSID and/or EMA
+is not enabled because otherwise some client devices fail to associate.
+
+Bit 80 (complete list of non-tx profiles) is set for all Probe Response
+frames, but for Beacon frames it is set only if EMA is disabled or if
+EMA profile periodicity is 1.
+
+Signed-off-by: Aloka Dixit <quic_alokad@quicinc.com>
+Co-developed-by: John Crispin <john@phrozen.org>
+Signed-off-by: John Crispin <john@phrozen.org>
+
+
+From c5a09b051a91e02093ca2c9f493cbc6c5e8630b1 Mon Sep 17 00:00:00 2001
+From: Aloka Dixit <quic_alokad@quicinc.com>
+Date: Wed, 30 Nov 2022 19:18:37 -0800
+Subject: [PATCH] mbssid: Add Non-Inheritance element
+
+Add data per IEEE Std 802.11-2020, 9.4.2.240. Current implementation is
+added for the security and extended supported rates only.
+
+For the Extended rates element, add a new member 'xrates_supported'
+which is set to 1 only if hostapd_eid_ext_supp_rates() returns success.
+Without this change, there are cases where this function returns before
+adding the element for the transmitting interface resulting in incorrect
+addition of this element inside the MBSSID Non-Inheritance element.
+
+Signed-off-by: Aloka Dixit <quic_alokad@quicinc.com>
+Co-developed-by: John Crispin <john@phrozen.org>
+Signed-off-by: John Crispin <john@phrozen.org>
+Co-developed-by: Sowmiya Sree Elavalagan <quic_ssreeela@quicinc.com>
+Signed-off-by: Sowmiya Sree Elavalagan <quic_ssreeela@quicinc.com>
+
+
+From 15690faada17f429e5386bf5cb6153ed47773eff Mon Sep 17 00:00:00 2001
+From: Aloka Dixit <quic_alokad@quicinc.com>
+Date: Wed, 30 Nov 2022 19:18:40 -0800
+Subject: [PATCH] mbssid: Add MBSSID Configuration element
+
+Add Multiple BSSID Configuration element data per IEEE Std
+802.11ax-2021, 9.4.2.260 when enhanced multiple BSSID advertisement
+(EMA) is enabled. This element informs the stations about the EMA
+profile periodicity of the multiple BSSID set.
+
+Signed-off-by: Aloka Dixit <quic_alokad@quicinc.com>
+
+
+Date: Nov 5, 2024 1:00 PM
+From: 
+Subject: MBSSID support
+Source: Comcast
+License: BSD
+Upstream-Status: Pending
+Signed-off-by: Bogdan Bogush <bogdan.bogush@comcast.com>
+##########################################
+--- git/source/hostap-2.10/src/ap/ap_config.h	2025-01-23 16:22:48.400913100 +0000
++++ git/source/hostap-2.10/src/ap/ap_config.h	2025-01-23 16:24:29.103645485 +0000
+@@ -1173,6 +1173,11 @@
+ #define CH_SWITCH_EHT_ENABLED BIT(0)
+ #define CH_SWITCH_EHT_DISABLED BIT(1)
+ 	unsigned int ch_switch_eht_config;
++	enum mbssid {
++                MBSSID_DISABLED = 0,
++                MBSSID_ENABLED = 1,
++                ENHANCED_MBSSID_ENABLED = 2,
++       } mbssid;
+ };
+ 
+ 
+--- git/source/hostap-2.10/src/ap/ap_drv_ops.c	2025-01-23 16:24:38.951521523 +0000
++++ git/source/hostap-2.10/src/ap/ap_drv_ops.c	2025-01-23 16:29:55.755533594 +0000
+@@ -87,7 +87,7 @@
+ 
+ /* avoid duplicated tag in beacon */
+ #ifndef CONFIG_DRIVER_BRCM
+-	pos = hostapd_eid_ext_capab(hapd, pos);
++	pos = hostapd_eid_ext_capab(hapd, pos, false);
+ #endif
+ 	if (add_buf_data(&assocresp, buf, pos - buf) < 0)
+ 		goto fail;
+@@ -1085,3 +1085,51 @@
+ 
+ 	return hapd->driver->get_rnr_colocation_ie(hapd->drv_priv, eid, current_len);
+ }
++
++struct hostapd_data* hostapd_drv_mbssid_get_tx_bss(struct hostapd_data *hapd)
++{
++       if (!hapd->driver || !hapd->driver->get_mbssid_tx_bss || !hapd->drv_priv)
++               return hapd;
++
++       return hapd->driver->get_mbssid_tx_bss(hapd->drv_priv);
++}
++
++int hostapd_drv_mbssid_get_bss_index(struct hostapd_data *hapd)
++{
++       if (!hapd->driver || !hapd->driver->get_mbssid_bss_index || !hapd->drv_priv)
++               return 0;
++
++       return hapd->driver->get_mbssid_bss_index(hapd->drv_priv);
++}
++
++size_t hostapd_drv_eid_mbssid_len(struct hostapd_data *hapd, u32 frame_type,
++                              u8 *elem_count, const u8 *known_bss,
++                              size_t known_bss_len, size_t *rnr_len)
++{
++       if (!hapd->driver || !hapd->driver->get_mbssid_len || !hapd->drv_priv)
++	       return 0;
++ 
++       return hapd->driver->get_mbssid_len(hapd->drv_priv, frame_type, elem_count);
++}
++
++u8* hostapd_drv_eid_mbssid(struct hostapd_data *hapd, u8 *eid, u8 *end,
++                       unsigned int frame_stype, u8 elem_count,
++                       u8 **elem_offset,
++                       const u8 *known_bss, size_t known_bss_len, u8 *rnr_eid,
++                       u8 *rnr_count, u8 **rnr_offset, size_t rnr_len)
++{
++       if (!hapd->driver || !hapd->driver->get_mbssid_ie || !hapd->drv_priv)
++               return eid;
++
++       return hapd->driver->get_mbssid_ie(hapd->drv_priv, eid, end, frame_stype,
++               elem_count, elem_offset);
++}
++
++u8* hostapd_drv_mbssid_config(struct hostapd_data *hapd, u8 *eid)
++{
++       if (!hapd->driver || !hapd->driver->get_mbssid_config || !hapd->drv_priv)
++               return eid;
++
++       return hapd->driver->get_mbssid_config(hapd->drv_priv, eid);
++}
++
+--- git/source/hostap-2.10/src/ap/ap_drv_ops.h	2025-01-23 16:36:58.274201839 +0000
++++ git/source/hostap-2.10/src/ap/ap_drv_ops.h	2025-01-23 16:39:50.148031554 +0000
+@@ -150,6 +150,17 @@
+ 				       size_t *current_len);
+ u8* hostapd_drv_eid_rnr_colocation(struct hostapd_data *hapd, u8 *eid,
+ 				   size_t *current_len);
++struct hostapd_data* hostapd_drv_mbssid_get_tx_bss(struct hostapd_data *hapd);
++int hostapd_drv_mbssid_get_bss_index(struct hostapd_data *hapd);
++size_t hostapd_drv_eid_mbssid_len(struct hostapd_data *hapd, u32 frame_type,
++                             u8 *elem_count, const u8 *known_bss,
++                             size_t known_bss_len, size_t *rnr_len);
++u8* hostapd_drv_eid_mbssid(struct hostapd_data *hapd, u8 *eid, u8 *end,
++                       unsigned int frame_stype, u8 elem_count,
++                       u8 **elem_offset,
++                       const u8 *known_bss, size_t known_bss_len, u8 *rnr_eid,
++                       u8 *rnr_count, u8 **rnr_offset, size_t rnr_len);
++u8* hostapd_drv_mbssid_config(struct hostapd_data *hapd, u8 *eid);
+ 
+ #include "drivers/driver.h"
+ 
+--- git/source/hostap-2.10/src/ap/beacon.c	2025-01-23 16:40:03.395864266 +0000
++++ git/source/hostap-2.10/src/ap/beacon.c	2025-01-23 17:02:50.610550154 +0000
+@@ -519,7 +519,103 @@
+ 	return eid;
+ }
+ 
+-
++static int
++ieee802_11_build_ap_params_mbssid(struct hostapd_data *hapd,
++                                 struct wpa_driver_ap_params *params)
++{
++       struct hostapd_iface *iface = hapd->iface;
++       struct hostapd_data *tx_bss;
++       size_t len = 0, rnr_len = 0;
++       u8 elem_count = 0, *elem = NULL, **elem_offset = NULL, *end;
++       u8 rnr_elem_count = 0, *rnr_elem = NULL, **rnr_elem_offset = NULL;
++       size_t i;
++
++       if (!iface->mbssid_max_interfaces ||
++           iface->num_bss > iface->mbssid_max_interfaces ||
++           (iface->conf->mbssid == ENHANCED_MBSSID_ENABLED &&
++            !iface->ema_max_periodicity))
++               goto fail;
++
++       /* Make sure bss->xrates_supported is set for all BSSs to know whether
++        * it need to be non-inherited. */
++       for (i = 0; i < iface->num_bss; i++) {
++               u8 buf[100];
++
++               hostapd_eid_ext_supp_rates(iface->bss[i], buf);
++       }
++
++#ifdef RDK_ONEWIFI
++       tx_bss = hostapd_drv_mbssid_get_tx_bss(hapd);
++       len = hostapd_drv_eid_mbssid_len(tx_bss, WLAN_FC_STYPE_BEACON, &elem_count,
++                                    NULL, 0, &rnr_len);
++#else
++       /* tx_bss = hostapd_mbssid_get_tx_bss(hapd);
++       len = hostapd_eid_mbssid_len(tx_bss, WLAN_FC_STYPE_BEACON, &elem_count,
++                                    NULL, 0, &rnr_len); */
++#endif /* RDK_ONEWIFI */
++       if (!len || (iface->conf->mbssid == ENHANCED_MBSSID_ENABLED &&
++                    elem_count > iface->ema_max_periodicity))
++               goto fail;
++
++       elem = os_zalloc(len);
++       if (!elem)
++               goto fail;
++
++       elem_offset = os_zalloc(elem_count * sizeof(u8 *));
++       if (!elem_offset)
++               goto fail;
++
++       if (rnr_len) {
++               rnr_elem = os_zalloc(rnr_len);
++               if (!rnr_elem)
++                       goto fail;
++
++               rnr_elem_offset = os_calloc(elem_count + 1, sizeof(u8 *));
++               if (!rnr_elem_offset)
++                       goto fail;
++       }
++
++#ifdef RDK_ONEWIFI
++       end = hostapd_drv_eid_mbssid(tx_bss, elem, elem + len, WLAN_FC_STYPE_BEACON,
++                                elem_count, elem_offset, NULL, 0, rnr_elem,
++                                &rnr_elem_count, rnr_elem_offset, rnr_len);
++#else
++       /* end = hostapd_eid_mbssid(tx_bss, elem, elem + len, WLAN_FC_STYPE_BEACON,
++                                elem_count, elem_offset, NULL, 0, rnr_elem,
++                                &rnr_elem_count, rnr_elem_offset, rnr_len); */
++#endif /* RDK_ONEWIFI */
++
++      params->mbssid_tx_iface = tx_bss->conf->iface;
++#ifdef RDK_ONEWIFI
++       params->mbssid_index = hostapd_drv_mbssid_get_bss_index(hapd);
++#else
++       params->mbssid_index = hostapd_mbssid_get_bss_index(hapd);
++#endif /* RDK_ONEWIFI */
++
++       params->mbssid_elem = elem;
++       params->mbssid_elem_len = end - elem;
++       params->mbssid_elem_count = elem_count;
++       params->mbssid_elem_offset = elem_offset;
++#if 0
++       params->rnr_elem = rnr_elem;
++       params->rnr_elem_len = rnr_len;
++       params->rnr_elem_count = rnr_elem_count;
++       params->rnr_elem_offset = rnr_elem_offset;
++#endif
++       if (iface->conf->mbssid == ENHANCED_MBSSID_ENABLED)
++               params->ema = true;
++
++       return 0;
++
++fail:
++       os_free(rnr_elem);
++       os_free(rnr_elem_offset);
++       os_free(elem_offset);
++       os_free(elem);
++       wpa_printf(MSG_ERROR, "MBSSID: Configuration failed");
++       return -1;
++}
++       
+ static u8 * hostapd_gen_probe_resp(struct hostapd_data *hapd,
+ 				   const struct ieee80211_mgmt *req,
+ 				   int is_p2p, size_t *resp_len)
+@@ -528,6 +624,10 @@
+ 	u8 *pos, *epos, *csa_pos;
+ 	size_t buflen;
+ 
++#ifdef RDK_ONEWIFI
++       hapd = hostapd_drv_mbssid_get_tx_bss(hapd);
++#endif /* RDK_ONEWIFI */
++
+ #define MAX_PROBERESP_LEN 768
+ 	buflen = MAX_PROBERESP_LEN;
+ #ifdef CONFIG_WPS
+@@ -641,6 +741,11 @@
+ 
+ 	pos = hostapd_get_rsne(hapd, pos, epos - pos);
+ 	pos = hostapd_eid_bss_load(hapd, pos, epos - pos);
++#ifdef RDK_ONEWIFI
++       pos = hostapd_drv_eid_mbssid(hapd, pos, epos, WLAN_FC_STYPE_PROBE_RESP, 0,
++                                NULL, NULL, 0,
++                                NULL, NULL, NULL, 0);
++#endif /* RDK_ONEWIFI */	
+ 	pos = hostapd_eid_rm_enabled_capab(hapd, pos, epos - pos);
+ 	pos = hostapd_get_mde(hapd, pos, epos - pos);
+ 
+@@ -654,7 +759,9 @@
+ 	pos = hostapd_eid_ht_capabilities(hapd, pos);
+ 	pos = hostapd_eid_ht_operation(hapd, pos);
+ 
+-	pos = hostapd_eid_ext_capab(hapd, pos);
++	/* Probe Response frames always include all non-TX profiles */
++       pos = hostapd_eid_ext_capab(hapd, pos,
++                                   hapd->iconf->mbssid >= MBSSID_ENABLED);
+ 
+ 	pos = hostapd_eid_time_adv(hapd, pos);
+ 	pos = hostapd_eid_time_zone(hapd, pos);
+@@ -1232,6 +1339,9 @@
+ 				hapd->cs_c_off_ecsa_proberesp;
+ 	}
+ 
++#ifdef RDK_ONEWIFI
++       hapd = hostapd_drv_mbssid_get_tx_bss(hapd);
++#endif /* RDK_ONEWIFI */
+ 	ret = hostapd_drv_send_mlme(hapd, resp, resp_len, noack,
+ 				    csa_offs_len ? csa_offs : NULL,
+ 				    csa_offs_len, 0);
+@@ -1582,9 +1692,14 @@
+ #ifdef NEED_AP_MLME
+ 	u16 capab_info;
+ 	u8 *pos, *tailpos, *tailend, *csa_pos;
++	bool complete = false;
++#endif /* NEED_AP_MLME */
+ 
++        os_memset(params, 0, sizeof(*params));	
++
++#ifdef NEED_AP_MLME
+ #define BEACON_HEAD_BUF_SIZE 256
+-#define BEACON_TAIL_BUF_SIZE 512
++#define BEACON_TAIL_BUF_SIZE 1500
+ 	head = os_zalloc(BEACON_HEAD_BUF_SIZE);
+ 	tail_len = BEACON_TAIL_BUF_SIZE;
+ #ifdef CONFIG_WPS
+@@ -1640,6 +1755,11 @@
+ 	}
+ #endif /* CONFIG_IEEE80211BE */
+ 
++#ifdef RDK_ONEWIFI
++       if (hapd->iconf->mbssid == MBSSID_ENABLED)
++               tail_len += 5; /* Multiple BSSID Configuration element */
++#endif /* RDK_ONEWIFI */
++       
+ 	tail_len += hostapd_eid_rnr_len(hapd, WLAN_FC_STYPE_BEACON);
+ 	tail_len += hostapd_mbo_ie_len(hapd);
+ 	tail_len += hostapd_eid_owe_trans_len(hapd);
+@@ -1734,8 +1854,26 @@
+ 	tailpos = hostapd_eid_ht_capabilities(hapd, tailpos);
+ 	tailpos = hostapd_eid_ht_operation(hapd, tailpos);
+ 
+-	tailpos = hostapd_eid_ext_capab(hapd, tailpos);
++        if (hapd->iconf->mbssid && hapd->iconf->num_bss > 1) {
++               if (ieee802_11_build_ap_params_mbssid(hapd, params)) {
++                       os_free(head);
++                       os_free(tail);
++                       wpa_printf(MSG_ERROR,
++                                  "MBSSID: Failed to set beacon data");
++                       return -1;
++               }
++               complete = hapd->iconf->mbssid == MBSSID_ENABLED ||
++                       (hapd->iconf->mbssid == ENHANCED_MBSSID_ENABLED &&
++                        params->mbssid_elem_count == 1);
++       }
++
++#ifdef CONFIG_DRIVER_BRCM
++       memcpy(tailpos, params->mbssid_elem, params->mbssid_elem_len);
++       tailpos += params->mbssid_elem_len;
++#endif /* CONFIG_DRIVER_BRCM */
+ 
++       tailpos = hostapd_eid_ext_capab(hapd, tailpos, complete);
++ 
+ 	/*
+ 	 * TODO: Time Advertisement element should only be included in some
+ 	 * DTIM Beacon frames.
+@@ -1774,6 +1912,9 @@
+ 	tailpos = hostapd_eid_rnr(hapd, tailpos, WLAN_FC_STYPE_BEACON);
+ 	tailpos = hostapd_eid_fils_indic(hapd, tailpos, 0);
+ 	tailpos = hostapd_get_rsnxe(hapd, tailpos, tailend - tailpos);
++#ifdef RDK_ONEWIFI
++       tailpos = hostapd_drv_mbssid_config(hapd, tailpos);
++#endif /* RDK_ONEWIFI */
+ 
+ #ifdef CONFIG_IEEE80211AX
+ 	if (hapd->iconf->ieee80211ax && !hapd->conf->disable_11ax) {
+@@ -1856,7 +1997,6 @@
+ 	resp = hostapd_probe_resp_offloads(hapd, &resp_len);
+ #endif /* NEED_AP_MLME */
+ 
+-	os_memset(params, 0, sizeof(*params));
+ 	params->head = (u8 *) head;
+ 	params->head_len = head_len;
+ 	params->tail = tail;
+@@ -1959,6 +2099,10 @@
+ 	params->head = NULL;
+ 	os_free(params->proberesp);
+ 	params->proberesp = NULL;
++	os_free(params->mbssid_elem);
++        params->mbssid_elem = NULL;
++        os_free(params->mbssid_elem_offset);
++        params->mbssid_elem_offset = NULL;
+ #ifdef CONFIG_FILS
+ 	os_free(params->fd_frame_tmpl);
+ 	params->fd_frame_tmpl = NULL;
+--- git/source/hostap-2.10/src/ap/hostapd.h	2025-01-23 17:05:27.560559180 +0000
++++ git/source/hostap-2.10/src/ap/hostapd.h	2025-01-23 17:08:36.218136811 +0000
+@@ -633,6 +633,11 @@
+ 
+ 	/* Previous WMM element information */
+ 	struct hostapd_wmm_ac_params prev_wmm[WMM_AC_NUM];
++         
++       /* Maximum number of interfaces supported for MBSSID advertisement */
++       unsigned int mbssid_max_interfaces;
++       /* Maximum profile periodicity for enhanced MBSSID advertisement */
++       unsigned int ema_max_periodicity;
+ 
+ 	int (*enable_iface_cb)(struct hostapd_iface *iface);
+ 	int (*disable_iface_cb)(struct hostapd_iface *iface);
+--- git/source/hostap-2.10/src/ap/ieee802_11.c	2025-01-23 17:08:57.505863204 +0000
++++ git/source/hostap-2.10/src/ap/ieee802_11.c	2025-01-23 17:09:33.013406845 +0000
+@@ -5226,7 +5226,7 @@
+ 	}
+ #endif /* CONFIG_IEEE80211AX */
+ 
+-	p = hostapd_eid_ext_capab(hapd, p);
++	p = hostapd_eid_ext_capab(hapd, p, false);
+ 	p = hostapd_eid_bss_max_idle_period(hapd, p);
+ 	if (sta && sta->qos_map_enabled)
+ 		p = hostapd_eid_qos_map_set(hapd, p);
+--- git/source/hostap-2.10/src/ap/ieee802_11.h	2025-01-24 05:11:54.933255170 +0000
++++ git/source/hostap-2.10/src/ap/ieee802_11.h	2025-01-24 05:14:33.099293812 +0000
+@@ -45,7 +45,8 @@
+ #endif /* NEED_AP_MLME */
+ u16 hostapd_own_capab_info(struct hostapd_data *hapd);
+ void ap_ht2040_timeout(void *eloop_data, void *user_data);
+-u8 * hostapd_eid_ext_capab(struct hostapd_data *hapd, u8 *eid);
++u8 * hostapd_eid_ext_capab(struct hostapd_data *hapd, u8 *eid,
++                           bool mbssid_complete);
+ u8 * hostapd_eid_qos_map_set(struct hostapd_data *hapd, u8 *eid);
+ u8 * hostapd_eid_supp_rates(struct hostapd_data *hapd, u8 *eid);
+ u8 * hostapd_eid_ext_supp_rates(struct hostapd_data *hapd, u8 *eid);
+--- git/source/hostap-2.10/src/ap/ieee802_11_shared.c	2025-01-24 05:14:48.683100565 +0000
++++ git/source/hostap-2.10/src/ap/ieee802_11_shared.c	2025-01-24 05:22:57.785035383 +0000
+@@ -339,7 +339,8 @@
+ }
+ 
+ 
+-static void hostapd_ext_capab_byte(struct hostapd_data *hapd, u8 *pos, int idx)
++static void hostapd_ext_capab_byte(struct hostapd_data *hapd, u8 *pos, int idx,
++                                   bool mbssid_complete)	
+ {
+ 	*pos = 0x00;
+ 
+@@ -363,6 +364,8 @@
+ 			*pos |= 0x02; /* Bit 17 - WNM-Sleep Mode */
+ 		if (hapd->conf->bss_transition)
+ 			*pos |= 0x08; /* Bit 19 - BSS Transition */
++		if (hapd->iconf->mbssid)
++                        *pos |= 0x40; /* Bit 22 - Multiple BSSID */
+ 		break;
+ 	case 3: /* Bits 24-31 */
+ #ifdef CONFIG_WNM_AP
+@@ -435,6 +438,11 @@
+ 		    (hapd->iface->drv_flags &
+ 		     WPA_DRIVER_FLAGS_BEACON_PROTECTION))
+ 			*pos |= 0x10; /* Bit 84 - Beacon Protection Enabled */
++		if (hapd->iconf->mbssid == ENHANCED_MBSSID_ENABLED)
++                        *pos |= 0x08; /* Bit 83 - Enhanced multiple BSSID */
++                if (mbssid_complete)
++                        *pos |= 0x01; /* Bit 80 - Complete List of NonTxBSSID
++                                       * Profiles */
+ 		break;
+ 	case 11: /* Bits 88-95 */
+ #ifdef CONFIG_SAE_PK
+@@ -447,8 +455,8 @@
+ 	}
+ }
+ 
+-
+-u8 * hostapd_eid_ext_capab(struct hostapd_data *hapd, u8 *eid)
++u8 * hostapd_eid_ext_capab(struct hostapd_data *hapd, u8 *eid,
++                           bool mbssid_complete)
+ {
+ 	u8 *pos = eid;
+ 	u8 len = EXT_CAPA_MAX_LEN, i;
+@@ -459,7 +467,7 @@
+ 	*pos++ = WLAN_EID_EXT_CAPAB;
+ 	*pos++ = len;
+ 	for (i = 0; i < len; i++, pos++) {
+-		hostapd_ext_capab_byte(hapd, pos, i);
++		hostapd_ext_capab_byte(hapd, pos, i, mbssid_complete);
+ 
+ 		if (i < hapd->iface->extended_capa_len) {
+ 			*pos &= ~hapd->iface->extended_capa_mask[i];
+@@ -470,6 +478,13 @@
+ 			*pos &= ~hapd->conf->ext_capa_mask[i];
+ 			*pos |= hapd->conf->ext_capa[i];
+ 		}
++		
++                /* Clear bits 83 and 22 if EMA and MBSSID are not enabled
++                 * otherwise association fails with some clients */
++                if (i == 10 && hapd->iconf->mbssid < ENHANCED_MBSSID_ENABLED)
++                        *pos &= ~0x08;
++                if (i == 2 && !hapd->iconf->mbssid)
++                        *pos &= ~0x40;
+ 	}
+ 
+ 	while (len > 0 && eid[1 + len] == 0) {
+--- git/source/hostap-2.10/src/common/ieee802_11_defs.h	2025-01-24 05:25:18.995284283 +0000
++++ git/source/hostap-2.10/src/common/ieee802_11_defs.h	2025-01-24 05:34:53.508095831 +0000
+@@ -481,6 +481,8 @@
+ #define WLAN_EID_EXT_SPATIAL_REUSE 39
+ #define WLAN_EID_EXT_COLOR_CHANGE_ANNOUNCEMENT 42
+ #define WLAN_EID_EXT_OCV_OCI 54
++#define WLAN_EID_EXT_MULTIPLE_BSSID_CONFIGURATION 55
++#define WLAN_EID_EXT_NON_INHERITANCE 56
+ #define WLAN_EID_EXT_SHORT_SSID_LIST 58
+ #define WLAN_EID_EXT_HE_6GHZ_BAND_CAP 59
+ #define WLAN_EID_EXT_EDMG_CAPABILITIES 61
+@@ -587,6 +589,9 @@
+ #define WLAN_RSNX_CAPAB_SECURE_RTT 9
+ #define WLAN_RSNX_CAPAB_PROT_RANGE_NEG 10
+ 
++/* Multiple BSSID element subelements */
++#define WLAN_MBSSID_SUBELEMENT_NONTRANSMITTED_BSSID_PROFILE 0
++
+ /* Action frame categories (IEEE Std 802.11-2016, 9.4.1.11, Table 9-76) */
+ #define WLAN_ACTION_SPECTRUM_MGMT 0
+ #define WLAN_ACTION_QOS 1
+--- git/source/hostap-2.10/src/drivers/driver.h	2025-01-24 05:36:18.491031443 +0000
++++ git/source/hostap-2.10/src/drivers/driver.h	2025-01-24 05:43:53.909326553 +0000
+@@ -1608,6 +1608,42 @@
+ 	 * Unsolicited broadcast Probe Response template length
+ 	 */
+ 	size_t unsol_bcast_probe_resp_tmpl_len;
++
++        /**
++         * mbssid_tx_iface - Transmitting interface of the MBSSID set
++         */
++        const char *mbssid_tx_iface;
++
++        /**
++         * mbssid_index - The index of this BSS in the MBSSID set
++         */
++        unsigned int mbssid_index;
++
++        /**
++         * mbssid_elem - Buffer containing all MBSSID elements
++         */
++        u8 *mbssid_elem;
++
++        /**
++         * mbssid_elem_len - Total length of all MBSSID elements
++         */
++        size_t mbssid_elem_len;
++
++        /**
++         * mbssid_elem_count - The number of MBSSID elements
++         */
++        u8 mbssid_elem_count;
++
++        /**
++         * mbssid_elem_offset - Offsets to elements in mbssid_elem.
++         * Kernel will use these offsets to generate multiple BSSID beacons.
++         */
++        u8 **mbssid_elem_offset;
++ 
++        /**
++	 * ema - Enhanced MBSSID advertisements support.
++         */
++        bool ema;
+ };
+ 
+ struct wpa_driver_mesh_bss_params {
+@@ -2169,6 +2205,11 @@
+ 
+ 	/* Maximum number of supported CSA counters */
+ 	u16 max_csa_counters;
++
++	/* Maximum number of interfaces supported for MBSSID advertisement */
++        unsigned int mbssid_max_interfaces;
++        /* Maximum profile periodicity for enhanced MBSSID advertisement */
++        unsigned int ema_max_periodicity;
+ };
+ 
+ 
+@@ -4690,6 +4731,14 @@
+ #endif /* CONFIG_TESTING_OPTIONS */
+ 	int (*radius_eap_failure)(void *priv, int failure_reason);
+ 	int (*radius_fallback_failover)(void *priv, int radius_switch_reason);
++	struct hostapd_data *(*get_mbssid_tx_bss)(void *priv);
++        int (*get_mbssid_bss_index)(void *priv);
++        size_t (*get_mbssid_len)(void *priv, u32 frame_type,
++                              u8 *elem_count);
++        u8 * (*get_mbssid_ie)(void *priv, u8 *eid, u8 *end,
++                        unsigned int frame_stype, u8 elem_count,
++                        u8 **elem_offset);
++        u8* (*get_mbssid_config)(void *priv, u8 *eid);
+ };
+ 
+ /**
