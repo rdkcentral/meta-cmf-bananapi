@@ -1,0 +1,30 @@
+From a1522dded07a7b77d209e04a990f6ad82fd3fc4c Mon Sep 17 00:00:00 2001
+From: Heam Kumar <hkumar343@cable.comcast.com>
+Date: Fri, 20 Dec 2024 12:15:15 +0530
+Subject: [PATCH] RDKBDEV-3082 RDKBACCL-313: Bridge Mode support in BPI R4.
+
+Reason for change:Bridge mode support for bpi4 platform.
+Test Procedure: Ethernet (lan) clients should get Public IP address(i,e in erouter ip series)
+Risks: Low
+
+Change-Id: Ib27dc8cc73b4478376a2ad10bdd874b181e37e6e
+---
+
+diff --git a/source/scripts/init/c_registration/02_bridge.c b/source/scripts/init/c_registration/02_bridge.c
+index 7fd2cee..38cb24a 100644
+--- a/source/scripts/init/c_registration/02_bridge.c
++++ b/source/scripts/init/c_registration/02_bridge.c
+@@ -53,9 +53,12 @@
+ #else
+ const char* SERVICE_CUSTOM_EVENTS[] = { NULL };
+ #endif
+-#elif defined (_PLATFORM_RASPBERRYPI_) || defined(_PLATFORM_BANANAPI_R4_)
++#elif defined (_PLATFORM_RASPBERRYPI_)
+ const char* SERVICE_DEFAULT_HANDLER = "/etc/utopia/service.d/service_bridge_rpi.sh";
+ const char* SERVICE_CUSTOM_EVENTS[] = { NULL };
++#elif defined (_PLATFORM_BANANAPI_R4_)
++const char* SERVICE_DEFAULT_HANDLER = "/etc/utopia/service.d/service_bridge_bpi.sh";
++const char* SERVICE_CUSTOM_EVENTS[] = { NULL };
+ #else
+ const char* SERVICE_DEFAULT_HANDLER = "/etc/utopia/service.d/service_bridge.sh";
+ const char* SERVICE_CUSTOM_EVENTS[] = { NULL };
