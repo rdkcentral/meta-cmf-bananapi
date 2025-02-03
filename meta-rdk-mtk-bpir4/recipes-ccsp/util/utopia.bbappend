@@ -3,7 +3,22 @@ include meta-rdk-mtk-bpir4/recipes-ccsp/ccsp/ccsp_common_bananapi.inc
 FILESEXTRAPATHS_prepend := "${THISDIR}/${PN}:"
 
 SRC_URI += " file://service_bridge_bpi.sh"
-SRC_URI += " file://bridge_mode_support.patch"
+SRC_URI += " file://bridge_mode_support.patch;apply=no"
+SRC_URI += " file://brlan0_issue_fix.patch;apply=no"
+
+do_bpi_patches() {
+    cd ${S}
+    if [ ! -e bpi_patch_applied ]; then
+         bbnote "Patching bridge_mode_support.patch"
+         patch -p1 < ${WORKDIR}/bridge_mode_support.patch
+
+         bbnote "Patching brlan0_issue_fix.patch"
+         patch -p1 < ${WORKDIR}/brlan0_issue_fix.patch
+         touch bpi_patch_applied
+    fi
+}
+
+addtask bpi_patches after do_unpack before do_compile
 
 do_install_append() {
 
