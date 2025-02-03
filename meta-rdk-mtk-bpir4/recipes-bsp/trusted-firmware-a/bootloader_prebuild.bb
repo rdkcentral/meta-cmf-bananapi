@@ -25,7 +25,7 @@ SRC_URI[bl2.sha256sum]= "7af8092bc993241f44013c28894739ceb9bdb93bab593d15cc10e2e
 SRC_URI[fip.sha256sum] = "e32aa5b1d5aca78765703f8544386fb6c294385ae120c272a863d46a599339e3"
 
 # Alternative SRC_URI using local files - uncomment below 2 lines and comment above SRC_URI and checksums
-#SRC_URI = “file://bpi-r4_sdmmc_bl2.img \
+#SRC_URI = "file://bpi-r4_sdmmc_bl2.img \
 #           file://bpi-r4_sdmmc_fip.bin "
 
 do_deploy() {
