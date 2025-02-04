@@ -1,5 +1,5 @@
 #!/bin/sh
-sleep 5
+sleep 20
 iw phy phy0 interface add wifi0 type __ap
 iw phy phy0 interface add wifi1 type __ap
 iw phy phy0 interface add wifi2 type __ap
