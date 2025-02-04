@@ -24,6 +24,7 @@ do_install_append() {
 
 install -d ${D}${sysconfdir}/
 install -d ${D}${sysconfdir}/utopia/
+install -d -m 0777 ${D}/minidumps
 DISTRO_WAN_ENABLED="${@bb.utils.contains('DISTRO_FEATURES','rdkb_wan_manager','true','false',d)}"
 if [ $DISTRO_WAN_ENABLED = 'true' ]; then
 
@@ -95,3 +96,7 @@ echo "#SelfHeal
 $custom_data_model_enabled=0
 $custom_data_model_file_name=/usr/ccsp/tr069pa/custom_mapper.xml"  >> ${D}${sysconfdir}/utopia/system_defaults
 }
+
+FILES_${PN} += " \
+                /minidumps/ \
+"
