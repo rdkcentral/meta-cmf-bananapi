@@ -26,8 +26,8 @@ SRC_URI[fip.sha256sum] = "e32aa5b1d5aca78765703f8544386fb6c294385ae120c272a863d4
 
 # Alternative SRC_URI using local files - uncomment below 3 lines and comment above SRC_URI and checksums
 #FILESEXTRAPATHS_append := "${THISDIR}/files:"
-#SRC_URI = "file://bl2.img \
-#           file://fip.bin "
+#SRC_URI = "file://bpi-r4_sdmmc_bl2.img \
+#           file://bpi-r4_sdmmc_fip.bin "
 
 do_deploy() {
         mkdir -p ${DEPLOYDIR}/atf/
