@@ -53,5 +53,15 @@ sed -i '8 s/^/#/' ${_TOPDIR}/meta-cmf-filogic/recipes-ccsp/util/utopia.bbappend
 sed -i '42 s/^/#/' ${_TOPDIR}/meta-cmf-filogic/recipes-ccsp/util/utopia.bbappend
 sed -i '43 s/^/#/' ${_TOPDIR}/meta-cmf-filogic/recipes-ccsp/util/utopia.bbappend
 sed -i '21 s/^/#/' ${_TOPDIR}/meta-cmf-filogic/recipes-ccsp/util/utopia.bbappend
+sed -i '170 s/^/#/' ${_TOPDIR}/meta-cmf-filogic/recipes-ccsp/util/utopia.bbappend
+sed -i '171 s/^/#/' ${_TOPDIR}/meta-cmf-filogic/recipes-ccsp/util/utopia.bbappend
+sed -i '172 s/^/#/' ${_TOPDIR}/meta-cmf-filogic/recipes-ccsp/util/utopia.bbappend
+sed -i '179 s/^/#/' ${_TOPDIR}/meta-cmf-filogic/recipes-ccsp/util/utopia.bbappend
+sed -i '180 s/^/#/' ${_TOPDIR}/meta-cmf-filogic/recipes-ccsp/util/utopia.bbappend
+sed -i '199 s/^/#/' ${_TOPDIR}/meta-cmf-filogic/recipes-ccsp/util/utopia.bbappend
+sed -i '200 s/^/#/' ${_TOPDIR}/meta-cmf-filogic/recipes-ccsp/util/utopia.bbappend
+sed -i '201 s/^/#/' ${_TOPDIR}/meta-cmf-filogic/recipes-ccsp/util/utopia.bbappend
+sed -i '202 s/^/#/' ${_TOPDIR}/meta-cmf-filogic/recipes-ccsp/util/utopia.bbappend
+sed -i '203 s/^/#/' ${_TOPDIR}/meta-cmf-filogic/recipes-ccsp/util/utopia.bbappend
 touch ${_TOPDIR}/meta-cmf-filogic/recipes-ccsp/util/utopia_changes_applied
 fi
