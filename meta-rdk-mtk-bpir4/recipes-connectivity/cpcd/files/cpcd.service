@@ -2,24 +2,11 @@
 Description=Service for the 802.15.4 co-processor communication daemon
 StartLimitIntervalSec=300
 StartLimitBurst=5
-OnFailure=zilker.service
 [Service]
 Type=simple
 Restart=always
 RestartSec=5
 TimeoutStartSec=60
-ExecStartPre=/usr/bin/init-iot-radio.sh
 ExecStart=/usr/bin/cpcd -c /etc/cpcd.conf
-#
-# If the main process is stopped and the service is restarted,
-# it takes some time to flash the firmware. We do not want monitoring
-# at that stage because it is already managed by TimeoutStartSec,
-# which will mark the service as failed if the flashing process gets stuck.
-ExecStartPost=/bin/systemctl start cpcd-monitor
-#
-# If the main process is stopped, we stop monitoring as well to avoid
-# unnecessary restarts of this service by the monitor service.
-ExecStopPost=/bin/systemctl stop cpcd-monitor
-TimeoutStopSec=8
 [Install]
 WantedBy=multi-user.target
