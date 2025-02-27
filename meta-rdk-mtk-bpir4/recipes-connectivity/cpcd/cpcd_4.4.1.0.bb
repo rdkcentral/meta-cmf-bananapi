@@ -1,6 +1,6 @@
-# TODO: Verify license -- it is Silabs specific
 DESCRIPTION = "Co-Processor Communication Daemon"
-LICENSE = "CLOSED"
+# Refer to the LICENSE at SRC_URI and also http://www.silabs.com/about-us/legal/master-software-license-agreement).
+LICENSE = "Proprietary"
 LIC_FILES_CHKSUM = "file://LICENSE;md5=5e588136d392e8e0e36bd310e9ca0ab3"
 SRC_URI = "git://github.com/SiliconLabs/cpc_daemon;protocol=https;name=cpc-daemon;branch=main"
 PR = "r0"
