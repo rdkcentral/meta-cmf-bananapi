@@ -53,7 +53,7 @@ else # SD card image is default
         echo "> Place those binaries under ${_TOPDIR}/downloads/"
         echo "> EXITING NOW."
         echo "**********************************************************************"
-        exit 1
+        return 1
     fi
 fi
 
