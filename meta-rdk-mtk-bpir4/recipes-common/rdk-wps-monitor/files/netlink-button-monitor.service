@@ -1,0 +1,16 @@
+[Unit]
+Description=RDK WPS Button Monitor Service
+After=network.target
+
+[Service]
+Type=simple
+ExecStart=/usr/bin/netlink-button-monitor -f
+Restart=on-failure
+RestartSec=5
+# Add these lines for logging
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=wps-button-monitor
+
+[Install]
+WantedBy=multi-user.target
