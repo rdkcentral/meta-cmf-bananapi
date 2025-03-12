@@ -7,7 +7,7 @@ SRCREV_FORMAT = "sysintgeneric_sysintdevicebpi"
 
 do_install_append () {
   #Webpa ServerURL
-  echo "SERVERURL=http://webpa.rdkcentral.com:8080" >> ${D}${sysconfdir}/device.properties
+  echo "SERVERURL=https://webpa.rdkcentral.com:8080" >> ${D}${sysconfdir}/device.properties
   echo "Box_Type=bpi" >> ${D}${sysconfdir}/device.properties
   ${@bb.utils.contains('DISTRO_FEATURES', 'OneWifi', 'echo "OneWiFiEnabled=true" >> ${D}${sysconfdir}/device.properties', '', d)}
 
