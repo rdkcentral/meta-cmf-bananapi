@@ -19,3 +19,5 @@ add_busybox_fixes() {
 			cd -
                 fi
 }
+
+IMAGE_INSTALL_remove = "${@bb.utils.contains('DISTRO_FEATURES', 'ppp-enabled', '', 'pptp-linux rp-pppoe xl2tpd', d)}"

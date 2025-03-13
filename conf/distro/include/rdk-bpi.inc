@@ -37,3 +37,6 @@ DISTRO_FEATURES_append = " partner_default_ext"
 
 #Enable SDcard image as default
 DISTRO_FEATURES_append = " sdmmc"
+
+#PPP Feature
+#DISTRO_FEATURES_append = "ppp-enabled"
