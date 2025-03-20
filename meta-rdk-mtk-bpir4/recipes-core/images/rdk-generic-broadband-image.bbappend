@@ -4,6 +4,9 @@ IMAGE_INSTALL_append = " parodus parodus2ccsp"
 #TR069 Feature
 IMAGE_INSTALL_append = " ccsp-tr069-pa"
 
+#WPS Feature
+IMAGE_INSTALL_append = " rdk-wps-monitor"
+
 ROOTFS_POSTPROCESS_COMMAND_append = "add_busybox_fixes; "
 
 #Emptying the PRSERV_HOST since builds are local

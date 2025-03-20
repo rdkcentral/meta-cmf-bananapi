@@ -1,0 +1,76 @@
+diff --git a/rdk-wps-monitor/Makefile b/rdk-wps-monitor/Makefile
+index 6ce146c..082cf50 100644
+--- a/rdk-wps-monitor/Makefile
++++ b/rdk-wps-monitor/Makefile
+@@ -27,7 +27,7 @@ debug: CFLAGS += $(DEBUG_CFLAGS)
+ debug: all
+ 
+ $(EXECUTABLE): $(OBJECTS)
+-	$(CC) $(LDFLAGS) -o $@ $^
++	$(CC) $(LDFLAGS) -o $@ $^ -lrbus -lrtMessage -lrbuscore
+ 
+ $(OBJ_DIR)/%.o: $(SRC_DIR)/%.c $(HEADERS)
+ 	$(CC) $(CFLAGS) -I$(INCLUDE_DIR) -c -o $@ $<
+diff --git a/rdk-wps-monitor/source/button_callback.c b/rdk-wps-monitor/source/button_callback.c
+index 8ce3bc0..3853f2e 100644
+--- a/rdk-wps-monitor/source/button_callback.c
++++ b/rdk-wps-monitor/source/button_callback.c
+@@ -9,6 +9,27 @@
+ #include "../include/button_callback.h"
+ #include "../include/utils.h"
+ 
++#include <rbus.h>
++#include <pthread.h>
++#include <unistd.h>
++
++pthread_mutex_t wps_mutex = PTHREAD_MUTEX_INITIALIZER;
++
++#define WPS_DELAY 60 // 60 seconds delay between presses
++
++void set_wps_push_button(rbusHandle_t handle, const char* param) {
++    pthread_mutex_lock(&wps_mutex);
++
++    rbusError_t err = rbus_setBoolean(handle, param, true);
++    if (err != RBUS_ERROR_SUCCESS) {
++        printf("Failed to set %s: %d\n", param, err);
++    } else {
++        printf("Successfully set %s.\n", param);
++    }
++
++    pthread_mutex_unlock(&wps_mutex);
++}
++
+ // The active callback function
+ static button_callback event_callback = default_button_callback;
+ 
+@@ -17,6 +38,30 @@ void default_button_callback(const char *device, int button_code, int value) {
+     
+     log_message(LOG_INFO, "Device: %s, Button %d %s", 
+            device, button_code, action);
++
++    rbusHandle_t handle;
++    rbusError_t err;
++    char button_name[32];
++    snprintf(button_name, sizeof(button_name), "wps_button_%d", button_code);
++
++    // Initialize RBus
++    //err = rbus_open(&handle, "wps_push_button");
++    err = rbus_open(&handle, button_name);
++    if (err != RBUS_ERROR_SUCCESS) {
++        printf("Failed to initialize RBus: %d\n", err);
++    }
++
++    // Set WPS Push Button for Access Point 1
++    log_message(LOG_INFO, "WPS button pressed on device %s - triggering WPS action for 2G", device);
++    set_wps_push_button(handle, "Device.WiFi.AccessPoint.1.WPS.X_CISCO_COM_ActivatePushButton");
++
++    // Set WPS Push Button for Access Point 2
++    log_message(LOG_INFO, "WPS button pressed on device %s - triggering WPS action for 5G", device);
++    set_wps_push_button(handle, "Device.WiFi.AccessPoint.2.WPS.X_CISCO_COM_ActivatePushButton");
++    sleep(WPS_DELAY);
++
++    // Close RBus
++    rbus_close(handle);
+ }
+ 
+ void custom_wps_button_callback(const char *device, int button_code, int value) {
