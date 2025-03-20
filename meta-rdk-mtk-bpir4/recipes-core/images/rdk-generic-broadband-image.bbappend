@@ -4,6 +4,9 @@ IMAGE_INSTALL_append = " parodus parodus2ccsp"
 #TR069 Feature
 IMAGE_INSTALL_append = " ccsp-tr069-pa"
 
+#WPS Feature
+IMAGE_INSTALL_append = " rdk-wps-monitor"
+
 #SDCARD supported Pre build bootloader
 do_build[depends] += "${@bb.utils.contains('DISTRO_FEATURES','sdmmc','atf_bootloader_prebuild:do_deploy','',d)}"
 
