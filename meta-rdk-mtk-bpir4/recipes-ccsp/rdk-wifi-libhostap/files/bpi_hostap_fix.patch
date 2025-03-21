@@ -1,0 +1,10 @@
+--- git/source/hostap-2.10/src/ap/ap_config.h
++++ git/source/hostap-2.10/src/ap/ap_config.h
+@@ -310,6 +310,7 @@
+ 	char *eap_sim_db;
+ 	unsigned int eap_sim_db_timeout;
+ 	int eap_server_erp; /* Whether ERP is enabled on internal EAP server */
++	struct hostapd_ip_addr own_ip_addr;
+ 	char *nas_identifier;
+ 	struct hostapd_radius_servers *radius;
+ 	int acct_interim_interval;
