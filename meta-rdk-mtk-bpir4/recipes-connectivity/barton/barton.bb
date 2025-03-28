@@ -29,6 +29,7 @@ DEPENDS += " \
     mbedtls \
     dbus \
     cjson \
+    otbr-agent \
 "
 
 # Tell CMake to find dependencies in the Yocto sysroot
@@ -40,7 +41,9 @@ EXTRA_OECMAKE += "-DCMAKE_SYSROOT=${STAGING_DIR_HOST}"
 # Disable Matter by default to avoid Python venv errors
 EXTRA_OECMAKE += "-DBDS_MATTER=OFF"
 
-EXTRA_OECMAKE += "-DBDS_THREAD=OFF"
+# Enable Thread support
+EXTRA_OECMAKE += "-DBDS_THREAD=ON"
+EXTRA_OECMAKE += "-DBDS_THREAD_OTBR=ON"
 
 # Disable GIR generation since we don't have libgirepository
 EXTRA_OECMAKE += "-DBDS_GEN_GIR=OFF"
@@ -54,12 +57,15 @@ EXTRA_OECMAKE += "-DBUILD_TESTING=OFF"
 # Disable the dependency on mbedcrypto completely
 EXTRA_OECMAKE += "-DBDS_USE_MBEDCRYPTO=OFF"
 
-# Disable components that might need dbus
-EXTRA_OECMAKE += "-DBDS_BUILD_DBUS=OFF"
-EXTRA_OECMAKE += "-DBDS_USE_DBUS=OFF"
+# Enable DBus for Thread since OTBR interface uses DBus
+EXTRA_OECMAKE += "-DBDS_BUILD_DBUS=ON"
+EXTRA_OECMAKE += "-DBDS_USE_DBUS=ON"
 
 # Provide extra cmake paths
 EXTRA_OECMAKE += "-DCMAKE_MODULE_PATH=${STAGING_DATADIR}/cmake/Modules"
+
+# Add flags to find OpenThread Border Router includes
+CXXFLAGS += "-I${STAGING_INCDIR}/otbr"
 
 # Fix CMake issues by modifying files directly
 do_configure:prepend() {
