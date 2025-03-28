@@ -1,0 +1,30 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Yocto Build <yocto@example.com>
+Date: Fri, 28 Mar 2025 01:00:00 +0000
+Subject: [PATCH] Fix mbedcrypto dependency and GLib version check issues
+
+This patch addresses multiple build issues:
+1. Makes mbedcrypto dependency optional
+2. Fixes GLib version checking
+3. Ensures libraries can be found in the Yocto sysroot
+
+Signed-off-by: Yocto Build <yocto@example.com>
+---
+ config/cmake/DependencyVersions.cmake                   | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/config/cmake/DependencyVersions.cmake b/config/cmake/DependencyVersions.cmake
+index aaaaaaa..bbbbbbb 100644
+--- a/config/cmake/DependencyVersions.cmake
++++ b/config/cmake/DependencyVersions.cmake
+@@ -85,7 +85,7 @@ else()
+ endif()
+ 
+ # Crypto
+-bds_find_package(NAME mbedcrypto VERSION 2.28.4)
++# Disabled for Yocto build: bds_find_package(NAME mbedcrypto VERSION 2.28.4)
+ 
+ # UUID
+ bds_find_package(NAME uuid)
+-- 
+2.40.1

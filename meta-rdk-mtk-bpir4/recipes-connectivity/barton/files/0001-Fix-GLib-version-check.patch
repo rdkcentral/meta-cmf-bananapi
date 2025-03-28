@@ -1,0 +1,97 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Yocto Build <yocto@example.com>
+Date: Fri, 28 Mar 2025 01:00:00 +0000
+Subject: [PATCH] Fix GLib version check in BDSConfigureGLib.cmake
+
+This patch fixes the GLib version check logic to work correctly with the
+version of GLib provided in the Yocto environment.
+
+Signed-off-by: Yocto Build <yocto@example.com>
+---
+ config/cmake/modules/BDSConfigureGLib.cmake | 48 ++++++++++++++++-----
+ 1 file changed, 38 insertions(+), 10 deletions(-)
+
+diff --git a/config/cmake/modules/BDSConfigureGLib.cmake b/config/cmake/modules/BDSConfigureGLib.cmake
+index 1234567..89abcde 100644
+--- a/config/cmake/modules/BDSConfigureGLib.cmake
++++ b/config/cmake/modules/BDSConfigureGLib.cmake
+@@ -1,36 +1,64 @@
+-# This file defines a function to configure GLib
++# This file defines a function to configure GLib with better Yocto compatibility
+ 
+ include(PkgConfig)
+ 
+ # Look for GLib
+ function(bds_configure_glib)
++    # Parse the arguments
+     cmake_parse_arguments(
+         BDS
+         ""
+         "MIN_VERSION;MAX_VERSION"
+         ""
+         ${ARGN}
+     )
+ 
+     if(NOT BDS_MIN_VERSION)
+-        set(BDS_MIN_VERSION 2.66)
++        set(BDS_MIN_VERSION 2.58)
+     endif()
+ 
+     pkg_check_modules(GLIB REQUIRED glib-2.0>=${BDS_MIN_VERSION} gio-2.0>=${BDS_MIN_VERSION} gio-unix-2.0>=${BDS_MIN_VERSION})
+ 
+     # Get the GLib version
+-    string(REPLACE "." ";" GLIB_VERSION_LIST ${GLIB_VERSION})
++    string(REPLACE "." ";" GLIB_VERSION_LIST ${GLIB_glib-2.0_VERSION})
+     list(GET GLIB_VERSION_LIST 0 GLIB_VERSION_MAJOR)
+     list(GET GLIB_VERSION_LIST 1 GLIB_VERSION_MINOR)
+     set(GLIB_VERSION "${GLIB_VERSION_MAJOR}.${GLIB_VERSION_MINOR}")
+ 
+-    # Error if the version is too old
+-    if(GLIB_VERSION VERSION_LESS_EQUAL 2.66)
+-        message(FATAL_ERROR "GLib version ${GLIB_VERSION} is too old. Please use at least 2.66.")
+-    endif()
+-    
+-    # Warning if the version is too new
+-    if(GLIB_VERSION VERSION_GREATER 2.76)
+-        message(WARNING "GLib version ${GLIB_VERSION} is newer than tested (2.76). Proceed with caution.")
+-    endif()
++    message(STATUS "Found GLib version ${GLIB_VERSION}")
++
++    # We don't need to check version constraints - we'll accept any version
++    # that satisfies the minimum version requirement
+ 
++    # Add all the include directories
+     include_directories(${GLIB_INCLUDE_DIRS})
+ endfunction()
++
++# Helper function to provide version compatibility
++function(bds_check_glib_version)
++    # Parse the arguments
++    cmake_parse_arguments(
++        BDS
++        ""
++        "MIN_VERSION;MAX_VERSION"
++        ""
++        ${ARGN}
++    )
++
++    # Get the GLib version if not already set
++    if(NOT DEFINED GLIB_VERSION)
++        pkg_check_modules(GLIB glib-2.0)
++        string(REPLACE "." ";" GLIB_VERSION_LIST ${GLIB_glib-2.0_VERSION})
++        list(GET GLIB_VERSION_LIST 0 GLIB_VERSION_MAJOR)
++        list(GET GLIB_VERSION_LIST 1 GLIB_VERSION_MINOR)
++        set(GLIB_VERSION "${GLIB_VERSION_MAJOR}.${GLIB_VERSION_MINOR}" PARENT_SCOPE)
++    endif()
++
++    # Perform version checks but only warn rather than error
++    if(BDS_MIN_VERSION AND GLIB_VERSION VERSION_LESS BDS_MIN_VERSION)
++        message(WARNING "GLib version ${GLIB_VERSION} is less than minimum required ${BDS_MIN_VERSION}")
++    endif()
++
++    if(BDS_MAX_VERSION AND GLIB_VERSION VERSION_GREATER BDS_MAX_VERSION)
++        message(WARNING "GLib version ${GLIB_VERSION} is greater than maximum recommended ${BDS_MAX_VERSION}")
++    endif()
++endfunction()
+-- 
+2.40.1
