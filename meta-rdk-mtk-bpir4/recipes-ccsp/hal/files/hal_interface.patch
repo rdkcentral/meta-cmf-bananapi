@@ -1,0 +1,95 @@
+################################################
+#From: 2deb7d57df61e41ae71d8431bbc62dabeae8b660,
+#      a1a55d64c1240a1f9cf34dcd1cdde9b29070cc6d
+#Subject: Add callback func to get AKM and wpa3 comp enum
+#Source: COMCAST
+#Signed-off-by:Amalesh_Nandh@comcast.com
+################################################
+diff --git a/wifi_hal_ap.h b/wifi_hal_ap.h
+index a5b1acf..704d5bd 100644
+--- a/wifi_hal_ap.h
++++ b/wifi_hal_ap.h
+@@ -1742,6 +1742,45 @@ void wifi_newApAssociatedDevice_callback_register(wifi_newApAssociatedDevice_cal
+ * calls. It should probably just send a message to a driver event handler task.
+ *
+ */
++typedef INT ( * wifi_stamode_callback)(int apIndex, char *mac, int key_mgmt, int type, int radio, int mode);
++
++/* wifi_hal_ap_max_client_rejection_callback_register() function */
++/**
++ * @brief This call back will be called whenever an authentication response with reject reason 17
++ * is received.
++ *
++ * @param[in] apIndex          Access Point Index
++ * @param[in] mac_address      client_mac_address
++ * @param[in] reject_reason    reject reason
++ *
++ * @return The status of the operation
++ * @retval RETURN_OK if successful
++ * @retval RETURN_ERR if any error is detected
++ *
++ * @execution Synchronous
++ * @sideeffect None
++ *
++ * @note This function must not suspend and must not invoke any blocking system
++ * calls. It should probably just send a message to a driver event handler task.
++ *
++ */
++typedef INT (*wifi_apMaxClientRejection_callback)(INT apIndex, char *MAC, INT reason);
++
++/**
++ * @brief Callback function invoked when a RADIUS or EAP failure occurs.
++ *
++ * This callback function is invoked when a RADIUS or EAP failure occurs on
++ * the specified Access Point (AP).
++ * This function must not suspend and must not invoke any blocking system calls.
++ *
++ * @param[in] apIndex         Index of the Access Point.
++ * @param[in] failure_reason  Reason for the failure.
++ *
++ * @returns The status of the operation.
++ * @retval WIFI_HAL_SUCCESS If successful.
++ * @retval WIFI_HAL_ERROR   If any error is detected.
++ */
++
+ typedef INT ( * wifi_apDisassociatedDevice_callback)(INT apIndex, char *MAC, INT event_type);
+ 
+ /* wifi_radiusEapFailure_callback() function */
+@@ -2700,6 +2739,8 @@ typedef struct {
+     mac_address_t bssid;                    /**< The BSSID. This variable should only be used in the get API. It can't used to change the interface MAC */
+     UINT   wmmNoAck;
+     UINT   wepKeyLength;
++    UINT   vendor_elements_len;
++    UCHAR *vendor_elements;
+     BOOL   bssHotspot;
+     UINT   wpsPushButton;
+     char   beaconRateCtl[32];
+@@ -2857,4 +2898,4 @@ INT wifi_hal_analytics_callback_register(wifi_analytics_callback callback);
+ }
+ #endif
+ 
+-#endif
+\ No newline at end of file
++#endif
+diff --git a/wifi_hal_generic.h b/wifi_hal_generic.h
+index 7edc2c4..db9ff83 100644
+--- a/wifi_hal_generic.h
++++ b/wifi_hal_generic.h
+@@ -274,7 +274,8 @@ typedef enum {
+     wifi_security_mode_wpa3_personal = 0x00000200,
+     wifi_security_mode_wpa3_transition = 0x00000400,
+     wifi_security_mode_wpa3_enterprise = 0x00000800,
+-    wifi_security_mode_enhanced_open = 0x00001000
++    wifi_security_mode_enhanced_open = 0x00001000,
++    wifi_security_mode_wpa3_compatibility = 0x00002000
+ } wifi_security_modes_t;
+ 
+ /**
+@@ -822,6 +823,7 @@ typedef struct {
+      BOOL radio_presence[MAX_NUM_RADIOS];         /**< Indicates if the interfaces is present (not in deep sleep)*/
+      wifi_multi_link_info_t mu_info;
+      UINT BssMaxStaAllow;                    /**< Maximum number of stations supported for given platform. Gets populated during bring-up. */
++     UINT colocated_mode;
+ 
+     //Device Information related fields
+      CHAR manufacturer[DEFAULT_DEVICE_FIELD_LEN];
