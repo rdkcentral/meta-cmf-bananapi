@@ -1,0 +1,169 @@
+Source: COMCAST
+diff -Naur git.orig/source/hostap-2.11/src/ap/ap_config.c git/source/hostap-2.11/src/ap/ap_config.c
+--- git.orig/source/hostap-2.11/src/ap/ap_config.c	2025-04-04 07:01:06.741390859 +0100
++++ git/source/hostap-2.11/src/ap/ap_config.c	2025-04-04 07:02:28.414588520 +0100
+@@ -518,9 +518,10 @@
+ 				       conf->rsn_override_key_mgmt_2) &&
+ 	     !hostapd_sae_pk_in_use(conf)) ||
+ 	    conf->sae_pwe == SAE_PWE_FORCE_HUNT_AND_PECK ||
+-	    !wpa_key_mgmt_sae(conf->wpa_key_mgmt |
++	    !(wpa_key_mgmt_sae(conf->wpa_key_mgmt |
+ 			      conf->rsn_override_key_mgmt |
+-			      conf->rsn_override_key_mgmt_2))
++			      conf->rsn_override_key_mgmt_2)||
++	    wpa_key_mgmt_sae(conf->wpa_key_mgmt_rsno)))
+ 		return 0; /* PT not needed */
+ 
+ 	if (!groups) {
+diff -Naur git.orig/source/hostap-2.11/src/ap/ap_config.h git/source/hostap-2.11/src/ap/ap_config.h
+--- git.orig/source/hostap-2.11/src/ap/ap_config.h	2025-04-04 07:01:06.741390859 +0100
++++ git/source/hostap-2.11/src/ap/ap_config.h	2025-04-04 07:02:28.414588520 +0100
+@@ -1055,6 +1055,8 @@
+ 	char apup_peer_ifname_prefix[IFNAMSIZ + 1];
+ #endif /* CONFIG_APUP */
+ 	int connected_building_avp;
++	int wpa_key_mgmt_rsno;
++	enum mfp_options ieee80211w_rsno;
+ };
+ 
+ /**
+diff -Naur git.orig/source/hostap-2.11/src/ap/beacon.c git/source/hostap-2.11/src/ap/beacon.c
+--- git.orig/source/hostap-2.11/src/ap/beacon.c	2025-04-04 07:01:06.741390859 +0100
++++ git/source/hostap-2.11/src/ap/beacon.c	2025-04-04 07:02:28.414588520 +0100
+@@ -418,6 +418,38 @@
+ 	return pos + 2 + ie[1];
+ }
+ 
++static u8 * hostapd_eid_rsno_ie(struct hostapd_data *hapd, u8 *pos, size_t len)
++{
++	const u8 *ie;
++
++	ie = hostapd_vendor_wpa_ie(hapd, WPA_RSNO_OUI_TYPE);
++       if (!ie || 2U + ie[1] > len)
++	{
++		wpa_printf(MSG_ERROR, "%s IE not found in hostapd_vendor_wpa_ie \n", __func__);
++		return pos;
++	}
++
++	os_memcpy(pos, ie, 2 + ie[1]);
++
++	return pos + 2 + ie[1];
++}
++
++static u8 * hostapd_eid_rsnxo_ie(struct hostapd_data *hapd, u8 *pos, size_t len)
++{
++	const u8 *ie;
++
++	ie = hostapd_vendor_wpa_ie(hapd, WPA_RSNXO_OUI_TYPE);
++	if (!ie || 2U + ie[1] > len) {
++		wpa_printf(MSG_ERROR, "%s Error in hostapd_vendor_wpa_ie\n", __func__);
++		return pos;
++	}
++
++	os_memcpy(pos, ie, 2 + ie[1]);
++
++	return pos + 2 + ie[1];
++}
++
++
+ 
+ static u8 * hostapd_get_osen_ie(struct hostapd_data *hapd, u8 *pos, size_t len)
+ {
+@@ -1079,6 +1111,10 @@
+ 		pos += wpabuf_len(hapd->conf->vendor_elements);
+ 	}
+ 
++	if(hapd->conf->wpa_key_mgmt_rsno) {
++		pos = hostapd_eid_rsno_ie(hapd, pos, epos - pos);
++		pos = hostapd_eid_rsnxo_ie(hapd, pos, epos - pos);
++	}
+ #ifdef CONFIG_TESTING_OPTIONS
+ 	if (hapd->conf->presp_elements) {
+ 		os_memcpy(pos, wpabuf_head(hapd->conf->presp_elements),
+@@ -2666,6 +2702,11 @@
+ 		tailpos += wpabuf_len(hapd->conf->vendor_elements);
+ 	}
+ 
++	if(hapd->conf->wpa_key_mgmt_rsno) {
++		tailpos = hostapd_eid_rsno_ie(hapd, tailpos, tail + tail_len - tailpos);
++		tailpos = hostapd_eid_rsnxo_ie(hapd, tailpos, tail + tail_len - tailpos);
++	}
++
+ 	tail_len = tailpos > tail ? tailpos - tail : 0;
+ 
+ 	resp = hostapd_probe_resp_offloads(hapd, &resp_len);
+diff -Naur git.orig/source/hostap-2.11/src/ap/ieee802_11.c git/source/hostap-2.11/src/ap/ieee802_11.c
+--- git.orig/source/hostap-2.11/src/ap/ieee802_11.c	2025-04-04 07:01:06.741390859 +0100
++++ git/source/hostap-2.11/src/ap/ieee802_11.c	2025-04-04 07:02:28.474589400 +0100
+@@ -3059,10 +3059,12 @@
+ 	       auth_alg == WLAN_AUTH_FT) ||
+ #endif /* CONFIG_IEEE80211R_AP */
+ #ifdef CONFIG_SAE
+-	      (hapd->conf->wpa &&
++
++	      ( ((hapd->conf->wpa &&
+ 	       wpa_key_mgmt_sae(hapd->conf->wpa_key_mgmt |
+ 				hapd->conf->rsn_override_key_mgmt |
+-				hapd->conf->rsn_override_key_mgmt_2) &&
++				hapd->conf->rsn_override_key_mgmt_2)) ||
++		 (hapd->conf->wpa && wpa_key_mgmt_sae(hapd->conf->wpa_key_mgmt_rsno)))&&
+ 	       auth_alg == WLAN_AUTH_SAE) ||
+ #endif /* CONFIG_SAE */
+ #ifdef CONFIG_FILS
+diff -Naur git.orig/source/hostap-2.11/src/ap/wpa_auth_glue.c git/source/hostap-2.11/src/ap/wpa_auth_glue.c
+--- git.orig/source/hostap-2.11/src/ap/wpa_auth_glue.c	2025-04-04 07:01:06.741390859 +0100
++++ git/source/hostap-2.11/src/ap/wpa_auth_glue.c	2025-04-04 07:02:28.478589459 +0100
+@@ -278,6 +278,8 @@
+ 	wconf->no_disconnect_on_group_keyerror =
+ 		conf->bss_max_idle && conf->ap_max_inactivity &&
+ 		conf->no_disconnect_on_group_keyerror;
++        wconf->wpa_key_mgmt_rsno = conf->wpa_key_mgmt_rsno;
++        wconf->ieee80211w_rsno = conf->ieee80211w_rsno;
+ 
+ 	wconf->rsn_override_omit_rsnxe = conf->rsn_override_omit_rsnxe;
+ }
+diff -Naur git.orig/source/hostap-2.11/src/ap/wpa_auth.h git/source/hostap-2.11/src/ap/wpa_auth.h
+--- git.orig/source/hostap-2.11/src/ap/wpa_auth.h	2025-04-04 07:01:06.741390859 +0100
++++ git/source/hostap-2.11/src/ap/wpa_auth.h	2025-04-04 07:02:28.474589400 +0100
+@@ -297,7 +297,8 @@
+ #ifdef CONFIG_DRIVER_BRCM
+ 	int spp_amsdu;
+ #endif /* CONFIG_DRIVER_BRCM */
+-
++	int wpa_key_mgmt_rsno;
++	enum mfp_options ieee80211w_rsno;
+ 	/*
+ 	 * If set Key Derivation Key should be derived as part of PMK to
+ 	 * PTK derivation regardless of advertised capabilities.
+diff -Naur git.orig/source/hostap-2.11/src/common/wpa_common.h git/source/hostap-2.11/src/common/wpa_common.h
+--- git.orig/source/hostap-2.11/src/common/wpa_common.h	2025-04-04 07:01:06.745390919 +0100
++++ git/source/hostap-2.11/src/common/wpa_common.h	2025-04-04 07:02:28.414588520 +0100
+@@ -150,6 +150,8 @@
+ #define WFA_KEY_DATA_RSN_OVERRIDE_LINK RSN_SELECTOR(0x50, 0x6f, 0x9a, 0x2d)
+ 
+ #define WPA_OUI_TYPE RSN_SELECTOR(0x00, 0x50, 0xf2, 1)
++#define WPA_RSNO_OUI_TYPE RSN_SELECTOR(0x50, 0x6f, 0x9a, 0x29)
++#define WPA_RSNXO_OUI_TYPE RSN_SELECTOR(0x50, 0x6f, 0x9a, 0x2B)
+ 
+ #define RSN_SELECTOR_PUT(a, val) WPA_PUT_BE32((u8 *) (a), (val))
+ #define RSN_SELECTOR_GET(a) WPA_GET_BE32((const u8 *) (a))
+@@ -812,4 +814,19 @@
+ void rsn_set_snonce_cookie(u8 *snonce);
+ bool rsn_is_snonce_cookie(const u8 *snonce);
+ 
++struct rsno_ie_hdr {
++	u8 elem_id;
++	u8 len;
++	u8 oui[3];
++	u8 oui_type;
++	u8 version[2]; /* little endian */
++}STRUCT_PACKED;
++
++struct rsnxo_ie_hdr {
++	u8 elem_id;
++	u8 len;
++	u8 oui[3];
++	u8 oui_type;
++}STRUCT_PACKED;
++
+ #endif /* WPA_COMMON_H */

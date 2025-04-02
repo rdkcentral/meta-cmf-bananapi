@@ -1,0 +1,338 @@
+##########################################
+From: Srijeyarankesh_JS@comcast.com
+Date: Mar 7, 2025 18:45
+Source: Comcast
+##########################################
+diff --git a/source/hostap-2.11/hostapd/config_file.c b/source/hostap-2.11/hostapd/config_file.c
+index 3fb0597..1b9b098 100644
+--- a/source/hostap-2.11/hostapd/config_file.c
++++ b/source/hostap-2.11/hostapd/config_file.c
+@@ -3055,7 +3055,7 @@
+ 	} else if (os_strcmp(buf, "dynamic_own_ip_addr") == 0) {
+ 		bss->dynamic_own_ip_addr = atoi(pos);
+ 	} else if (os_strcmp(buf, "own_ip_addr") == 0) {
+-		if (hostapd_parse_ip_addr(pos, &bss->own_ip_addr)) {
++		if (hostapd_parse_ip_addr(pos, &bss->radius->own_ip_addr)) {
+ 			wpa_printf(MSG_ERROR,
+ 				   "Line %d: invalid IP address '%s'",
+ 				   line, pos);
+diff -Naur git.orig/source/hostap-2.11/src/ap/ap_config.h git/source/hostap-2.11/src/ap/ap_config.h
+--- git.orig/source/hostap-2.11/src/ap/ap_config.h	2025-04-03 08:16:34.647227520 +0100
++++ git/source/hostap-2.11/src/ap/ap_config.h	2025-04-03 08:29:28.519321346 +0100
+@@ -314,7 +314,6 @@
+ 	char *eap_sim_db;
+ 	unsigned int eap_sim_db_timeout;
+ 	int eap_server_erp; /* Whether ERP is enabled on internal EAP server */
+-	struct hostapd_ip_addr own_ip_addr;
+ 	int dynamic_own_ip_addr;
+ 	char *nas_identifier;
+ 	struct hostapd_radius_servers *radius;
+diff -Naur git.orig/source/hostap-2.11/src/ap/hostapd.c git/source/hostap-2.11/src/ap/hostapd.c
+--- git.orig/source/hostap-2.11/src/ap/hostapd.c	2025-04-03 08:16:34.647227520 +0100
++++ git/source/hostap-2.11/src/ap/hostapd.c	2025-04-03 08:29:28.523321450 +0100
+@@ -1017,8 +1017,8 @@
+ 	}
+ 
+ 	if (attr->nas_ip_addr &&
+-	    (hapd->conf->own_ip_addr.af != AF_INET ||
+-	     os_memcmp(&hapd->conf->own_ip_addr.u.v4, attr->nas_ip_addr, 4) !=
++	    (hapd->radius->conf->own_ip_addr.af != AF_INET ||
++	     os_memcmp(&hapd->radius->conf->own_ip_addr.u.v4, attr->nas_ip_addr, 4) !=
+ 	     0)) {
+ 		wpa_printf(MSG_DEBUG, "RADIUS DAS: NAS-IP-Address mismatch");
+ 		return 1;
+@@ -1026,8 +1026,8 @@
+ 
+ #ifdef CONFIG_IPV6
+ 	if (attr->nas_ipv6_addr &&
+-	    (hapd->conf->own_ip_addr.af != AF_INET6 ||
+-	     os_memcmp(&hapd->conf->own_ip_addr.u.v6, attr->nas_ipv6_addr, 16)
++	    (hapd->radius->conf->own_ip_addr.af != AF_INET6 ||
++	     os_memcmp(&hapd->radius->conf->own_ip_addr.u.v6, attr->nas_ipv6_addr, 16)
+ 	     != 0)) {
+ 		wpa_printf(MSG_DEBUG, "RADIUS DAS: NAS-IPv6-Address mismatch");
+ 		return 1;
+diff -Naur git.orig/source/hostap-2.11/src/ap/ieee802_1x.c git/source/hostap-2.11/src/ap/ieee802_1x.c
+--- git.orig/source/hostap-2.11/src/ap/ieee802_1x.c	2025-04-03 10:05:39.454043970 +0100
++++ git/source/hostap-2.11/src/ap/ieee802_1x.c	2025-04-03 10:07:09.352388265 +0100
+@@ -608,9 +608,9 @@
+ 
+ 	if (!hostapd_config_get_radius_attr(req_attr,
+ 					    RADIUS_ATTR_NAS_IP_ADDRESS) &&
+-	    hapd->conf->own_ip_addr.af == AF_INET &&
++	    hapd->radius->conf->own_ip_addr.af == AF_INET &&
+ 	    !radius_msg_add_attr(msg, RADIUS_ATTR_NAS_IP_ADDRESS,
+-				 (u8 *) &hapd->conf->own_ip_addr.u.v4, 4)) {
++				 (u8 *) &hapd->radius->conf->own_ip_addr.u.v4, 4)) {
+ 		wpa_printf(MSG_ERROR, "Could not add NAS-IP-Address");
+ 		return -1;
+ 	}
+@@ -618,9 +618,9 @@
+ #ifdef CONFIG_IPV6
+ 	if (!hostapd_config_get_radius_attr(req_attr,
+ 					    RADIUS_ATTR_NAS_IPV6_ADDRESS) &&
+-	    hapd->conf->own_ip_addr.af == AF_INET6 &&
++	    hapd->radius->conf->own_ip_addr.af == AF_INET6 &&
+ 	    !radius_msg_add_attr(msg, RADIUS_ATTR_NAS_IPV6_ADDRESS,
+-				 (u8 *) &hapd->conf->own_ip_addr.u.v6, 16)) {
++				 (u8 *) &hapd->radius->conf->own_ip_addr.u.v6, 16)) {
+ 		wpa_printf(MSG_ERROR, "Could not add NAS-IPv6-Address");
+ 		return -1;
+ 	}
+diff -Naur git.orig/source/hostap-2.11/src/radius/radius_client.c git/source/hostap-2.11/src/radius/radius_client.c
+--- git.orig/source/hostap-2.11/src/radius/radius_client.c	2025-04-03 08:16:34.675228246 +0100
++++ git/source/hostap-2.11/src/radius/radius_client.c	2025-04-03 08:29:28.523321450 +0100
+@@ -154,110 +154,6 @@
+ };
+ 
+ 
+-/**
+- * struct radius_client_data - Internal RADIUS client data
+- *
+- * This data structure is used internally inside the RADIUS client module.
+- * External users allocate this by calling radius_client_init() and free it by
+- * calling radius_client_deinit(). The pointer to this opaque data is used in
+- * calls to other functions as an identifier for the RADIUS client instance.
+- */
+-struct radius_client_data {
+-	/**
+-	 * ctx - Context pointer for hostapd_logger() callbacks
+-	 */
+-	void *ctx;
+-
+-	struct hostapd_ip_addr local_ip;
+-
+-	/**
+-	 * conf - RADIUS client configuration (list of RADIUS servers to use)
+-	 */
+-	struct hostapd_radius_servers *conf;
+-
+-	/**
+-	 * auth_sock - Currently used socket for RADIUS authentication server
+-	 */
+-	int auth_sock;
+-
+-	/**
+-	 * auth_tls - Whether current authentication connection uses TLS
+-	 */
+-	bool auth_tls;
+-
+-	/**
+-	 * auth_tls_ready - Whether authentication TLS is ready
+-	 */
+-	bool auth_tls_ready;
+-
+-	/**
+-	 * acct_sock - Currently used socket for RADIUS accounting server
+-	 */
+-	int acct_sock;
+-
+-	/**
+-	 * acct_tls - Whether current accounting connection uses TLS
+-	 */
+-	bool acct_tls;
+-
+-	/**
+-	 * acct_tls_ready - Whether accounting TLS is ready
+-	 */
+-	bool acct_tls_ready;
+-
+-	/**
+-	 * auth_handlers - Authentication message handlers
+-	 */
+-	struct radius_rx_handler *auth_handlers;
+-
+-	/**
+-	 * num_auth_handlers - Number of handlers in auth_handlers
+-	 */
+-	size_t num_auth_handlers;
+-
+-	/**
+-	 * acct_handlers - Accounting message handlers
+-	 */
+-	struct radius_rx_handler *acct_handlers;
+-
+-	/**
+-	 * num_acct_handlers - Number of handlers in acct_handlers
+-	 */
+-	size_t num_acct_handlers;
+-
+-	/**
+-	 * msgs - Pending outgoing RADIUS messages
+-	 */
+-	struct radius_msg_list *msgs;
+-
+-	/**
+-	 * num_msgs - Number of pending messages in the msgs list
+-	 */
+-	size_t num_msgs;
+-
+-	/**
+-	 * next_radius_identifier - Next RADIUS message identifier to use
+-	 */
+-	u8 next_radius_identifier;
+-
+-	/**
+-	 * interim_error_cb - Interim accounting error callback
+-	 */
+-	void (*interim_error_cb)(const u8 *addr, void *ctx);
+-
+-	/**
+-	 * interim_error_cb_ctx - interim_error_cb() context data
+-	 */
+-	void *interim_error_cb_ctx;
+-
+-#ifdef CONFIG_RADIUS_TLS
+-	void *tls_ctx;
+-	struct tls_connection *auth_tls_conn;
+-	struct tls_connection *acct_tls_conn;
+-#endif /* CONFIG_RADIUS_TLS */
+-};
+-
+-
+ static int
+ radius_change_server(struct radius_client_data *radius,
+ 		     struct hostapd_radius_server *nserv,
+@@ -1764,6 +1660,8 @@
+ 			wpa_printf(MSG_DEBUG, "RADIUS local address: %s:%u",
+ 				   inet_ntoa(claddr.sin_addr),
+ 				   ntohs(claddr.sin_port));
++                        radius->conf->own_ip_addr.af = AF_INET;
++                        radius->conf->own_ip_addr.u.v4 = claddr.sin_addr;
+ 			if (auth) {
+ 				radius->local_ip.af = AF_INET;
+ 				radius->local_ip.u.v4 = claddr.sin_addr;
+@@ -1779,6 +1677,8 @@
+ 				   inet_ntop(AF_INET6, &claddr6.sin6_addr,
+ 					     abuf, sizeof(abuf)),
+ 				   ntohs(claddr6.sin6_port));
++                        radius->conf->own_ip_addr.af = AF_INET6;
++                        radius->conf->own_ip_addr.u.v6 = claddr6.sin6_addr;
+ 			if (auth) {
+ 				radius->local_ip.af = AF_INET6;
+ 				radius->local_ip.u.v6 = claddr6.sin6_addr;
+diff -Naur git.orig/source/hostap-2.11/src/radius/radius_client.h git/source/hostap-2.11/src/radius/radius_client.h
+--- git.orig/source/hostap-2.11/src/radius/radius_client.h	2025-04-03 08:16:34.675228246 +0100
++++ git/source/hostap-2.11/src/radius/radius_client.h	2025-04-03 08:29:28.523321450 +0100
+@@ -196,6 +196,11 @@
+ 	int msg_dumps;
+ 
+ 	/**
++     * own_ip_addr - used to store the NAS IP Address and it's IP family
++	 */
++    struct hostapd_ip_addr own_ip_addr;
++
++	/**
+ 	 * client_addr - Client (local) address to use if force_client_addr
+ 	 */
+ 	struct hostapd_ip_addr client_addr;
+@@ -267,7 +272,108 @@
+ 	RADIUS_RX_INVALID_AUTHENTICATOR
+ } RadiusRxResult;
+ 
+-struct radius_client_data;
++
++/**
++ * struct radius_client_data - Internal RADIUS client data
++ *
++ * This data structure is used internally inside the RADIUS client module.
++ * External users allocate this by calling radius_client_init() and free it by
++ * calling radius_client_deinit(). The pointer to this opaque data is used in
++ * calls to other functions as an identifier for the RADIUS client instance.
++ */
++ struct radius_client_data {
++	/**
++	 * ctx - Context pointer for hostapd_logger() callbacks
++	 */
++	void *ctx;
++
++	/**
++	 * conf - RADIUS client configuration (list of RADIUS servers to use)
++	 */
++	struct hostapd_radius_servers *conf;
++
++	/**
++	 * auth_sock - Currently used socket for RADIUS authentication server
++	 */
++	int auth_sock;
++
++	/**
++	 * auth_tls - Whether current authentication connection uses TLS
++	 */
++	bool auth_tls;
++
++	/**
++	 * auth_tls_ready - Whether authentication TLS is ready
++	 */
++	bool auth_tls_ready;
++
++	/**
++	 * acct_sock - Currently used socket for RADIUS accounting server
++	 */
++	int acct_sock;
++
++	/**
++	 * acct_tls - Whether current accounting connection uses TLS
++	 */
++	bool acct_tls;
++
++	/**
++	 * acct_tls_ready - Whether accounting TLS is ready
++	 */
++	bool acct_tls_ready;
++
++	/**
++	 * auth_handlers - Authentication message handlers
++	 */
++	struct radius_rx_handler *auth_handlers;
++
++	/**
++	 * num_auth_handlers - Number of handlers in auth_handlers
++	 */
++	size_t num_auth_handlers;
++
++	/**
++	 * acct_handlers - Accounting message handlers
++	 */
++	struct radius_rx_handler *acct_handlers;
++
++	/**
++	 * num_acct_handlers - Number of handlers in acct_handlers
++	 */
++	size_t num_acct_handlers;
++
++	/**
++	 * msgs - Pending outgoing RADIUS messages
++	 */
++	struct radius_msg_list *msgs;
++
++	/**
++	 * num_msgs - Number of pending messages in the msgs list
++	 */
++	size_t num_msgs;
++
++	/**
++	 * next_radius_identifier - Next RADIUS message identifier to use
++	 */
++	u8 next_radius_identifier;
++
++	/**
++	 * interim_error_cb - Interim accounting error callback
++	 */
++	void (*interim_error_cb)(const u8 *addr, void *ctx);
++
++	/**
++	 * interim_error_cb_ctx - interim_error_cb() context data
++	 */
++	void *interim_error_cb_ctx;
++
++#ifdef CONFIG_RADIUS_TLS
++	void *tls_ctx;
++	struct tls_connection *auth_tls_conn;
++	struct tls_connection *acct_tls_conn;
++#endif /* CONFIG_RADIUS_TLS */
++};
++
+ 
+ int radius_client_register(struct radius_client_data *radius,
+ 			   RadiusType msg_type,

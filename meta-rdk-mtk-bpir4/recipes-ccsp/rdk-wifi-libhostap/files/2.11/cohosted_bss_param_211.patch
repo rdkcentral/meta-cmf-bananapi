@@ -1,0 +1,48 @@
+##########################################
+Date: Apr 16, 2024 1:00 PM
+From: 
+Subject: Add HE max cohosted BSSID parameter
+Source: Comcast
+License: BSD
+Upstream-Status: Pending
+Signed-off-by: Bogdan Bogush <bogdan.bogush@comcast.com>
+##########################################
+diff --git a/source/hostap-2.11/src/ap/ap_config.h b/source/hostap-2.11/src/ap/ap_config.h
+index de02dda..961383e 100644
+--- a/source/hostap-2.11/src/ap/ap_config.h
++++ b/source/hostap-2.11/src/ap/ap_config.h
+@@ -990,6 +990,8 @@ struct he_operation {
+ 	u16 he_rts_threshold;
+ 	u8 he_er_su_disable;
+ 	u16 he_basic_mcs_nss_set;
++	u8 he_cohosted_bss;
++	u8 he_max_cohosted_bssid;
+ };
+ 
+ /**
+diff --git a/source/hostap-2.11/src/ap/ieee802_11_he.c b/source/hostap-2.11/src/ap/ieee802_11_he.c
+index 4b693a7..6f5658b 100644
+--- a/source/hostap-2.11/src/ap/ieee802_11_he.c
++++ b/source/hostap-2.11/src/ap/ieee802_11_he.c
+@@ -178,6 +178,9 @@ u8 * hostapd_eid_he_operation(struct hostapd_data *hapd, u8 *eid)
+ 	if (!hapd->iface->current_mode)
+ 		return eid;
+ 
++	if (hapd->iface->conf->he_op.he_cohosted_bss)
++		oper_size += 1;
++
+ 	if (is_6ghz_op_class(hapd->iconf->op_class))
+ 		oper_size += 5;
+ 
+@@ -218,6 +221,11 @@ u8 * hostapd_eid_he_operation(struct hostapd_data *hapd, u8 *eid)
+ 
+ 	pos += 6; /* skip the fixed part */
+ 
++	if (hapd->iface->conf->he_op.he_cohosted_bss) {
++		params |= HE_OPERATION_COHOSTED_BSS;
++		*pos++ = hapd->iface->conf->he_op.he_max_cohosted_bssid;
++	}
++
+ 	if (is_6ghz_op_class(hapd->iconf->op_class)) {
+ 		enum oper_chan_width oper_chwidth =
+ 			hostapd_get_oper_chwidth(hapd->iconf);

@@ -1,0 +1,68 @@
+##########################################
+Date: Apr 16, 2024 1:00 PM
+From: 
+Subject: Implement supported operating classes tag
+Source: Comcast
+License: BSD
+Upstream-Status: Pending
+Signed-off-by: Bogdan Bogush <bogdan.bogush@comcast.com>
+##########################################
+diff --git a/source/hostap-2.11/src/ap/beacon.c b/source/hostap-2.11/src/ap/beacon.c
+index e50f0a0..7debfa3 100644
+--- a/source/hostap-2.11/src/ap/beacon.c
++++ b/source/hostap-2.11/src/ap/beacon.c
+@@ -441,7 +441,9 @@ static u8 * hostapd_eid_ecsa(struct hostapd_data *hapd, u8 *eid)
+ 
+ static u8 * hostapd_eid_supported_op_classes(struct hostapd_data *hapd, u8 *eid)
+ {
+-	u8 op_class, channel;
++	u8 *eid_len;
++	u8 op_class, channel, op_classes[32];
++	struct hostapd_hw_modes *mode;
+ 
+ 	if (!(hapd->iface->drv_flags & WPA_DRIVER_FLAGS_AP_CSA) ||
+ 	    !hapd->iface->freq)
+@@ -455,13 +457,40 @@ static u8 * hostapd_eid_supported_op_classes(struct hostapd_data *hapd, u8 *eid)
+ 		return eid;
+ 
+ 	*eid++ = WLAN_EID_SUPPORTED_OPERATING_CLASSES;
+-	*eid++ = 2;
++	eid_len = eid++;
++	*eid_len = 1;
+ 
+ 	/* Current Operating Class */
+ 	*eid++ = op_class;
+ 
+-	/* TODO: Advertise all the supported operating classes */
+-	*eid++ = 0;
++	mode = hapd->iface->current_mode;
++	memset(op_classes, 0, sizeof(op_classes));
++
++	for (int width = 0; width <= hostapd_get_oper_chwidth(hapd->iconf); width++) {
++		for (int ch = 0; ch < mode->num_channels; ch++) {
++			struct hostapd_channel_data *chan = &mode->channels[ch];
++			if (chan->flag & HOSTAPD_CHAN_DISABLED)
++				continue;
++
++			for (int sec_chan = -1; sec_chan <= 1; sec_chan++) {
++				if (ieee80211_freq_to_channel_ext(chan->freq,
++								  sec_chan,
++								  width,
++								  &op_class,
++								  &channel) !=
++				    NUM_HOSTAPD_MODES) {
++					op_classes[op_class / 8] |= 1 << (op_class % 8);
++				}
++			}
++		}
++	}
++
++	for (unsigned int i = 0; i < sizeof(op_classes) * 8; i++) {
++		if (op_classes[i / 8] & (1 << (i % 8))) {
++			*eid++ = i;
++			(*eid_len)++;
++		}
++	}
+ 
+ 	return eid;
+ }

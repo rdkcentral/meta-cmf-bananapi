@@ -1,0 +1,58 @@
+Source: COMCAST
+diff -Naur git.orig/source/hostap-2.11/src/ap/dfs.c git/source/hostap-2.11/src/ap/dfs.c
+--- git.orig/source/hostap-2.11/src/ap/dfs.c	2025-04-02 11:59:29.162702222 +0100
++++ git/source/hostap-2.11/src/ap/dfs.c	2025-04-02 12:03:14.382305004 +0100
+@@ -154,7 +154,7 @@
+ }
+ 
+ 
+-static struct hostapd_channel_data *
++struct hostapd_channel_data *
+ dfs_get_chan_data(struct hostapd_hw_modes *mode, int freq, int first_chan_idx)
+ {
+ 	int i;
+@@ -523,7 +523,7 @@
+ }
+ 
+ 
+-static struct hostapd_channel_data *
++struct hostapd_channel_data *
+ dfs_get_valid_channel(struct hostapd_iface *iface,
+ 		      int *secondary_channel,
+ 		      u8 *oper_centr_freq_seg0_idx,
+@@ -665,7 +665,7 @@
+ }
+ 
+ 
+-static int set_dfs_state_freq(struct hostapd_iface *iface, int freq, u32 state)
++int set_dfs_state_freq(struct hostapd_iface *iface, int freq, u32 state)
+ {
+ 	struct hostapd_hw_modes *mode;
+ 	struct hostapd_channel_data *chan = NULL;
+@@ -691,7 +691,7 @@
+ }
+ 
+ 
+-static int set_dfs_state(struct hostapd_iface *iface, int freq, int ht_enabled,
++int set_dfs_state(struct hostapd_iface *iface, int freq, int ht_enabled,
+ 			 int chan_offset, int chan_width, int cf1,
+ 			 int cf2, u32 state)
+ {
+@@ -757,7 +757,7 @@
+ }
+ 
+ 
+-static int dfs_are_channels_overlapped(struct hostapd_iface *iface, int freq,
++int dfs_are_channels_overlapped(struct hostapd_iface *iface, int freq,
+ 				       int chan_width, int cf1, int cf2)
+ {
+ 	int start_chan_idx, start_chan_idx1;
+@@ -1235,7 +1235,7 @@
+ }
+ 
+ 
+-static bool
++bool
+ hostapd_dfs_is_background_event(struct hostapd_iface *iface, int freq)
+ {
+ 	return dfs_use_radar_background(iface) &&

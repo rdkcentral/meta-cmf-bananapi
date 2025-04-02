@@ -1,0 +1,44 @@
+##########################################
+Date: Apr 16, 2024 1:00 PM
+From: 
+Subject: Allow power constraint tag for all bands
+Source: Comcast
+License: BSD
+Upstream-Status: Pending
+Signed-off-by: Bogdan Bogush <bogdan.bogush@comcast.com>
+##########################################
+diff --git a/source/hostap-2.11/src/ap/beacon.c b/source/hostap-2.11/src/ap/beacon.c
+index e50f0a0..cb6ff4f 100644
+--- a/source/hostap-2.11/src/ap/beacon.c
++++ b/source/hostap-2.11/src/ap/beacon.c
+@@ -131,13 +131,13 @@ static u8 * hostapd_eid_pwr_constraint(struct hostapd_data *hapd, u8 *eid)
+ 	u8 local_pwr_constraint = 0;
+ 	int dfs;
+ 
+-	if (hapd->iface->current_mode == NULL ||
+-	    hapd->iface->current_mode->mode != HOSTAPD_MODE_IEEE80211A)
++	if (hapd->iface->current_mode == NULL /*||
++	    hapd->iface->current_mode->mode != HOSTAPD_MODE_IEEE80211A*/)
+ 		return eid;
+ 
+ 	/* Let host drivers add this IE if DFS support is offloaded */
+-	if (hapd->iface->drv_flags & WPA_DRIVER_FLAGS_DFS_OFFLOAD)
+-		return eid;
++	/*if (hapd->iface->drv_flags & WPA_DRIVER_FLAGS_DFS_OFFLOAD)
++		return eid;*/
+ 
+ 	/*
+ 	 * There is no DFS support and power constraint was not directly
+diff --git a/source/hostap-2.11/src/ap/ieee802_11.c b/source/hostap-2.11/src/ap/ieee802_11.c
+index 88906a6..bb285c8 100644
+--- a/source/hostap-2.11/src/ap/ieee802_11.c
++++ b/source/hostap-2.11/src/ap/ieee802_11.c
+@@ -314,7 +314,7 @@ u16 hostapd_own_capab_info(struct hostapd_data *hapd)
+ 	 * TODO: Also consider driver support for TPC to set Spectrum Mgmt bit
+ 	 */
+ 	if (hapd->iface->current_mode &&
+-	    hapd->iface->current_mode->mode == HOSTAPD_MODE_IEEE80211A &&
++	    /*hapd->iface->current_mode->mode == HOSTAPD_MODE_IEEE80211A &&*/
+ 	    (hapd->iconf->spectrum_mgmt_required || dfs))
+ 		capab |= WLAN_CAPABILITY_SPECTRUM_MGMT;
+ 
