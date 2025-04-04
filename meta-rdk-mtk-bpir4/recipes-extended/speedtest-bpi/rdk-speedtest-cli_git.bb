@@ -4,7 +4,7 @@ SECTION = "net"
 LICENSE = "Apache-2.0"
 LIC_FILES_CHKSUM = "file://LICENSE;md5=86d3f3a95c324c9479bd8986968f4327"
 
-SRC_URI = "git://github.com/rdkcentral/rdk-speedtest-cli;protocol=${CMF_GIT_PROTOCOL};branch=develop"
+SRC_URI = "git://github.com/rdkcentral/rdk-speedtest-cli.git;protocol=${CMF_GIT_PROTOCOL};branch=develop"
 SRCREV = "${AUTOREV}"
 PV = "1.0.0"
 CFLAGS_append += " -DRBUS_BUILD_INTEGRATED"
