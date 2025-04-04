@@ -57,6 +57,9 @@ else # SD card image is default
     fi
 fi
 
+#require python libraries for running ipef3 in BPI / Mediatek had removed these lines for now
+sed -i '8 s/^/#/' recipes-core/images/image-exclude-files.inc
+
 if [ ! -e ${_TOPDIR}/meta-cmf-filogic/recipes-ccsp/util/utopia_changes_applied ]; then
 sed -i '19 s/^/#/' ${_TOPDIR}/meta-cmf-filogic/recipes-ccsp/util/utopia.bbappend
 sed -i '39 s/^/#/' ${_TOPDIR}/meta-cmf-filogic/recipes-ccsp/util/utopia.bbappend

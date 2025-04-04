@@ -3,6 +3,8 @@ IMAGE_INSTALL_append = " parodus parodus2ccsp"
 
 #TR069 Feature
 IMAGE_INSTALL_append = " ccsp-tr069-pa"
+IMAGE_INSTALL_append = " rdk-speedtest-cli"
+
 
 ROOTFS_POSTPROCESS_COMMAND_append = "add_busybox_fixes; "
 
