@@ -5,7 +5,7 @@ LIC_FILES_CHKSUM = "file://LICENSE;md5=86d3f3a95c324c9479bd8986968f4327"
 
 inherit autotools ${@bb.utils.contains("DISTRO_FEATURES", "kirkstone", "python3native", "pythonnative", d)}
 
-SRC_URI = "git://github.com/anatar818/rdk-speedtest-cli.git;branch=main;protocol=https;"
+SRC_URI = "git://github.com/rdkcentral/rdk-speedtest-cli.git;branch=main;protocol=https;"
 
 S = "${WORKDIR}/git"
 SRCREV = "${AUTOREV}"
