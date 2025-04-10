@@ -1,0 +1,48 @@
+##########################################
+From: NarendraVarma_Dandu@comcast.com
+Date: Jan 10, 2025 1:00 AM
+Source: Comcast
+##########################################
+
+diff --git a/source/hostap-2.11/src/ap/ieee802_11.c b/source/hostap-2.11/src/ap/ieee802_11.c
+index 9ffeb63..a30ab15 100644
+--- a/source/hostap-2.11/src/ap/ieee802_11.c
++++ b/source/hostap-2.11/src/ap/ieee802_11.c
+@@ -5563,6 +5563,11 @@ static void handle_assoc(struct hostapd_data *hapd,
+ 		}
+ 	}
+ 
++	os_free(sta->assoc_req);
++	sta->assoc_req = os_malloc(len);
++	os_memcpy(sta->assoc_req, (u8 *)mgmt, len);
++	sta->assoc_req_len = len;
++
+ 	if ((fc & WLAN_FC_RETRY) &&
+ 	    sta->last_seq_ctrl != WLAN_INVALID_MGMT_SEQ &&
+ 	    sta->last_seq_ctrl == seq_ctrl &&
+ 
+diff --git a/source/hostap-2.11/src/ap/sta_info.c b/source/hostap-2.11/src/ap/sta_info.c
+index 303e656..591e855 100644
+--- a/source/hostap-2.11/src/ap/sta_info.c
++++ b/source/hostap-2.11/src/ap/sta_info.c
+@@ -502,6 +502,8 @@ void ap_free_sta(struct hostapd_data *hapd, struct sta_info *sta)
+ 	forced_memzero(sta->last_tk, WPA_TK_MAX_LEN);
+ #endif /* CONFIG_TESTING_OPTIONS */
+ 
++	os_free(sta->assoc_req);
++
+ 	os_free(sta);
+ }
+ 
+diff --git a/source/hostap-2.11/src/ap/sta_info.h b/source/hostap-2.11/src/ap/sta_info.h
+index f0a5df2..d4b7e63 100644
+--- a/source/hostap-2.11/src/ap/sta_info.h
++++ b/source/hostap-2.11/src/ap/sta_info.h
+@@ -338,6 +338,9 @@ struct sta_info {
+ 
+ 	u16 max_idle_period; /* if nonzero, the granted BSS max idle period in
+ 			      * units of 1000 TUs */
++
++	u8 *assoc_req;
++	size_t assoc_req_len;
+ };

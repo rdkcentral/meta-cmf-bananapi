@@ -1,0 +1,80 @@
+##########################################
+From: NarendraVarma_Dandu@comcast.com
+Date: Jan 10, 2025 1:00 AM
+Source: Comcast
+##########################################
+
+diff --git a/source/hostap-2.11/src/ap/ap_drv_ops.c b/source/hostap-2.11/src/ap/ap_drv_ops.c
+index 27904d1..a93853e 100644
+--- a/source/hostap-2.11/src/ap/ap_drv_ops.c
++++ b/source/hostap-2.11/src/ap/ap_drv_ops.c
+@@ -277,6 +277,17 @@ int hostapd_set_ap_wps_ie(struct hostapd_data *hapd)
+ 	return ret;
+ }
+ 
++#ifdef RDK_ONEWIFI
++int hostapd_drv_wps_event_notify_cb(struct hostapd_data *hapd, enum wps_event event,
++                                    union wps_event_data *data)
++{
++	if (!hapd->driver || !hapd->driver->wps_event_notify_cb || !hapd->drv_priv) {
++		return 0;
++	}
++
++	return hapd->driver->wps_event_notify_cb(hapd->drv_priv, event, (union wps_event_data *)data);
++}
++#endif //RDK_ONEWIFI
+ 
+ bool hostapd_sta_is_link_sta(struct hostapd_data *hapd,
+ 			     struct sta_info *sta)
+diff --git a/source/hostap-2.11/src/ap/ap_drv_ops.h b/source/hostap-2.11/src/ap/ap_drv_ops.h
+index fd8a623..ece896b 100644
+--- a/source/hostap-2.11/src/ap/ap_drv_ops.h
++++ b/source/hostap-2.11/src/ap/ap_drv_ops.h
+@@ -26,6 +26,10 @@ void hostapd_free_ap_extra_ies(struct hostapd_data *hapd, struct wpabuf *beacon,
+ 			       struct wpabuf *assocresp);
+ int hostapd_reset_ap_wps_ie(struct hostapd_data *hapd);
+ int hostapd_set_ap_wps_ie(struct hostapd_data *hapd);
++#ifdef RDK_ONEWIFI
++int hostapd_drv_wps_event_notify_cb(struct hostapd_data *hapd, enum wps_event event,
++				    union wps_event_data *data);
++#endif //RDK_ONEWIFI
+ bool hostapd_sta_is_link_sta(struct hostapd_data *hapd,
+ 			     struct sta_info *sta);
+ int hostapd_set_authorized(struct hostapd_data *hapd,
+diff --git a/source/hostap-2.11/src/ap/wps_hostapd.c b/source/hostap-2.11/src/ap/wps_hostapd.c
+index acca304..c4a149d 100644
+--- a/source/hostap-2.11/src/ap/wps_hostapd.c
++++ b/source/hostap-2.11/src/ap/wps_hostapd.c
+@@ -1117,6 +1117,10 @@ static void hostapd_wps_event_cb(void *ctx, enum wps_event event,
+ 	}
+ 	if (hapd->wps_event_cb)
+ 		hapd->wps_event_cb(hapd->wps_event_cb_ctx, event, data);
++
++#ifdef RDK_ONEWIFI
++	hostapd_drv_wps_event_notify_cb(hapd, event, data);
++#endif //RDK_ONEWIFI
+ }
+ 
+ 
+diff --git a/source/hostap-2.11/src/drivers/driver.h b/source/hostap-2.11/src/drivers/driver.h
+index 6610d5d..8daa5b0 100644
+--- a/source/hostap-2.11/src/drivers/driver.h
++++ b/source/hostap-2.11/src/drivers/driver.h
+@@ -3969,6 +3969,17 @@ struct wpa_driver_ops {
+ 			     const struct wpabuf *proberesp,
+ 			     const struct wpabuf *assocresp);
+ 
++#ifdef RDK_ONEWIFI
++	/**
++	 * wps_event_notify_cb - Notification of WPS event
++	 * @ctx:   wpa_supplicant context
++	 * @event: wps event type
++	 * @data:  wps event data
++	 * Returns: 0 on success, -1 on failure
++	 */
++	int (*wps_event_notify_cb)(void *ctx, unsigned int event, void *data);
++#endif //RDK_ONEWIFI
++
+ 	/**
+ 	 * set_supp_port - Set IEEE 802.1X Supplicant Port status
+ 	 * @priv: Private driver interface data

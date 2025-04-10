@@ -1,0 +1,34 @@
+##########################################
+Date: Apr 16, 2024 1:00 PM
+From:
+Subject: Add RIFS mode parameter
+Source: Comcast
+Upstream-Status: Pending
+Signed-off-by: Bogdan Bogush <bogdan.bogush@comcast.com>
+##########################################
+diff -Naur git.orig/source/hostap-2.11/src/ap/ap_config.h git/source/hostap-2.11/src/ap/ap_config.h
+--- git.orig/source/hostap-2.11/src/ap/ap_config.h	2025-04-02 12:19:34.609984492 +0100
++++ git/source/hostap-2.11/src/ap/ap_config.h	2025-04-02 12:23:57.846194900 +0100
+@@ -1203,6 +1203,7 @@
+ 	u8 vht_oper_centr_freq_seg0_idx;
+ 	u8 vht_oper_centr_freq_seg1_idx;
+ 	u8 ht40_plus_minus_allowed;
++        u8 ht_rifs;
+ 
+ 	/* Use driver-generated interface addresses when adding multiple BSSs */
+ 	u8 use_driver_iface_addr;
+diff -Naur git.orig/source/hostap-2.11/src/ap/ieee802_11_ht.c git/source/hostap-2.11/src/ap/ieee802_11_ht.c
+--- git.orig/source/hostap-2.11/src/ap/ieee802_11_ht.c	2025-04-02 12:19:34.609984492 +0100
++++ git/source/hostap-2.11/src/ap/ieee802_11_ht.c	2025-04-02 12:23:57.846194900 +0100
+@@ -152,6 +152,11 @@
+ 
+ 	oper->primary_chan = hapd->iconf->channel;
+ 	oper->operation_mode = host_to_le16(hapd->iface->ht_op_mode);
++
++       if (hapd->iconf->ht_rifs == 1)
++               oper->ht_param |= HT_INFO_HT_PARAM_RIFS_MODE;
++
++
+ 	set_ht_param(hapd, oper);
+ 
+ 	vht_capabilities_info = host_to_le32(hapd->iface->current_mode->vht_capab);

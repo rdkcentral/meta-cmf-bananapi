@@ -1,0 +1,18 @@
+##########################################
+From: NarendraVarma_Dandu@comcast.com
+Date: Jan 10, 2025 1:00 AM
+Source: Comcast
+##########################################
+
+diff --git a/source/hostap-2.11/src/drivers/nl80211_copy.h b/source/hostap-2.11/src/drivers/nl80211_copy.h
+index dced2c4..e5c90d6 100644
+--- a/source/hostap-2.11/src/drivers/nl80211_copy.h
++++ b/source/hostap-2.11/src/drivers/nl80211_copy.h
+@@ -3440,6 +3440,7 @@
+ 	NL80211_ATTR_EMA_RNR_ELEMS,
+ 
+ 	NL80211_ATTR_MLO_LINK_DISABLED,
++	NL80211_ATTR_RX_PHY_RATE_INFO = 350,
+ 
+ 	NL80211_ATTR_BSS_DUMP_INCLUDE_USE_DATA,
+ 
