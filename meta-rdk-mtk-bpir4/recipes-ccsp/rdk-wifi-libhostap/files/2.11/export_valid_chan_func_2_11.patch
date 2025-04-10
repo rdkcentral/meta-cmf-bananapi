@@ -1,0 +1,21 @@
+##########################################
+Date: Feb 7, 2025 1:00 PM
+From: 
+Subject: export dfs_get_valid_channel used in HAL
+Source: Comcast
+Upstream-Status: Pending
+Signed-off-by: Bogdan Bogush <bogdan.bogush@comcast.com>
+##########################################
+--- a/source/hostap-2.11/src/ap/dfs.h
++++ b/source/hostap-2.11/src/ap/dfs.h
+@@ -59,4 +59,10 @@
+ 			   bool cac_required, bool bw_changed);
+ 
+ 
++struct hostapd_channel_data * dfs_get_valid_channel(struct hostapd_iface *iface,
++		      int *secondary_channel,
++		      u8 *oper_centr_freq_seg0_idx,
++		      u8 *oper_centr_freq_seg1_idx,
++		      enum dfs_channel_type type);
++
+ #endif /* DFS_H */

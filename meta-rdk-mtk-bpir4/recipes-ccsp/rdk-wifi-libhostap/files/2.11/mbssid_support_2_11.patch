@@ -1,0 +1,240 @@
+##########################################
+Date: Nov 5, 2024 1:00 PM
+From:
+Subject: MBSSID support
+Source: Comcast
+Upstream-Status: Pending
+Signed-off-by: Bogdan Bogush <bogdan.bogush@comcast.com>
+##########################################
+diff -Naur git.orig/source/hostap-2.11/src/ap/ap_config.c git/source/hostap-2.11/src/ap/ap_config.c
+--- git.orig/source/hostap-2.11/src/ap/ap_config.c	2025-04-03 07:46:02.515651390 +0100
++++ git/source/hostap-2.11/src/ap/ap_config.c	2025-04-03 07:54:32.096898096 +0100
+@@ -1555,11 +1555,13 @@
+ #endif /* CONFIG_TESTING_OPTIONS */
+ #endif /* CONFIG_IEEE80211BE */
+ 
++#ifndef RDK_ONEWIFI
+ 	if (full_config && bss->ignore_broadcast_ssid && conf->mbssid) {
+ 		wpa_printf(MSG_ERROR,
+ 			   "Hidden SSID is not suppored when MBSSID is enabled");
+ 		return -1;
+ 	}
++#endif /* RDK_ONEWIFI */
+ 
+ 	return 0;
+ }
+diff -Naur git.orig/source/hostap-2.11/src/ap/ap_drv_ops.c git/source/hostap-2.11/src/ap/ap_drv_ops.c
+--- git.orig/source/hostap-2.11/src/ap/ap_drv_ops.c	2025-04-03 07:46:02.519651493 +0100
++++ git/source/hostap-2.11/src/ap/ap_drv_ops.c	2025-04-03 07:54:32.096898096 +0100
+@@ -1376,6 +1376,53 @@
+ 	return hapd->driver->get_rnr_colocation_ie(hapd->drv_priv, eid, current_len);
+ }
+ 
++struct hostapd_data* hostapd_drv_mbssid_get_tx_bss(struct hostapd_data *hapd)
++{
++	if (!hapd->driver || !hapd->driver->get_mbssid_tx_bss || !hapd->drv_priv)
++		return hapd;
++
++	return hapd->driver->get_mbssid_tx_bss(hapd->drv_priv);
++}
++
++int hostapd_drv_mbssid_get_bss_index(struct hostapd_data *hapd)
++{
++	if (!hapd->driver || !hapd->driver->get_mbssid_bss_index || !hapd->drv_priv)
++		return 0;
++
++	return hapd->driver->get_mbssid_bss_index(hapd->drv_priv);
++}
++
++size_t hostapd_drv_eid_mbssid_len(struct hostapd_data *hapd, u32 frame_type,
++			      u8 *elem_count, const u8 *known_bss,
++			      size_t known_bss_len, size_t *rnr_len)
++{
++	if (!hapd->driver || !hapd->driver->get_mbssid_len || !hapd->drv_priv)
++		return 0;
++
++	return hapd->driver->get_mbssid_len(hapd->drv_priv, frame_type, elem_count);
++}
++
++u8* hostapd_drv_eid_mbssid(struct hostapd_data *hapd, u8 *eid, u8 *end,
++			unsigned int frame_stype, u8 elem_count,
++			u8 **elem_offset,
++			const u8 *known_bss, size_t known_bss_len, u8 *rnr_eid,
++			u8 *rnr_count, u8 **rnr_offset, size_t rnr_len)
++{
++	if (!hapd->driver || !hapd->driver->get_mbssid_ie || !hapd->drv_priv)
++		return eid;
++
++	return hapd->driver->get_mbssid_ie(hapd->drv_priv, eid, end, frame_stype,
++		elem_count, elem_offset);
++}
++
++u8* hostapd_drv_mbssid_config(struct hostapd_data *hapd, u8 *eid)
++{
++	if (!hapd->driver || !hapd->driver->get_mbssid_config || !hapd->drv_priv)
++		return eid;
++
++	return hapd->driver->get_mbssid_config(hapd->drv_priv, eid);
++}
++
+ #ifdef CONFIG_PASN
+ int hostapd_drv_set_secure_ranging_ctx(struct hostapd_data *hapd,
+ 				       const u8 *own_addr, const u8 *peer_addr,
+diff -Naur git.orig/source/hostap-2.11/src/ap/ap_drv_ops.h git/source/hostap-2.11/src/ap/ap_drv_ops.h
+--- git.orig/source/hostap-2.11/src/ap/ap_drv_ops.h	2025-04-03 07:46:02.519651493 +0100
++++ git/source/hostap-2.11/src/ap/ap_drv_ops.h	2025-04-03 07:54:32.096898096 +0100
+@@ -165,6 +165,17 @@
+ 				       size_t *current_len);
+ u8* hostapd_drv_eid_rnr_colocation(struct hostapd_data *hapd, u8 *eid,
+ 				   size_t *current_len);
++struct hostapd_data* hostapd_drv_mbssid_get_tx_bss(struct hostapd_data *hapd);
++int hostapd_drv_mbssid_get_bss_index(struct hostapd_data *hapd);
++size_t hostapd_drv_eid_mbssid_len(struct hostapd_data *hapd, u32 frame_type,
++			      u8 *elem_count, const u8 *known_bss,
++			      size_t known_bss_len, size_t *rnr_len);
++u8* hostapd_drv_eid_mbssid(struct hostapd_data *hapd, u8 *eid, u8 *end,
++			unsigned int frame_stype, u8 elem_count,
++			u8 **elem_offset,
++			const u8 *known_bss, size_t known_bss_len, u8 *rnr_eid,
++			u8 *rnr_count, u8 **rnr_offset, size_t rnr_len);
++u8* hostapd_drv_mbssid_config(struct hostapd_data *hapd, u8 *eid);
+ int hostapd_drv_set_secure_ranging_ctx(struct hostapd_data *hapd,
+ 				       const u8 *own_addr, const u8 *addr,
+ 				       u32 cipher, u8 key_len, const u8 *key,
+diff -Naur git.orig/source/hostap-2.11/src/ap/beacon.c git/source/hostap-2.11/src/ap/beacon.c
+--- git.orig/source/hostap-2.11/src/ap/beacon.c	2025-04-03 07:46:02.519651493 +0100
++++ git/source/hostap-2.11/src/ap/beacon.c	2025-04-03 07:54:32.096898096 +0100
+@@ -654,9 +654,15 @@
+ 		hostapd_eid_ext_supp_rates(iface->bss[i], buf);
+ 	}
+ 
++#ifdef RDK_ONEWIFI
++	tx_bss = hostapd_drv_mbssid_get_tx_bss(hapd);
++	len = hostapd_drv_eid_mbssid_len(tx_bss, WLAN_FC_STYPE_BEACON, &elem_count,
++				     NULL, 0, &rnr_len);
++#else
+ 	tx_bss = hostapd_mbssid_get_tx_bss(hapd);
+ 	len = hostapd_eid_mbssid_len(tx_bss, WLAN_FC_STYPE_BEACON, &elem_count,
+ 				     NULL, 0, &rnr_len);
++#endif /* RDK_ONEWIFI */
+ 	if (!len || (iface->conf->mbssid == ENHANCED_MBSSID_ENABLED &&
+ 		     elem_count > iface->ema_max_periodicity))
+ 		goto fail;
+@@ -679,12 +685,22 @@
+ 			goto fail;
+ 	}
+ 
++#ifdef RDK_ONEWIFI
++	end = hostapd_drv_eid_mbssid(tx_bss, elem, elem + len, WLAN_FC_STYPE_BEACON,
++				 elem_count, elem_offset, NULL, 0, rnr_elem,
++				 &rnr_elem_count, rnr_elem_offset, rnr_len);
++#else
+ 	end = hostapd_eid_mbssid(tx_bss, elem, elem + len, WLAN_FC_STYPE_BEACON,
+ 				 elem_count, elem_offset, NULL, 0, rnr_elem,
+ 				 &rnr_elem_count, rnr_elem_offset, rnr_len);
++#endif /* RDK_ONEWIFI */
+ 
+ 	params->mbssid_tx_iface = tx_bss->conf->iface;
++#ifdef RDK_ONEWIFI
++	params->mbssid_index = hostapd_drv_mbssid_get_bss_index(hapd);
++#else
+ 	params->mbssid_index = hostapd_mbssid_get_bss_index(hapd);
++#endif /* RDK_ONEWIFI */
+ 	params->mbssid_elem = elem;
+ 	params->mbssid_elem_len = end - elem;
+ 	params->mbssid_elem_count = elem_count;
+@@ -903,9 +919,15 @@
+ 
+ 	pos = hostapd_get_rsne(hapd, pos, epos - pos);
+ 	pos = hostapd_eid_bss_load(hapd, pos, epos - pos);
++#ifdef RDK_ONEWIFI
++	pos = hostapd_drv_eid_mbssid(hapd, pos, epos, WLAN_FC_STYPE_PROBE_RESP, 0,
++				 NULL, NULL, 0,
++				 NULL, NULL, NULL, 0);
++#else
+ 	pos = hostapd_eid_mbssid(hapd, pos, epos, WLAN_FC_STYPE_PROBE_RESP, 0,
+ 				 NULL, params->known_bss, params->known_bss_len,
+ 				 NULL, NULL, NULL, 0);
++#endif /* RDK_ONEWIFI */
+ 	pos = hostapd_eid_rm_enabled_capab(hapd, pos, epos - pos);
+ 	pos = hostapd_get_mde(hapd, pos, epos - pos);
+ 
+@@ -1075,7 +1097,11 @@
+ 	u8 *pos;
+ 	size_t buflen;
+ 
++#ifdef RDK_ONEWIFI
++	hapd = hostapd_drv_mbssid_get_tx_bss(hapd);
++#else
+ 	hapd = hostapd_mbssid_get_tx_bss(hapd);
++#endif /* RDK_ONEWIFI */
+ 
+ #define MAX_PROBERESP_LEN 768
+ 	buflen = MAX_PROBERESP_LEN;
+@@ -1766,6 +1792,9 @@
+ 				params.ecsa_pos - (u8 *) params.resp;
+ 	}
+ 
++#ifdef RDK_ONEWIFI
++	hapd = hostapd_drv_mbssid_get_tx_bss(hapd);
++#endif /* RDK_ONEWIFI */
+ 	ret = hostapd_drv_send_mlme(hapd, params.resp, params.resp_len, noack,
+ 				    csa_offs_len ? csa_offs : NULL,
+ 				    csa_offs_len, 0);
+@@ -2349,6 +2378,11 @@
+ 	}
+ #endif /* CONFIG_IEEE80211BE */
+ 
++#ifdef RDK_ONEWIFI
++	if (hapd->iconf->mbssid == MBSSID_ENABLED)
++		tail_len += 5; /* Multiple BSSID Configuration element */
++#endif /* RDK_ONEWIFI */
++
+ 	if (hapd->iconf->mbssid == ENHANCED_MBSSID_ENABLED &&
+ 	    hapd == hostapd_mbssid_get_tx_bss(hapd))
+ 		tail_len += 5; /* Multiple BSSID Configuration element */
+@@ -2468,6 +2502,11 @@
+ 			 params->mbssid_elem_count == 1);
+ 	}
+ 
++#ifdef CONFIG_DRIVER_BRCM
++	memcpy(tailpos, params->mbssid_elem, params->mbssid_elem_len);
++	tailpos += params->mbssid_elem_len;
++#endif /* CONFIG_DRIVER_BRCM */
++
+ 	tailpos = hostapd_eid_ext_capab(hapd, tailpos, complete);
+ 
+ 	/*
+@@ -2512,8 +2551,12 @@
+ 	tailpos = hostapd_eid_max_cs_time(hapd, tailpos);
+ 
+ 	tailpos = hostapd_get_rsnxe(hapd, tailpos, tailend - tailpos);
++#ifdef RDK_ONEWIFI
++	tailpos = hostapd_drv_mbssid_config(hapd, tailpos);
++#else
+ 	tailpos = hostapd_eid_mbssid_config(hapd, tailpos,
+ 					    params->mbssid_elem_count);
++#endif /* RDK_ONEWIFI */
+ 
+ #ifdef CONFIG_IEEE80211AX
+ 	if (hapd->iconf->ieee80211ax && !hapd->conf->disable_11ax) {
+diff -Naur git.orig/source/hostap-2.11/src/drivers/driver.h git/source/hostap-2.11/src/drivers/driver.h
+--- git.orig/source/hostap-2.11/src/drivers/driver.h	2025-04-03 07:46:02.531651805 +0100
++++ git/source/hostap-2.11/src/drivers/driver.h	2025-04-03 07:54:32.100898200 +0100
+@@ -5494,6 +5494,16 @@
+ #endif /* CONFIG_TESTING_OPTIONS */
+        int (*radius_eap_failure)(void *priv, int failure_reason);
+        int (*radius_fallback_failover)(void *priv, int radius_switch_reason);
++
++       struct hostapd_data *(*get_mbssid_tx_bss)(void *priv);
++       int (*get_mbssid_bss_index)(void *priv);
++       size_t (*get_mbssid_len)(void *priv, u32 frame_type,
++                             u8 *elem_count);
++       u8 * (*get_mbssid_ie)(void *priv, u8 *eid, u8 *end,
++                       unsigned int frame_stype, u8 elem_count,
++                       u8 **elem_offset);
++       u8* (*get_mbssid_config)(void *priv, u8 *eid);
++
+ 	/**
+ 	 * get_multi_hw_info - Get multiple underlying hardware information
+ 	 *		       (hardware IDx and supported frequency range)

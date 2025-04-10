@@ -1,0 +1,198 @@
+#################################################
+#From: bce6ad856011bb057bc29d1c66bb4e2378b32a57
+#Subject: Add RSN Override for WPA3 Compatibility
+#Source: COMCAST
+#Signed-off-by:Amalesh_Nandh@comcast.com
+#################################################
+diff --git a/source/hostap-2.11/src/ap/ap_drv_ops.c b/source/hostap-2.11/src/ap/ap_drv_ops.c
+index 3fd2a52..0ed19ec 100644
+--- a/source/hostap-2.11/src/ap/ap_drv_ops.c
++++ b/source/hostap-2.11/src/ap/ap_drv_ops.c
+@@ -1287,6 +1287,52 @@ size_t hostapd_drv_eid_rnr_colocation_len(struct hostapd_data *hapd,
+ 	return hapd->driver->get_rnr_colocation_len(hapd->drv_priv, current_len);
+ }
+ 
++int hostapd_drv_get_sta_auth_type(struct hostapd_data *hapd,
++					const u8 *addr, const u8 *ies, size_t ies_len, int frame_type)
++{
++	struct ieee802_11_elems elems;
++	const u8 *wpa_ie; int res;
++	size_t wpa_ie_len;
++	struct wpa_ie_data data;
++
++	if(!hapd->driver || !hapd->driver->get_sta_auth_type)
++		return -1;
++
++	if (ieee802_11_parse_elems(ies, ies_len, &elems, 1) == ParseFailed) {
++		wpa_printf(MSG_ERROR, "%s Failed to parse elements\n", __func__);
++		return -1;
++	}
++
++	if ((hapd->conf->wpa & WPA_PROTO_RSN) && elems.rsn_ie) {
++		wpa_ie = elems.rsn_ie;
++		wpa_ie_len = elems.rsn_ie_len;
++	} else if ((hapd->conf->wpa & WPA_PROTO_WPA) &&
++		   elems.wpa_ie) {
++		wpa_ie = elems.wpa_ie;
++		wpa_ie_len = elems.wpa_ie_len;
++	} else {
++		wpa_ie = NULL;
++		wpa_ie_len = 0;
++	}
++
++	if(wpa_ie == NULL) {
++		wpa_printf(MSG_ERROR, "wpa ie is NULL in %s\n", __func__);
++		return -1;
++	}
++
++	if (hapd->conf->wpa && wpa_ie) {
++		wpa_ie -= 2;wpa_ie_len += 2;
++	}
++
++	res = wpa_parse_wpa_ie_rsn(wpa_ie, wpa_ie_len, &data);
++	if(res) {
++		wpa_printf(MSG_ERROR, "RSN_IE %s Failed to parse wpa IE \n", __func__);
++		return -1;
++	}
++
++	return hapd->driver->get_sta_auth_type(hapd->drv_priv, addr, data.key_mgmt, frame_type);
++}
++
+ u8* hostapd_drv_eid_rnr_colocation(struct hostapd_data *hapd, u8 *eid,
+ 				      size_t *current_len)
+ {
+diff --git a/source/hostap-2.11/src/ap/ap_drv_ops.h b/source/hostap-2.11/src/ap/ap_drv_ops.h
+index 872630e..3b228e7 100644
+--- a/source/hostap-2.11/src/ap/ap_drv_ops.h
++++ b/source/hostap-2.11/src/ap/ap_drv_ops.h
+@@ -153,6 +153,8 @@ int hostapd_drv_update_dh_ie(struct hostapd_data *hapd, const u8 *peer,
+ int hostapd_drv_dpp_listen(struct hostapd_data *hapd, bool enable);
+ size_t hostapd_drv_eid_rnr_colocation_len(struct hostapd_data *hapd,
+ 				       size_t *current_len);
++int hostapd_drv_get_sta_auth_type(struct hostapd_data *hapd,const u8 *addr, const u8 *ies, size_t ies_len, int frame_type);
++
+ u8* hostapd_drv_eid_rnr_colocation(struct hostapd_data *hapd, u8 *eid,
+ 				   size_t *current_len);
+ struct hostapd_data* hostapd_drv_mbssid_get_tx_bss(struct hostapd_data *hapd);
+diff --git a/source/hostap-2.11/src/ap/ieee802_11.c b/source/hostap-2.11/src/ap/ieee802_11.c
+index a30ab15..d0aa660 100644
+--- a/source/hostap-2.11/src/ap/ieee802_11.c
++++ b/source/hostap-2.11/src/ap/ieee802_11.c
+@@ -5816,6 +5816,7 @@ static void handle_assoc(struct hostapd_data *hapd,
+ #endif /* CONFIG_FILS */
+ 
+ 	if (resp >= 0)
++		hostapd_drv_get_sta_auth_type(hapd, mgmt->sa, pos, left, reassoc ? STA_FRAME_REASSOC:STA_FRAME_ASSOC);
+ 		reply_res = send_assoc_resp(hapd,
+ 					    mld_addrs_not_translated ?
+ 					    NULL : sta,
+diff --git a/source/hostap-2.11/src/ap/wpa_auth.c b/source/hostap-2.11/src/ap/wpa_auth.c
+index d317a9c..64a188b 100644
+--- a/source/hostap-2.11/src/ap/wpa_auth.c
++++ b/source/hostap-2.11/src/ap/wpa_auth.c
+@@ -305,6 +305,13 @@ static inline int wpa_auth_set_key(struct wpa_authenticator *wpa_auth,
+ 				     key, key_len, key_flag);
+ }
+ 
++static void wpa_auth_get_sta_auth_type(struct wpa_authenticator *wpa_auth, const u8 *addr,
++					const u8 *data, size_t data_len, int frame_type)
++{
++	if(!wpa_auth->cb->get_sta_auth_type)
++		return;
++	wpa_auth->cb->get_sta_auth_type(wpa_auth->cb_ctx, addr, data, data_len, frame_type);
++}
+ 
+ #ifdef CONFIG_PASN
+ static inline int wpa_auth_set_ltf_keyseed(struct wpa_authenticator *wpa_auth,
+@@ -3864,6 +3871,7 @@ SM_STATE(WPA_PTK, PTKCALCNEGOTIATING)
+ 		eapol_key_ie = kde.wpa_ie;
+ 		eapol_key_ie_len = kde.wpa_ie_len;
+ 	}
++	wpa_auth_get_sta_auth_type(wpa_auth, sm->addr, eapol_key_ie, eapol_key_ie_len, STA_FRAME_EAPOL_M2);
+ 	ft = sm->wpa == WPA_VERSION_WPA2 && wpa_key_mgmt_ft(sm->wpa_key_mgmt);
+ 	if (!sm->wpa_ie ||
+ 	    wpa_compare_rsn_ie(ft, sm->wpa_ie, sm->wpa_ie_len,
+diff --git a/source/hostap-2.11/src/ap/wpa_auth.h b/source/hostap-2.11/src/ap/wpa_auth.h
+index 34720dc..0383e0b 100644
+--- a/source/hostap-2.11/src/ap/wpa_auth.h
++++ b/source/hostap-2.11/src/ap/wpa_auth.h
+@@ -401,6 +401,7 @@ struct wpa_auth_callbacks {
+ #if defined(CONFIG_DRIVER_BRCM) && defined(CONFIG_DRIVER_BRCM_CEVENT)
+ 	char* (*get_ifname)(void *ctx);
+ #endif /* CONFIG_DRIVER_BRCM && CONFIG_DRIVER_BRCM_CEVENT */
++void (*get_sta_auth_type)(void *ctx, const u8 *addr,const u8 *ies, size_t ies_len, int frame_type);
+ #ifdef CONFIG_PASN
+ 	int (*set_ltf_keyseed)(void *ctx, const u8 *addr, const u8 *ltf_keyseed,
+ 			       size_t ltf_keyseed_len);
+diff --git a/source/hostap-2.11/src/ap/wpa_auth_glue.c b/source/hostap-2.11/src/ap/wpa_auth_glue.c
+index df6e8a9..2caa232 100644
+--- a/source/hostap-2.11/src/ap/wpa_auth_glue.c
++++ b/source/hostap-2.11/src/ap/wpa_auth_glue.c
+@@ -1618,6 +1618,17 @@ static void hostapd_request_radius_psk(void *ctx, const u8 *addr, int key_mgmt,
+ }
+ #endif /* CONFIG_NO_RADIUS */
+ 
++static void hostapd_wpa_auth_get_sta_auth_type(void *ctx, const u8 *addr,
++			 const u8 *ies, size_t ies_len, int frame_type)
++{
++	struct hostapd_data *hapd = ctx;
++
++	if(!hapd){
++		wpa_printf(MSG_ERROR, "%s hapd is NULL", __func__);
++		return;
++	}
++	hostapd_drv_get_sta_auth_type(hapd, addr, ies, ies_len, frame_type);
++}
+ 
+ #ifdef CONFIG_PASN
+ static int hostapd_set_ltf_keyseed(void *ctx, const u8 *peer_addr,
+@@ -1752,6 +1763,7 @@ int hostapd_setup_wpa(struct hostapd_data *hapd)
+ #if defined(CONFIG_DRIVER_BRCM) && defined(CONFIG_DRIVER_BRCM_CEVENT)
+ 		.get_ifname = hostapd_wpa_auth_get_ifname,
+ #endif /* CONFIG_DRIVER_BRCM && CONFIG_DRIVER_BRCM_CEVENT */
++		.get_sta_auth_type = hostapd_wpa_auth_get_sta_auth_type,
+ #ifdef CONFIG_PASN
+ 		.set_ltf_keyseed = hostapd_set_ltf_keyseed,
+ #endif /* CONFIG_PASN */
+diff --git a/source/hostap-2.11/src/drivers/driver.h b/source/hostap-2.11/src/drivers/driver.h
+index daa1034..7b81a68 100644
+--- a/source/hostap-2.11/src/drivers/driver.h
++++ b/source/hostap-2.11/src/drivers/driver.h
+@@ -5494,6 +5494,18 @@
+ #endif /* CONFIG_TESTING_OPTIONS */
+        int (*radius_eap_failure)(void *priv, int failure_reason);
+        int (*radius_fallback_failover)(void *priv, int radius_switch_reason);
++       /**
++        * get_sta_auth_type - Notify about Auth Type STA sent in Assoc/Reassoc Req
++        * @priv: Private driver interface data
++        * @addr: Sends the STA Address
++        * @key_mgmt: STA Auth Type in Association Request
++        * @frame_type: Sends Frame Type of the Station
++        *
++        * Returns: 0 on success, -1 on failure
++        * Update about Auth Type in Association/Reassociation Request to driver
++        */
++       int (*get_sta_auth_type)(void *priv,
++                                       const u8 *addr, int key_mgmt, int frame_type);
+ 
+        struct hostapd_data *(*get_mbssid_tx_bss)(void *priv);
+        int (*get_mbssid_bss_index)(void *priv);
+@@ -5988,6 +5999,18 @@ enum sta_connect_fail_reason_codes {
+ 	STA_CONNECT_FAIL_REASON_ASSOC_NO_RESP_RECEIVED = 7,
+ };
+ 
++/**
++ * enum sta_frame_type
++ * @STA_FRAME_ASSOC: Received STA Frame Type is Association
++ * @STA_FRAME_REASSOC: Received STA Frame Type is Reassociation
++ * @STA_FRAME_EAPOL_M2: Received STA Frame Type is EAPOL M2
++ */
++ enum sta_frame_type {
++	STA_FRAME_ASSOC = 0,
++	STA_FRAME_REASSOC,
++	STA_FRAME_EAPOL_M2,
++};
++
+ /**
+  * union wpa_event_data - Additional data for wpa_supplicant_event() calls
+  */

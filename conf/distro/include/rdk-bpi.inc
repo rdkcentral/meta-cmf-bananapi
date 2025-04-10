@@ -43,3 +43,5 @@ DISTRO_FEATURES_append = " sdmmc"
 
 #disabling lan0_as_wan to allow lan0 interface to come
 DISTRO_FEATURES_remove = " lan0_as_wan"
+
+DISTRO_FEATURES_append = " CONFIG_IEEE80211BE"
