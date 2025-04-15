@@ -10,9 +10,11 @@ SRC_URI_append = " ${@bb.utils.contains('DISTRO_FEATURES', 'HOSTAPD_2_11', 'file
 
 DEPENDS_append = " ucode"
 
+#Upstep from hostapd 2.11 to hostapd 2.12-devel with following commit
+SRCREV_2.11 = "96e48a05aa0a82e91e3cab75506297e433e253d0"
+
 SRC_URI_append = " \
 ${@bb.utils.contains('DISTRO_FEATURES', 'HOSTAPD_2_11', '\
-file://2.11/0000-hostap-211-to-hostap-212-dev.patch;patchdir=source/hostap-2.11/ \
 file://2.11/0001-mtk-hostapd-patch-all-in-one.patch;patchdir=source/hostap-2.11/ \
 file://2.11/comcast_changes_merged_to_source_2_11.patch \
 file://2.11/onewifi_lib_2_12.patch \
