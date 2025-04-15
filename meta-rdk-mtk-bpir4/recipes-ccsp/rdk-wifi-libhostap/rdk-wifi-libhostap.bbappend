@@ -42,7 +42,8 @@ file://2.11/increase_eapol_timeout.patch \
 file://2.11/Dynamic_NAS_IP_Update_2_11.patch \
 file://2.11/patch_issues_with2_12.patch \
 file://2.11/wpa3_compatibility_hostap_2_11.patch \
-file://2.11/wpa3_compatibility_telem_hostap_2_11.patch ',\
+file://2.11/wpa3_compatibility_telem_hostap_2_11.patch \
+file://2.11/onewifi_crash_with_2_12.patch ',\
  ' ', d)}"
 
 do_configure_append() {
