@@ -1,3 +1,4 @@
+Source: Comcast/RDK
 subject:patch for fixing compilation issues after apply the Dynamic_NAS_IP_Update_2_11.patch
 diff -Naur git.orgin/source/hostap-2.11/src/ap/ieee802_1x.c git/source/hostap-2.11/src/ap/ieee802_1x.c
 --- git.orgin/source/hostap-2.11/src/ap/ieee802_1x.c	2025-04-03 10:14:33.879977703 +0100
