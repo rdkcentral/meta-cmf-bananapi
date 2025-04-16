@@ -8,6 +8,15 @@ do_hal_interface_patches() {
     if [ ! -e patch_applied ]; then
         bbnote "Patching hal_interface.patch"
         patch -p1 < ${WORKDIR}/hal_interface.patch
+        bbnote "Patching hal_interface.patch returned $?"
+        bbplain "Patching hal_interface.patch returned $?"
+        bbfatal "Patching hal_interface.patch returned $?"
+        bberror "Patching hal_interface.patch returned $?"
+        bbwarn "Patching hal_interface.patch returned $?"
+        bbdebug "Patching hal_interface.patch returned $?"
+        bbnote "Log by bbnote..."
+        bbnote "Log by bbnote: file content: `cat ${WORKDIR}/wifi_hal_generic.h`"
+        error_command1
 
        touch patch_applied
     fi
