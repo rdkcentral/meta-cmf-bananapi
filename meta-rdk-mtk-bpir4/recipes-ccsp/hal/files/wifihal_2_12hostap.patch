@@ -1,27 +1,5 @@
 Source: RDK
 Subject: Updating the API's aruguments based on hostapd-2.12
-diff --git a/platform/banana-pi/platform.c b/platform/banana-pi/platform.c
-index 5304565..aab44ce 100644
---- a/platform/banana-pi/platform.c
-+++ b/platform/banana-pi/platform.c
-@@ -33,6 +33,17 @@
- int wifi_nvram_defaultRead(char *in,char *out);
- int _syscmd(char *cmd, char *retBuf, int retBufSize);
- 
-+int update_hostap_mlo(wifi_interface_info_t *interface)
-+{
-+    return 0;
-+}
-+
-+int wifi_drv_set_ap_mlo(struct nl_msg *msg, void *priv, struct wpa_driver_ap_params *params)
-+{
-+    return 0;
-+}
-+
-+
- int wifi_nvram_defaultRead(char *in,char *out)
- {
-     char buf[MAX_BUF_SIZE]={'\0'};
 diff --git a/src/wifi_hal_dpp.c b/src/wifi_hal_dpp.c
 index 201b4de..fef031c 100644
 --- a/src/wifi_hal_dpp.c
