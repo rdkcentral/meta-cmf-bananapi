@@ -1,8 +1,8 @@
 SRC_URI_remove = "${CMF_GIT_ROOT}/rdkb/components/opensource/ccsp/OneWifi;protocol=${CMF_GIT_PROTOCOL};branch=${CMF_GIT_BRANCH};name=libwebconfig"
 
-SRC_URI = "git://github.com/rdkcentral/OneWifi.git;protocol=https;branch=develop;name=libwebconfig"
+SRC_URI = "git://github.com/rdkcentral/OneWifi.git;protocol=https;branch=MLOdemo;name=libwebconfig"
 
-SRCREV_libwebconfig = "e958c0f8878fa5034ea8594b6f402714cfb3374e"
+SRCREV_libwebconfig = "baa3dc324be35a9fc59eb9b9bba60ac482f3fd50"
 DEPENDS += " ${@bb.utils.contains('DISTRO_FEATURES', 'EasyMesh', ' rdk-wifi-libhostap unified-wifi-mesh-header ', '', d)}"
 EXTRA_OECONF_append = " ${@bb.utils.contains('DISTRO_FEATURES', 'EasyMesh', ' --enable-easymesh ', '', d)}"
 
