@@ -3,8 +3,8 @@ require ccsp_common_bananapi.inc
 FILESEXTRAPATHS_prepend := "${THISDIR}/files:"
 
 SRC_URI_remove = "${CMF_GIT_ROOT}/rdkb/components/opensource/ccsp/OneWifi;protocol=${CMF_GIT_PROTOCOL};branch=${CMF_GIT_BRANCH};name=OneWifi"
-SRC_URI = "git://github.com/rdkcentral/OneWifi.git;protocol=https;branch=develop;name=OneWifi"
-SRCREV_OneWifi = "e958c0f8878fa5034ea8594b6f402714cfb3374e"
+SRC_URI = "git://github.com/rdkcentral/OneWifi.git;protocol=https;branch=MLOdemo;name=OneWifi"
+SRCREV_OneWifi = "baa3dc324be35a9fc59eb9b9bba60ac482f3fd50"
 DEPENDS_append = " mesh-agent "
 DEPENDS_remove = " opensync "
 
