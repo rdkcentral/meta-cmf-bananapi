@@ -16,6 +16,7 @@ SRC_URI += " \
     file://checkwifi.sh \
     file://onewifi_pre_start.sh \
     file://wifi_defaults.txt \
+    file://BE_variant_2GHZ.patch \
 "
 do_install_append(){
     install -d ${D}/nvram 
