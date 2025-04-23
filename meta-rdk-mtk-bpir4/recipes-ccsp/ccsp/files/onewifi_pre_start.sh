@@ -1,5 +1,13 @@
 #!/bin/sh
 sleep 20
+
+#To update al_mac_addr in EasyMeshCfg.json to avoid onewifi restarting during fresh boot-up
+wan_mac="$(cat /sys/class/ieee80211/phy0/macaddress)"
+old_al_mac_addr=`cat /nvram/EasymeshCfg.json | grep AL_MAC_ADDR  | cut -d '"' -f4`
+if [ "$old_al_mac_addr" == "00:00:00:00:00:00" ]; then
+  sed -i "s/$old_al_mac_addr/$wan_mac/g" /nvram/EasymeshCfg.json
+fi  
+
 iw phy phy0 interface add wifi0 type __ap
 iw phy phy0 interface add wifi1 type __ap
 iw phy phy0 interface add wifi2 type __ap

@@ -12,4 +12,4 @@ do_hal_interface_patches() {
        touch patch_applied
     fi
 }
-addtask hal_interface_patches after do_unpack before do_compile
+addtask hal_interface_patches after do_unpack before do_configure

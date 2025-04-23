@@ -1,0 +1,6 @@
+{
+	"AL_MAC_ADDR":	"00:00:00:00:00:00",
+	"Colocated_mode":	1,
+	"Backhaul_SSID":	"mesh_backhaul",
+	"Backhaul_KeyPassphrase":	"test-backhaul"
+}
