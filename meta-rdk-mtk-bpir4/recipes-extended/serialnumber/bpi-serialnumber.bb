@@ -19,10 +19,4 @@ do_compile() {
 do_install() {
 	install -d ${D}${bindir}
 	install -m 0755 rdkmmap ${D}${bindir}/rdkmmap
-	install -D -m 0644 ${S}/rdkmmap/rdkmmap.service ${D}${systemd_unitdir}/system/rdkmmap.service
 }
-
-SYSTEMD_SERVICE_${PN} += " rdkmmap.service"
-
-FILES_${PN}_append = "${systemd_unitdir}/system/rdkmmap.service"
-
