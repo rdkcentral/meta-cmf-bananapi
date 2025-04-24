@@ -1,11 +1,11 @@
 SUMMARY = "Update the serial number"
 
 LICENSE="Apache-2.0"
-LIC_FILES_CHKSUM = "file://rdkmmap/LICENSE;md5=86d3f3a95c324c9479bd8986968f4327"
+LIC_FILES_CHKSUM = "file://LICENSE;md5=175792518e4ac015ab6696d16c4f607e"
 
 inherit autotools ${@bb.utils.contains("DISTRO_FEATURES", "kirkstone", "python3native", "pythonnative", d)}  systemd
 
-SRC_URI = "git://github.com/rdkcentral/broadband-utils.git;branch=rdkbserial;protocol=https;"
+SRC_URI = "git://github.com/rdkcentral/broadband-utils.git;branch=main;protocol=https;"
 
 S = "${WORKDIR}/git"
 SRCREV = "${AUTOREV}"
