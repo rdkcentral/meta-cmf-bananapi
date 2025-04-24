@@ -13,20 +13,7 @@ FILESEXTRAPATHS_prepend := "${THISDIR}/files:"
 
 SRC_URI += " \
   file://InterfaceMap.json \
-  file://wifihal_2_12hostap.patch;apply=no \
-  file://nl_recv_core_2_12.patch;apply=no \
-  file://wifi_core_wrt_Host2_12.patch;apply=no \
 "
-do_hal_patches() {
-        cd ${WORKDIR}/git
-        if [ ! -e hal_patch_applied ]; then
-            patch -p1 < ${WORKDIR}/wifihal_2_12hostap.patch
-            patch -p1 < ${WORKDIR}/nl_recv_core_2_12.patch
-            patch -p1 < ${WORKDIR}/wifi_core_wrt_Host2_12.patch
-            touch hal_patch_applied
-        fi
-}
-addtask hal_patches after do_unpack before do_compile
 
 # Install InterfaceMap.json in /nvram
 do_install_append() {
