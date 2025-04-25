@@ -1,0 +1,28 @@
+--- git.orig/source/hostap-2.11/src/ap/drv_callbacks.c	2025-04-25 21:17:19.391617033 +0000
++++ git/source/hostap-2.11/src/ap/drv_callbacks.c	2025-04-25 21:15:32.992889866 +0000
+@@ -1496,11 +1496,13 @@
+ 			return;
+ 	}
+ 
++#ifdef CONFIG_TESTING_OPTIONS
+ 	for_each_mld_link(p_hapd, hapd) {
+ 		if (mld->new_attlm.disabled_links & BIT(p_hapd->mld_link_id))
+ 			p_hapd->conf->mld_indicate_disabled =
+ 							mld_indicate_disabled;
+ 	}
++#endif
+ 
+ 	ieee802_11_set_beacon(hapd);
+ }
+@@ -3167,9 +3169,11 @@
+ 			   hapd->conf->iface);
+ 		hostapd_event_color_change(hapd, true);
+ 		break;
++#ifdef CONFIG_TESTING_OPTIONS
+ 	case EVENT_LINK_RECONFIG:
+ 		hostapd_link_remove_cb(hapd, data->reconfig_info.removed_links);
+ 		break;
++#endif
+ 	case EVENT_CRIT_UPDATE:
+ 		if (!data)
+ 			break;

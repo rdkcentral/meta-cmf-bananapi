@@ -42,11 +42,12 @@ file://2.11/increase_eapol_timeout.patch \
 file://2.11/Dynamic_NAS_IP_Update_2_11.patch \
 file://2.11/patch_issues_with2_12.patch \
 file://2.11/wpa3_compatibility_hostap_2_11.patch \
-file://2.11/wpa3_compatibility_telem_hostap_2_11.patch ',\
+file://2.11/wpa3_compatibility_telem_hostap_2_11.patch \
+file://2.11/disable_config_testing_options.patch',\
  ' ', d)}"
 
 do_configure_append() {
-${@bb.utils.contains('DISTRO_FEATURES', 'HOSTAPD_2_11', 'echo "CONFIG_TESTING_OPTIONS=y" >> ${S}/source/hostap-${HOSTAPD_PV}/hostapd/.config', '',d)}
+#${@bb.utils.contains('DISTRO_FEATURES', 'HOSTAPD_2_11', 'echo "CONFIG_TESTING_OPTIONS=y" >> ${S}/source/hostap-${HOSTAPD_PV}/hostapd/.config', '',d)}
 ${@bb.utils.contains('DISTRO_FEATURES', 'HOSTAPD_2_11', 'echo "LIB_HDRS += ../src/common/nan.h" >> ${S}/source/hostap-${HOSTAPD_PV}/hostapd/libhostap.mk', '',d)}
 ${@bb.utils.contains('DISTRO_FEATURES', 'HOSTAPD_2_11', 'echo "LIB_HDRS += ../src/ap/ubus.h" >> ${S}/source/hostap-${HOSTAPD_PV}/hostapd/libhostap.mk', '',d)}
 ${@bb.utils.contains('DISTRO_FEATURES', 'HOSTAPD_2_11', 'echo "LIB_HDRS += ../src/ap/ucode.h" >> ${S}/source/hostap-${HOSTAPD_PV}/hostapd/libhostap.mk', '',d)}
