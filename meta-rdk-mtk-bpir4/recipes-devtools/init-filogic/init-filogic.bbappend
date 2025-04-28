@@ -5,7 +5,7 @@ do_install_append(){
 sed -i '/model/a \
 if [ ! -d /nvram/secure ]; then \
     mkdir -p /nvram/secure \
-fi' \
+fi \
 rdkmmap \
 rdkb-bpi-mac \
 if [ $? -eq 0 ];then \
