@@ -5,14 +5,14 @@ iw phy phy0 interface add wifi1 type __ap
 iw phy phy0 interface add wifi2 type __ap
 
 #Obtain the wifi0 mac address
-wifi0_mac="$(cat /sys/class/ieee80211/phy0/macaddress)"
+wifi0_mac=`cat /nvram/mac_addresses.txt | grep -a wifi0 | cut -d " " -f 2`
 #Strip the : and increment mac by 1 to get wifi1 macaddress
-mac=$(echo $wifi0_mac | tr -d ':')
-mac_incr=$((0x$mac + 1))
-wifi1_mac=$(printf "%012x" $mac_incr | sed 's/../&:/g;s/:$//')
+#mac=$(echo $wifi0_mac | tr -d ':')
+#mac_incr=$((0x$mac + 1))
+wifi1_mac=`cat /nvram/mac_addresses.txt | grep -a wifi1 | cut -d " " -f 2`
 #Increment again by 1 to get wifi2 address
-mac_incr=$(($mac_incr + 1))
-wifi2_mac=$(printf "%012x" $mac_incr | sed 's/../&:/g;s/:$//')
+#mac_incr=$(($mac_incr + 1))
+wifi2_mac=`cat /nvram/mac_addresses.txt | grep -a wifi2 | cut -d " " -f 2`
 #print the mac address
 echo $wifi0_mac
 echo $wifi1_mac
