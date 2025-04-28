@@ -16,7 +16,7 @@ DISTRO_FEATURES_append = " HOSTAPD_2_11"
 DISTRO_FEATURES_append = " OneWifi"
 
 # MacFilter Feature
-DISTRO_FEATURES_append = " acl_nl_support"
+DISTRO_FEATURES_append = " disable_nl80211_acl"
 
 #No Moca Support
 DISTRO_FEATURES_append = " no_moca_support"
@@ -43,3 +43,7 @@ DISTRO_FEATURES_append = " sdmmc"
 
 #disabling lan0_as_wan to allow lan0 interface to come
 DISTRO_FEATURES_remove = " lan0_as_wan"
+
+#Need to enable below distro once required changes are merged 
+#DISTRO_FEATURES_append = " EasyMesh"
+PREFERRED_VERSION_go = "1.19.%"

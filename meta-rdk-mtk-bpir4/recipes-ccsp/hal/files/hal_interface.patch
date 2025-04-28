@@ -6,65 +6,44 @@
 #Signed-off-by:Amalesh_Nandh@comcast.com
 ################################################
 diff --git a/wifi_hal_ap.h b/wifi_hal_ap.h
-index a5b1acf..704d5bd 100644
+index f5c37db..7daf939 100644
 --- a/wifi_hal_ap.h
 +++ b/wifi_hal_ap.h
-@@ -1742,6 +1742,45 @@ void wifi_newApAssociatedDevice_callback_register(wifi_newApAssociatedDevice_cal
- * calls. It should probably just send a message to a driver event handler task.
- *
- */
-+typedef INT ( * wifi_stamode_callback)(int apIndex, char *mac, int key_mgmt, int type, int radio, int mode);
-+
-+/* wifi_hal_ap_max_client_rejection_callback_register() function */
-+/**
-+ * @brief This call back will be called whenever an authentication response with reject reason 17
-+ * is received.
-+ *
-+ * @param[in] apIndex          Access Point Index
-+ * @param[in] mac_address      client_mac_address
-+ * @param[in] reject_reason    reject reason
-+ *
-+ * @return The status of the operation
-+ * @retval RETURN_OK if successful
-+ * @retval RETURN_ERR if any error is detected
-+ *
-+ * @execution Synchronous
-+ * @sideeffect None
-+ *
-+ * @note This function must not suspend and must not invoke any blocking system
-+ * calls. It should probably just send a message to a driver event handler task.
-+ *
-+ */
-+typedef INT (*wifi_apMaxClientRejection_callback)(INT apIndex, char *MAC, INT reason);
-+
-+/**
-+ * @brief Callback function invoked when a RADIUS or EAP failure occurs.
-+ *
-+ * This callback function is invoked when a RADIUS or EAP failure occurs on
-+ * the specified Access Point (AP).
-+ * This function must not suspend and must not invoke any blocking system calls.
-+ *
-+ * @param[in] apIndex         Index of the Access Point.
-+ * @param[in] failure_reason  Reason for the failure.
-+ *
-+ * @returns The status of the operation.
-+ * @retval WIFI_HAL_SUCCESS If successful.
-+ * @retval WIFI_HAL_ERROR   If any error is detected.
-+ */
-+
- typedef INT ( * wifi_apDisassociatedDevice_callback)(INT apIndex, char *MAC, INT event_type);
+@@ -349,7 +349,8 @@ typedef enum
+     WIFI_RADIO_SCAN_MODE_FULL,
+     WIFI_RADIO_SCAN_MODE_ONCHAN,
+     WIFI_RADIO_SCAN_MODE_OFFCHAN,
+-    WIFI_RADIO_SCAN_MODE_SURVEY
++    WIFI_RADIO_SCAN_MODE_SURVEY,
++    WIFI_RADIO_SCAN_MODE_SELECT_CHANNELS
+ } wifi_neighborScanMode_t;
  
- /* wifi_radiusEapFailure_callback() function */
-@@ -2700,6 +2739,8 @@ typedef struct {
-     mac_address_t bssid;                    /**< The BSSID. This variable should only be used in the get API. It can't used to change the interface MAC */
+ /**
+@@ -2736,6 +2737,14 @@ typedef struct {
+ } __attribute__((packed)) wifi_back_haul_sta_t;
+ 
+ #define WIFI_AP_MAX_SSID_LEN    33
++/**
++ * @brief Maximum length of the vendor information elements buffer
++ *
++ * Not a standard value, but a reasonable maximum for vendor elements
++ * Computed by taking Max MPDU size - ~ MAX 802.11 header size - 802.11 FCS size - ~Size of required IEs
++ * 2,310 is divisible by the typical Vendor IE size (7 = IE Type[1] + IE Length[1] + OUI[3] + VIE Type[1] + VIE Subtype [1])
++ */
++#define WIFI_AP_MAX_VENDOR_IE_LEN 2310	
+ typedef struct {
+     CHAR    ssid[WIFI_AP_MAX_SSID_LEN];
+     BOOL    enabled;
+@@ -2763,6 +2772,8 @@ typedef struct {
      UINT   wmmNoAck;
      UINT   wepKeyLength;
-+    UINT   vendor_elements_len;
-+    UCHAR *vendor_elements;
      BOOL   bssHotspot;
++    UINT   vendor_elements_len;
++    UCHAR  vendor_elements[WIFI_AP_MAX_VENDOR_IE_LEN];
      UINT   wpsPushButton;
      char   beaconRateCtl[32];
-@@ -2857,4 +2898,4 @@ INT wifi_hal_analytics_callback_register(wifi_analytics_callback callback);
+     BOOL   network_initiated_greylist;
+@@ -2919,4 +2930,4 @@ INT wifi_hal_analytics_callback_register(wifi_analytics_callback callback);
  }
  #endif
  
@@ -72,10 +51,10 @@ index a5b1acf..704d5bd 100644
 \ No newline at end of file
 +#endif
 diff --git a/wifi_hal_generic.h b/wifi_hal_generic.h
-index 7edc2c4..db9ff83 100644
+index a55ede6..c8ca1a8 100644
 --- a/wifi_hal_generic.h
 +++ b/wifi_hal_generic.h
-@@ -822,6 +823,7 @@ typedef struct {
+@@ -832,6 +832,7 @@ typedef struct {
       BOOL radio_presence[MAX_NUM_RADIOS];         /**< Indicates if the interfaces is present (not in deep sleep)*/
       wifi_multi_link_info_t mu_info;
       UINT BssMaxStaAllow;                    /**< Maximum number of stations supported for given platform. Gets populated during bring-up. */
@@ -83,3 +62,22 @@ index 7edc2c4..db9ff83 100644
  
      //Device Information related fields
       CHAR manufacturer[DEFAULT_DEVICE_FIELD_LEN];
+diff --git a/wifi_hal_telemetry.h b/wifi_hal_telemetry.h
+index 6867002..3596ea0 100644
+--- a/wifi_hal_telemetry.h
++++ b/wifi_hal_telemetry.h
+@@ -102,6 +102,7 @@ typedef struct _wifi_neighbor_ap2
+      CHAR  ap_SupportedDataTransferRates[256];  /**< Comma-separated list (maximum list length 256) of strings. Data transmit rates (in Mbps) for unicast frames at which the SSID will permit a station to connect. For example, ifSupportedDataTransferRatesis "1,2,5.5", this indicates that the SSID will only permit connections at 1 Mbps, 2 Mbps and 5.5 Mbps. */
+      UINT  ap_DTIMPeriod;   /**< The number of beacon intervals that elapse between transmission of Beacon frames containing a TIM element whose DTIM count field is 0. This value is transmitted in the DTIM Period field of beacon frames. [802.11-2012] */
+      UINT  ap_ChannelUtilization;   /**< Indicates the fraction of the time AP senses that the channel is in use by the neighboring AP for transmissions. */
++     UINT  ap_freq;    /**< Frequency. */
+ } wifi_neighbor_ap2_t;    //COSA_DML_NEIGHTBOURING_WIFI_RESULT
+ 
+ /*    Explanation:
+@@ -338,4 +339,4 @@ INT wifi_getVAPTelemetry(UINT apIndex, wifi_VAPTelemetry_t *telemetry);
+ }
+ #endif
+ 
+-#endif
+\ No newline at end of file
++#endif
