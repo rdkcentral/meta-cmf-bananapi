@@ -1,0 +1,7 @@
+d /var/lib/asterisk 0700 asterisk asterisk
+d /run/asterisk	    0770 root	  asterisk
+d /var/log/asterisk 0770 root	  asterisk
+
+d /var/log/asterisk/cdr-csv	0770 root asterisk
+d /var/log/asterisk/cdr-custom	0770 root asterisk
+d /var/log/asterisk/cel-custom	0770 root asterisk

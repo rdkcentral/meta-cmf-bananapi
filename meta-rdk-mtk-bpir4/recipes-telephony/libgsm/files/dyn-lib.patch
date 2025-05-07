@@ -1,0 +1,75 @@
+#
+Index: gsm-1.0-pl18/Makefile
+===================================================================
+--- gsm-1.0-pl18.orig/Makefile
++++ gsm-1.0-pl18/Makefile
+@@ -140,11 +140,16 @@ LFLAGS	= $(LDFLAGS) $(LDINC)
+ # Targets
+ 
+ LIBGSM	= $(LIB)/libgsm.a
++LIBGSMSO = ${LIB}/libgsm.so.${SOVER}
++SONAME	= libgsm.so.1
++SOVER	= 1.0.18
+ 
+ TOAST	= $(BIN)/toast
+ UNTOAST	= $(BIN)/untoast
+ TCAT	= $(BIN)/tcat
+ 
++INSTALL	= install
++
+ # Headers
+ 
+ GSM_HEADERS =	$(INC)/gsm.h
+@@ -258,6 +263,9 @@ STUFF = 	ChangeLog			\
+ 
+ GSM_INSTALL_TARGETS =	\
+ 		$(GSM_INSTALL_LIB)/libgsm.a		\
++		$(GSM_INSTALL_LIB)/libgsm.so		\
++		$(GSM_INSTALL_LIB)/libgsm.so.${SOVER}	\
++		$(GSM_INSTALL_LIB)/${SONAME}		\
+ 		$(GSM_INSTALL_INC)/gsm.h		\
+ 		$(GSM_INSTALL_MAN)/gsm.3		\
+ 		$(GSM_INSTALL_MAN)/gsm_explode.3	\
+@@ -279,7 +287,7 @@ TOAST_INSTALL_TARGETS =	\
+ 
+ # Target rules
+ 
+-all:		$(LIBGSM) $(TOAST) $(TCAT) $(UNTOAST)
++all:		$(LIBGSM) $(LIBGSMSO) $(TOAST) $(TCAT) $(UNTOAST)
+ 		@-echo $(ROOT): Done.
+ 
+ tst:		$(TST)/lin2cod $(TST)/cod2lin $(TOAST) $(TST)/test-result
+@@ -304,11 +312,16 @@ $(LIBGSM):	$(LIB) $(GSM_OBJECTS)
+ 		$(AR) $(ARFLAGS) $(LIBGSM) $(GSM_OBJECTS)
+ 		$(RANLIB) $(LIBGSM)
+ 
++${LIBGSMSO}:	$(LIB) $(GSM_OBJECTS)
++		@rm -f $@ ${@D}/${SONAME} ${@D}/libgsm.so
++		$(LD) -o $@ -shared -Xlinker -soname -Xlinker ${SONAME} $(LDFLAGS) $(GSM_OBJECTS) -lc
++		${LN} ${@F} ${@D}/${SONAME}
++		${LN} ${@F} ${@D}/libgsm.so
+ 
+ # Toast, Untoast and Tcat -- the compress-like frontends to gsm.
+ 
+-$(TOAST):	$(BIN) $(TOAST_OBJECTS) $(LIBGSM)
+-		$(LD) $(LFLAGS) -o $(TOAST) $(TOAST_OBJECTS) $(LIBGSM) $(LDLIB)
++$(TOAST):	$(BIN) $(TOAST_OBJECTS) $(LIBGSMSO)
++		$(LD) $(LFLAGS) -o $(TOAST) $(TOAST_OBJECTS) $(LIBGSMSO) $(LDLIB)
+ 
+ $(UNTOAST):	$(BIN) $(TOAST)
+ 		-rm $(RMFLAGS) $(UNTOAST)
+@@ -398,6 +411,14 @@ $(GSM_INSTALL_LIB)/libgsm.a:	$(LIBGSM)
+ 		cp $? $@
+ 		chmod 444 $@
+ 
++$(GSM_INSTALL_LIB)/libgsm.so.${SOVER}:	${LIBGSMSO}
++		-rm $@
++		${INSTALL} -D -p -m 0755 $< $@
++
++$(GSM_INSTALL_LIB)/${SONAME} \
++$(GSM_INSTALL_LIB)/libgsm.so:		$(GSM_INSTALL_LIB)/libgsm.so.${SOVER}
++		-rm $@
++		${LN} ${<F} $@
+ 
+ # Distribution
+
