@@ -1,5 +1,5 @@
 #WebPA Feature
-IMAGE_INSTALL_append = " parodus parodus2ccsp"
+IMAGE_INSTALL_append = " parodus parodus2ccsp rust-hello-world ieee1905"
 
 #TR069 Feature
 IMAGE_INSTALL_append = " ccsp-tr069-pa"
