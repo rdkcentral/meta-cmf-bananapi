@@ -8,3 +8,5 @@ Licensed under the Apache License, Version 2.0
 
 Copyright [2014] [Cisco Systems, Inc.]
 Licensed under the Apache License, Version 2.0
+
+Some material is derived from openembedded.org or the yocto project  and is licensed in the same manner here (MIT for metadata; source code to match the associated recipe license).

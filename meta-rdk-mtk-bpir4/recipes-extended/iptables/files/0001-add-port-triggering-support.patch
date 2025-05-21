@@ -1,0 +1,389 @@
+Source: Backport from http://asuswrt-merlin.ng/
+Index: iptables-1.8.4/extensions/libipt_TRIGGER.c
+===================================================================
+--- /dev/null
++++ iptables-1.8.4/extensions/libipt_TRIGGER.c
+@@ -0,0 +1,347 @@
++/* Port-triggering target. 
++ *
++ * Copyright (C) 2003, CyberTAN Corporation
++ * All Rights Reserved.
++ */
++
++/* Shared library add-on to iptables to add port-trigger support. */
++
++#include <stdio.h>
++#include <string.h>
++#include <stdlib.h>
++#include <getopt.h>
++#include <xtables.h>
++#include <linux/netfilter_ipv4/ip_tables.h>
++#include <linux/netfilter_ipv4/ipt_TRIGGER.h>
++
++
++#define IPT_TRIGGER_USED    (1) << 0
++#define IPT_TRIGGER_MATCH_USED    (1) << 1
++#define IPT_TRIGGER_RELATE_USED    (1) << 2
++#define IPT_TRIGGER_DNAT_USED    (1) << 3
++#define IPT_TRIGGER_IN_USED    (1) << 4
++#define IPT_TRIGGER_OUT_USED    (1) << 5
++#define IPT_TRIGGER_PROTO_USED    (1) << 6
++
++static void
++parse_tcp_ports(const char *portstring, u_int16_t *ports)
++{
++        char *buffer;
++        char *cp;
++
++        buffer = strdup(portstring);
++        if ((cp = strchr(buffer, ':')) == NULL)
++                ports[0] = ports[1] = xtables_parse_port(buffer, "tcp");
++        else {
++                *cp = '\0';
++                cp++;
++
++                ports[0] = buffer[0] ? xtables_parse_port(buffer, "tcp") : 0;
++                ports[1] = cp[0] ? xtables_parse_port(cp, "tcp") : 0xFFFF;
++
++                if (ports[0] > ports[1])
++                        xtables_error(PARAMETER_PROBLEM,
++                                   "invalid portrange (min > max)");
++        }
++        free(buffer);
++}
++
++/* Function which prints out usage message. */
++
++static void TRIGGER_help(void)
++{
++	printf(
++               "TRIGGER  options:\n"
++                        " --trigger-type (dnat|in|out)\n"
++	         	"'\t\t Trigger type\n"
++                        " --trigger-proto proto\n"
++                        "\t\t Trigger protocol tcp|udp|all\n"
++                         " --trigger-match port[-port]\n"
++                         "\t\tTrigger destination port range\n"
++                         " --trigger-relate port[-port]\n"
++                         "\t\tPort range to map related destination port range to.\n\n"
++			  );
++}
++/* man 3 getopt structure */
++static struct option TRIGGER_opts[] = {
++	{ "trigger-type", 1, NULL, '1' },
++	{ "trigger-proto", 1, NULL, '2' },
++	{ "trigger-match", 1, NULL, '3' },
++	{ "trigger-relate", 1, NULL, '4' },
++	{ .name = NULL }
++
++};
++
++
++
++/* Parses ports */
++static int parse_ports(const char *arg, u_int16_t *ports)
++{
++	const char *dash;
++	int port;
++	ports[0] =  0;
++	ports[1] =  0;
++
++	dash = strchr(arg, ':');
++	if (dash == NULL) {
++            port = ( u_int16_t ) atoi(arg );
++	    if (port == 0 || port > 65535) {
++		    xtables_error(PARAMETER_PROBLEM, "Invalid Port  %d \n", port);
++		    return -1; /* not OK */
++	        }
++	    ports[0] =  port;
++	    ports[1] =  0;
++	}
++	else {
++		int portEnd;
++
++		port=strtol(arg, NULL, 10);
++		portEnd = ( u_int16_t ) atoi(dash + 1);
++		if (portEnd == 0 || portEnd > 65535 || ( portEnd < port ))
++		{
++			xtables_error(PARAMETER_PROBLEM, "Port range %d:%d is invalid\n", port, portEnd);
++		        return -1; /* not OK */
++		}
++		ports[0] = port;
++		ports[1] = portEnd;
++	}
++	return 1;
++}
++
++
++/* Function which parses command options; returns true if it
++   ate an option */
++
++static int 
++TRIGGER_parse(int c, char **argv, int invert, unsigned int *flags,
++      const void *entry,
++      struct xt_entry_target **target)
++{
++    struct ipt_trigger_info *info = (struct ipt_trigger_info *) (*target)->data;
++
++    if  ( info == NULL )
++    {
++          xtables_error(PARAMETER_PROBLEM, "NULL paramaeter (*target)->data specified" );
++	  return 0;
++    }
++    if  ( optarg == NULL )
++    {
++          xtables_error(PARAMETER_PROBLEM, "NULL paramaeter optarg specified" );
++	  return 0;
++    }
++
++    /* Parse argument number 1, 2,3, 4 */
++	switch (c) {
++	case '1':
++	        {
++		if (!strncasecmp(optarg, "dnat",3))
++                {
++			info->type = IPT_TRIGGER_DNAT;
++		         *flags |= IPT_TRIGGER_DNAT_USED;
++                }
++		else if (!strncasecmp(optarg, "in",2))
++                {
++			info->type = IPT_TRIGGER_IN;
++		         *flags |= IPT_TRIGGER_IN_USED;
++                }
++		else if (!strncasecmp(optarg, "out",3))
++                {
++			info->type = IPT_TRIGGER_OUT;
++		         *flags |= IPT_TRIGGER_OUT_USED;
++                }
++		else
++                {
++			xtables_error(PARAMETER_PROBLEM, "unknown type trigger type specified");
++                        return 0;
++                }
++		return 1;
++	        }
++
++	case '2':
++	        {
++				if (!strncasecmp(optarg, "tcp",3))
++        		{
++					info->proto = IPPROTO_TCP;
++		         	*flags		|= IPT_TRIGGER_PROTO_USED;
++        		}
++				else if (!strncasecmp(optarg, "udp",3))
++        		{
++					info->proto	 = IPPROTO_UDP;
++		         	*flags		 |= IPT_TRIGGER_PROTO_USED;
++        		}
++				else if (!strncasecmp(optarg, "all",3))
++        		{
++					info->proto	 = IPT_TRIGGER_BOTH_PROTOCOLS;
++		         	*flags		 |= IPT_TRIGGER_PROTO_USED;
++        		}
++        		else if (!strncasecmp(optarg, "both",4))
++        		{
++					info->proto = IPT_TRIGGER_BOTH_PROTOCOLS;
++		        	 *flags		 |= IPT_TRIGGER_PROTO_USED;
++        		}
++				else
++        		{
++				xtables_error(PARAMETER_PROBLEM, "unknown protocol  specified");
++        		}
++				return 1;
++	        }
++
++	case '3':
++	        {
++		    if (invert) /* Operator NOT is not supported */
++		    {
++		        xtables_error(PARAMETER_PROBLEM, "Unexpected `!' after --trigger-match");
++                        return 0;
++
++                    }
++		    if (parse_ports(optarg, info->ports.mport))
++		    {
++		         *flags |= IPT_TRIGGER_MATCH_USED;
++			     *flags |= IPT_TRIGGER_USED;
++		         return 1;
++                     }
++                }
++
++	case '4':
++	        {
++		    	if (invert) /* Operator NOT is not supported */
++		    	{
++		            xtables_error(PARAMETER_PROBLEM, "Unexpected `!' after --trigger-relate");
++
++                 }
++		     	if (parse_ports(optarg, info->ports.rport))
++		     	{
++					*flags |= IPT_TRIGGER_RELATE_USED;
++					*flags |= IPT_TRIGGER_USED;
++		          return 1;
++             	}
++	        }
++
++	default:
++		   return 0; /* NOK */
++    }
++   return 0; /* NOK */
++}
++
++
++/* Prints out the targinfo. iptables -L  */
++static void TRIGGER_print(const void  *ip,
++      const struct xt_entry_target *target, int numeric)
++{
++	struct ipt_trigger_info *info = (struct ipt_trigger_info *)target->data;
++
++	printf(" TRIGGER ");
++	if (info->type == IPT_TRIGGER_DNAT)
++		printf("type:dnat ");
++	else if (info->type == IPT_TRIGGER_IN)
++		printf("type:in ");
++	else if (info->type == IPT_TRIGGER_OUT)
++		printf("type:out ");
++    if (info->type == IPT_TRIGGER_OUT)  /* only trigger-type out specifies other parameters */ 
++	{
++	if (info->proto == IPPROTO_TCP)
++		printf("tcp ");
++	else if (info->proto == IPPROTO_UDP)
++		printf("udp ");
++	else if (info->proto == IPT_TRIGGER_BOTH_PROTOCOLS)
++		printf("both ");
++	else
++	    printf("all ");
++
++	printf("match:%hu", info->ports.mport[0]);
++	if (info->ports.mport[1] > info->ports.mport[0])
++		printf("-%hu", info->ports.mport[1]);
++	printf(" ");
++
++	printf("relate:%hu", info->ports.rport[0]);
++	if (info->ports.rport[1] > info->ports.rport[0])
++		printf("-%hu", info->ports.rport[1]);
++	}
++	printf(" ");
++}
++/*
++*
++* last chance for sanity check. 
++* It's called when the user enter a new rule, right after arguments parsing is done.
++*  
++*/
++
++static void TRIGGER_final_check(unsigned int flags)
++{
++	if (flags & IPT_TRIGGER_OUT_USED)
++        {
++	   if (!(flags & IPT_TRIGGER_RELATE_USED))
++           {
++		xtables_error(PARAMETER_PROBLEM, "TRIGGER: You must specify trigger relate an parameter");
++           }
++	   if (!(flags & IPT_TRIGGER_MATCH_USED))
++           {
++		xtables_error(PARAMETER_PROBLEM, "TRIGGER: You must specify trigger match an parameter");
++           }
++	   if (!(flags & IPT_TRIGGER_OUT_USED))
++           {
++		xtables_error(PARAMETER_PROBLEM, "TRIGGER: You must specify trigger type an parameter");
++           }
++	   if (!(flags & IPT_TRIGGER_PROTO_USED))
++           {
++		xtables_error(PARAMETER_PROBLEM, "TRIGGER: You must specify trigger protocols an parameter");
++           }
++
++        }
++}
++
++/*
++* If we have a ruleset that we want to save, iptables provide the tool 'iptables-save' which dumps all your rules. It obviously needs your extension's help to dump proper rules.
++* This is done by calling this function.
++*
++* 
++*/
++
++
++static void TRIGGER_save(const void *ip, const struct xt_entry_target *target)
++{
++	struct ipt_trigger_info *info = (struct ipt_trigger_info *)target->data;
++
++	printf(" --trigger-proto ");
++	if (info->proto == IPPROTO_TCP)
++		printf("tcp ");
++	else if (info->proto == IPPROTO_UDP)
++		printf("udp ");
++	else if (info->proto == IPT_TRIGGER_BOTH_PROTOCOLS)
++		printf("both ");
++	else
++	    printf("all ");
++	printf(" --trigger-match %hu", info->ports.mport[0]);
++    if (info->ports.mport[1])
++        printf("-%hu", info->ports.mport[1]);
++	printf(" ");
++	printf(" --trigger-relate %hu", info->ports.rport[0]);
++    if (info->ports.rport[1])
++        printf("-%hu", info->ports.rport[1]);
++    printf(" ");
++}
++
++
++static struct xtables_target trigger_tg_reg = {
++        .name           = "TRIGGER",
++        .version        = XTABLES_VERSION,
++        .family         = NFPROTO_IPV4,
++        .size           = XT_ALIGN(sizeof(struct ipt_trigger_info)),
++        .userspacesize  = XT_ALIGN(sizeof(struct ipt_trigger_info)),
++        .help           = TRIGGER_help,
++        .parse          = TRIGGER_parse,
++		.final_check	= TRIGGER_final_check,
++        .print          = TRIGGER_print,
++        .save           = TRIGGER_save,
++        .extra_opts     = TRIGGER_opts,
++};
++
++void _init(void)
++{
++/*
++*
++*  This function is called when the module is loaded by iptables.
++*   man dlopen.
++*/
++	xtables_register_target(&trigger_tg_reg);
++}
+Index: iptables-1.8.4/include/linux/netfilter_ipv4/ipt_TRIGGER.h
+===================================================================
+--- /dev/null
++++ iptables-1.8.4/include/linux/netfilter_ipv4/ipt_TRIGGER.h
+@@ -0,0 +1,31 @@
++/* Port-triggering target. 
++ *
++ * Copyright (C) 2003, CyberTAN Corporation
++ * All Rights Reserved.
++ */
++
++/* Shared library add-on to iptables to add port-trigger support. */
++
++#ifndef _IPT_TRIGGER_H_target
++#define _IPT_TRIGGER_H_target
++#define IPT_TRIGGER_BOTH_PROTOCOLS 253  /* unassigned number */
++
++enum ipt_trigger_type
++{
++	IPT_TRIGGER_DNAT = 1,
++	IPT_TRIGGER_IN = 2,
++	IPT_TRIGGER_OUT = 3
++};
++
++struct ipt_trigger_ports {
++	u_int16_t mport[2];	/* Related destination port range */
++	u_int16_t rport[2];	/* Port range to map related destination port range to */
++};
++
++struct ipt_trigger_info {
++	enum ipt_trigger_type type;
++	u_int16_t proto;	/* Related protocol */
++	struct ipt_trigger_ports ports;
++};
++
++#endif /*_IPT_TRIGGER_H_target*/

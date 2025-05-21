@@ -39,6 +39,9 @@ sed -i "s/\$\$lan_ethernet_physical_ifnames=lan0 lan1 lan2 lan3 lan4/\$\$lan_eth
 #Bridge-mode virtual interface net0 instead of lan0
 sed -i "s/\$\$cmdiag_ifname=lan0$/\$\$cmdiag_ifname=net0/g" ${D}${sysconfdir}/utopia/system_defaults
 
+#Port Triggering feature has to be disabled by default
+sed -i 's/^$CosaNAT::port_trigger_enabled=1/$CosaNAT::port_trigger_enabled=0/' ${D}${sysconfdir}/utopia/system_defaults
+
 #Script for enabling bridge mode in BPIR4.
 install -m 755 ${WORKDIR}/service_bridge_bpi.sh ${D}${sysconfdir}/utopia/service.d/
 install -m 755 ${WORKDIR}/service_bridge_bpi.sh ${D}${sysconfdir}/utopia/service.d/service_bridge.sh

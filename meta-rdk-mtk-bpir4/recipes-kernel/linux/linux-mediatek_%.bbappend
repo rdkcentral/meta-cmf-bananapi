@@ -1,9 +1,13 @@
 FILESEXTRAPATHS_prepend := "${THISDIR}/files:"
 
+SRC_URI += "file://0001-add-support-for-port-triggering.patch"
+SRC_URI += "file://BPI-resolving-port-triggering-errors.patch"
+
 SRC_URI += " \
     file://rdkb_cfg/iptables_nf.cfg \
     file://rdkb_cfg/bridge_mode.cfg \
     file://rdkb_cfg/coredump.cfg \
+    file://netfilter.cfg  \
     ${@bb.utils.contains('DISTRO_FEATURES','dac', 'file://rdkb_cfg/container.cfg', '', d)} \
     ${@bb.utils.contains('DISTRO_FEATURES','sdmmc','file://rdkb_cfg/sdmmc.cfg','',d)} \
     file://rdkb_cfg/wps_key.cfg \
