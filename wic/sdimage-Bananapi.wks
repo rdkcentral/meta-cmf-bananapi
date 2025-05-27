@@ -10,13 +10,12 @@ part --source rawcopy --sourceparams="file=atf/bpi-r4_sdmmc_bl2.img" --part-name
 part --source rawcopy --sourceparams="file=atf/bpi-r4_sdmmc_fip.bin" --part-name fip --align 6656 --fixed-size 2M --part-type=0FC63DAF-8483-4772-8E79-3D69D8477DE4
 
 # 3. Boot A
-part /boot_a --source bootimg-partition --ondisk mmcblk0 --fstype=vfat --label boot_a --active --align 8704 --fixed-size 100M --part-type=0FC63DAF-8483-4772-8E79-3D69D8477DE4
+part /boot --source bootimg-partition --ondisk mmcblk0 --fstype=vfat --label boot_a --active --align 8704 --fixed-size 100M --part-type=0FC63DAF-8483-4772-8E79-3D69D8477DE4
 
 # 4. rootfs A
-part /root_a --source rootfs --ondisk mmcblk0 --fstype=ext4 --label rootfs_a --align 111104
+part / --source rootfs --ondisk mmcblk0 --fstype=ext4 --label rootfs_a --align 111104
 
 # 5. MAC A (512KB)
-#part --source=rawcopy --sourceparams="file=mac/mac_a.bin" --part-name=mac_a --fixed-size=512K
 part --source=empty --label=mac_a --fixed-size=512K
 
 # 6. NVRAM A (2MB)
@@ -27,13 +26,12 @@ part --source=empty --fstype=ext4 --label=crash_a --fixed-size=8M
 
 
 # 8. Boot B
-part /boot_b --source bootimg-partition --ondisk mmcblk0 --fstype=vfat --label boot_b --active --fixed-size 100M
+part --source bootimg-partition --ondisk mmcblk0 --fstype=vfat --label boot_b --active --fixed-size 100M
 
 # 9. rootfs B
-part /root_b --source rootfs --ondisk mmcblk0 --fstype=ext4 --label rootfs_b --fixed-size 512M
+part --source rootfs --ondisk mmcblk0 --fstype=ext4 --label rootfs_b --fixed-size 512M
 
 # 10. MAC B (512KB)
-#part --source=rawcopy --sourceparams="file=mac/mac_b.bin" --part-name=mac_b --fixed-size=512K
 part --source=empty --label=mac_b --fixed-size=512K
 
 # 11. NVRAM B (2MB)
