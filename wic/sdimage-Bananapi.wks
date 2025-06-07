@@ -13,7 +13,7 @@ part --source rawcopy --sourceparams="file=atf/bpi-r4_sdmmc_fip.bin" --part-name
 part /boot --source bootimg-partition --ondisk mmcblk0 --fstype=vfat --label boot_a --active --align 8704 --fixed-size 100M --part-type=0FC63DAF-8483-4772-8E79-3D69D8477DE4
 
 # 4. rootfs A
-part / --source rootfs --ondisk mmcblk0 --fstype=ext4 --label rootfs_a --align 111104
+part / --source rootfs --ondisk mmcblk0 --fstype=ext4 --label rootfs_a --align 111104 --fixed-size 512M
 
 # 5. MAC A (512KB)
 part --source=empty --label=mac_a --fixed-size=512K
@@ -49,7 +49,7 @@ part --source=empty --fstype=ext4 --label=crash_b --fixed-size=8M
 part --source=empty --fstype=ext4 --label=reserved --fixed-size=16M
 
 # 16. Staging (64MB)
-part --source=empty --fstype=ext4 --label=staging --fixed-size=64M
+part --source=empty --fstype=ext4 --label=staging --fixed-size=512M
 
 # 17. DAC (256MB)
 part --source=empty --fstype=ext4 --label=dac --fixed-size=256M

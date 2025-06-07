@@ -99,7 +99,7 @@ if [ "X$BPI_IMG_TYPE" == "Xnand" ]; then
     sed -i '/sdmmc/s/^/#/' ${_TOPDIR}/meta-cmf-bananapi/conf/distro/include/rdk-bpi.inc
 else # SD card image is default
     mkdir -p ${_TOPDIR}/downloads
-    if [ -f ${_TOPDIR}/downloads/bpi-r4_sdmmc_bl2.img ] && [ -f ${_TOPDIR}/downloads/bpi-r4_sdmmc_fip.bin ]; then
+    if [ -f ${_TOPDIR}/downloads/bpi-r4_sdmmc_bl2.img ] && [ -f ${_TOPDIR}/downloads/bpi-r4_sdmmc_fip.bin ] && [ -f ${_TOPDIR}/downloads/bpi-r4_sdmmc_bl2_B.img ] && [ -f ${_TOPDIR}/downloads/bpi-r4_sdmmc_fip_B.bin ]; then
         echo "Both bl2 and fip binaries are present in local workspace."
     else
         echo "**********************************************************************"
