@@ -1,4 +1,4 @@
-SRC_URI_append = "${CMF_GITHUB_ROOT}/bananapi-sysint.git;protocol=git;nobranch=1;destsuffix=git/devicebpi;name=sysintdevicebpi"
+SRC_URI_append = "${CMF_GITHUB_ROOT}/bananapi-sysint;protocol=https;nobranch=1;destsuffix=git/devicebpi;name=sysintdevicebpi"
 SRCREV_sysintdevicebpi = "9c9644d7cdb8a50db53b69995d10729192991b21"
 SRCREV_FORMAT = "1.0.0"
 
