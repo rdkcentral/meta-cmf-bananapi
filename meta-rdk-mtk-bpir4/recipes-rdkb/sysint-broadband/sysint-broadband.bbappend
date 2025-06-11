@@ -1,9 +1,6 @@
-SRC_URI_append = " \
-    ${CMF_GITHUB_ROOT}/bananapi-sysint.git;;branch=${CMF_GIT_DEVELOP_BRANCH};protocol=${CMF_GIT_PROTOCOL};destsuffix=git/devicebpi;name=sysintdevicebpi \
-"
-SRCREV_sysintdevicebpi = "${AUTOREV}"
-SRCREV_FORMAT = "sysintgeneric_sysintdevicebpi"
-
+SRC_URI_append = "${CMF_GITHUB_ROOT}/bananapi-sysint;protocol=https;nobranch=1;destsuffix=git/devicebpi;name=sysintdevicebpi"
+SRCREV_sysintdevicebpi = "9c9644d7cdb8a50db53b69995d10729192991b21"
+SRCREV_FORMAT = "1.0.0"
 
 do_install_append () {
   #Webpa ServerURL
