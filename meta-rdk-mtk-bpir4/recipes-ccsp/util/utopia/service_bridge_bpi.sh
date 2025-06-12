@@ -440,6 +440,7 @@ virtual_interface()
         if [ "$LAN_IP" != "$dst_ip" ]; then
                 ifconfig "$CMDIAG_IF" $dst_ip netmask "$LAN_NETMASK" up
         fi
+        sysevent set ipv4_4-status down
     else
         ifconfig "$CMDIAG_IF" down
         ifconfig l"$CMDIAG_IF" down
