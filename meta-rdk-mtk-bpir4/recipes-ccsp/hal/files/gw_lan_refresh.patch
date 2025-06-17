@@ -1,0 +1,47 @@
+Source: Prabhudas Gannavarapu <prabhudas_gannavarapu@comcast.com>
+Subject: Adding HAL changes for gw_lan_refresh application for Banana Pi R4
+
+Index: ethsw/rdkb_hal/src/ethsw/ccsp_hal_ethsw.c
+===================================================================
+--- ethsw.orig/rdkb_hal/src/ethsw/ccsp_hal_ethsw.c
++++ ethsw/rdkb_hal/src/ethsw/ccsp_hal_ethsw.c
+@@ -622,7 +626,6 @@ CcspHalEthSwSetPortAdminStatus
+         CCSP_HAL_ETHSW_ADMIN_STATUS AdminStatus
+     )
+ {
+-    CcspHalEthSwTrace(("set port %d AdminStatus to %d", PortId, AdminStatus));
+     if(AdminStatus < CCSP_HAL_ETHSW_AdminUp || AdminStatus > CCSP_HAL_ETHSW_AdminTest)
+         return  RETURN_ERR;
+     if(PortId < 1 || PortId > MAX_LAN_PORT)
+@@ -630,20 +634,9 @@ CcspHalEthSwSetPortAdminStatus
+     
+     char cmd1[32] = {0};
+     char cmd2[32] = {0};
+-    char interface[8] = {0};
+-    char path[32] = {0};
+-
+-    strcpy(path,"/sys/class/net/eth1");
+-
+-    int eth_if=is_interface_exists(path);
+-
+-    if(eth_if == 0 )
+-        return  RETURN_ERR;
+-
+-    strcpy(interface,"eth1");
+ 
+-    sprintf(cmd1,"ip link set %s up",interface);
+-    sprintf(cmd2,"ip link set %s down",interface);
++    sprintf(cmd1,"ip link set lan%d up",PortId);
++    sprintf(cmd2,"ip link set lan%d down",PortId);
+ 
+     switch (PortId)
+     {
+@@ -661,7 +654,7 @@ CcspHalEthSwSetPortAdminStatus
+                  }
+                  else
+                  {
+-                     //system(cmd2);
++                     system(cmd2);
+                      admin_status=1;
+                  }
+              }
