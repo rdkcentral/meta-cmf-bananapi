@@ -4,3 +4,4 @@ RDEPENDS_packagegroup-filogic-mt76_remove_onewifi = " \
                     wifi-test-tool \
                     vts \
 "
+RDEPENDS_packagegroup-filogic-mt76_remove_broadband = " mt76-test"
