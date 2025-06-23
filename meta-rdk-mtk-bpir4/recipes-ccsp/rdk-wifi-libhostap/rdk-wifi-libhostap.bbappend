@@ -14,6 +14,7 @@ CFLAGS_append = " -D_PLATFORM_BANANAPI_R4_  -DCONFIG_SME -DCONFIG_GAS "
 
 do_configure_prepend() {
   cp ${WORKDIR}/2.11/libhostap.mk ${S}/source/hostap-${HOSTAPD_PV}/hostapd/
+  echo "CONFIG_IEEE80211BE=y" >> ${S}/source/hostap-${HOSTAPD_PV}/hostapd/.config
 }
 
 do_install_append() {

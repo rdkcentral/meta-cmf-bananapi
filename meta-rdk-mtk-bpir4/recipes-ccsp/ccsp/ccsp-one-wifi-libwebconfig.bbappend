@@ -10,6 +10,7 @@ EXTRA_OECONF_append = " ${@bb.utils.contains('DISTRO_FEATURES', 'EasyMesh', ' --
 CFLAGS += " ${@bb.utils.contains('DISTRO_FEATURES', 'EasyMesh', ' -Wno-error=maybe-uninitialized -Wno-error=unused-variable -Wno-error=unused-but-set-variable -Wno-error=incompatible-pointer-types -Wno-error=sign-compare -Wno-error -DEASY_MESH_NODE  ', '', d)}"
 
 CFLAGS_append = " -Wno-enum-conversion"
+CFLAGS_append = " -DCONFIG_IEEE80211BE"
 
 do_compile_append() {
     oe_runmake -C source/platform
