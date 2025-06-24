@@ -18,11 +18,15 @@ do_configure[noexec] = "1"
 RDEPENDS_${PN}-dev = ""
 
 SRC_URI_append += " file://bpi-r4_sdmmc_bl2.img \
-                    file://bpi-r4_sdmmc_fip.bin"
+                    file://bpi-r4_sdmmc_fip.bin \
+                    file://bpi-r4_sdmmc_bl2_B.img \
+                    file://bpi-r4_sdmmc_fip_B.bin"
 
 do_deploy() {
         mkdir -p ${DEPLOYDIR}/atf/
         install -m 0644 ${WORKDIR}/bpi-r4_sdmmc_bl2.img ${DEPLOYDIR}/atf/
+        install -m 0644 ${WORKDIR}/bpi-r4_sdmmc_bl2_B.img ${DEPLOYDIR}/atf/
         install -m 0644 ${WORKDIR}/bpi-r4_sdmmc_fip.bin ${DEPLOYDIR}/atf/
+        install -m 0644 ${WORKDIR}/bpi-r4_sdmmc_fip_B.bin ${DEPLOYDIR}/atf/
 }
 addtask do_deploy after do_install
