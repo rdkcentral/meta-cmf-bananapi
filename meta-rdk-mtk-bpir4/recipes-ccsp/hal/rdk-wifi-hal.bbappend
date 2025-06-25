@@ -8,6 +8,7 @@ CFLAGS_append_kirkstone = " -fcommon"
 CFLAGS_remove = "-DCONFIG_MBO"
 EXTRA_OECONF_append = " ${@bb.utils.contains('DISTRO_FEATURES', 'OneWifi', ' ONE_WIFIBUILD=true ', '', d)}"
 EXTRA_OECONF_append = " ${@bb.utils.contains('DISTRO_FEATURES', 'OneWifi', ' BANANA_PI_PORT=true ', '', d)}"
+CFLAGS_append = " -DCONFIG_HW_CAPABILITIES "
 
 FILESEXTRAPATHS_prepend := "${THISDIR}/files:"
 
