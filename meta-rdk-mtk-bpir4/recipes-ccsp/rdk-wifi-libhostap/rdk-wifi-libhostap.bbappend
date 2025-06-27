@@ -9,6 +9,8 @@ SRC_URI_append = " ${@bb.utils.contains('DISTRO_FEATURES', 'HOSTAPD_2_10', 'file
 SRC_URI_append = " ${@bb.utils.contains('DISTRO_FEATURES', 'HOSTAPD_2_11', 'file://2.11/Bpi_rdkwifilibhostap_2_11_changes.patch', 'file://2.10/Bpi_rdkwifilibhostap_2_10_changes.patch', d)}"
 SRC_URI_append = " ${@bb.utils.contains('DISTRO_FEATURES', 'HOSTAPD_2_11', 'file://2.11/supplicant.patch', '', d)}"
 SRC_URI_append = " ${@bb.utils.contains('DISTRO_FEATURES', 'HOSTAPD_2_11', 'file://2.11/libhostap.mk', '', d)}"
+SRC_URI_append = " ${@bb.utils.contains('DISTRO_FEATURES', 'HOSTAPD_2_11', 'file://2.11/wpa3_pcm_rsno_2_hostap_2_11.patch', '', d)}"
+SRC_URI_append = " ${@bb.utils.contains('DISTRO_FEATURES', 'HOSTAPD_2_11', 'file://2.11/mdu_radius_psk_auth_2_11.patch', '', d)}"
 
 CFLAGS_append = " -D_PLATFORM_BANANAPI_R4_  -DCONFIG_SME -DCONFIG_GAS "
 
