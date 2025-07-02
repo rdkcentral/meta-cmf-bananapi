@@ -22,7 +22,7 @@ part --source rawcopy --sourceparams="file=atf/bpi-r4_sdmmc_bl2_B.img" --part-na
 part --source rawcopy --sourceparams="file=atf/bpi-r4_sdmmc_fip_B.bin" --part-name fip_b --fixed-size 2M --part-type=0FC63DAF-8483-4772-8E79-3D69D8477DE4
 
 # 7. Boot B
-part /boot_b --source bootimg-partition --ondisk mmcblk0 --fstype=vfat --label boot_b --active --fixed-size 128M --part-type=0FC63DAF-8483-4772-8E79-3D69D8477DE4
+part --source bootimg-partition --ondisk mmcblk0 --fstype=vfat --label boot_b --active --fixed-size 128M --part-type=0FC63DAF-8483-4772-8E79-3D69D8477DE4
 
 # 8. rootfs B
 part / --source rootfs --ondisk mmcblk0 --fstype=ext4 --label rootfs_b --fixed-size 512M
