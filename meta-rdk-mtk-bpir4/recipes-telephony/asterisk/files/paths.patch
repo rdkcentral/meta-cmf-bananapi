@@ -1,0 +1,13 @@
+Index: git/configure.ac
+===================================================================
+--- git.orig/configure.ac
++++ git/configure.ac
+@@ -41,7 +41,7 @@ AC_SUBST([astlibdir],         ['${libdir
+ AC_SUBST([astmoddir],         ['${libdir}/asterisk/modules'])dnl
+ AC_SUBST([astmandir],         ['${mandir}'])dnl
+ AC_SUBST([astvarlibdir],      ['${localstatedir}/lib/asterisk'])dnl
+-AC_SUBST([astdatadir],        ['${astvarlibdir}'])dnl
++AC_SUBST([astdatadir],        ['${datadir}/asterisk'])dnl
+ AC_SUBST([astdbdir],          ['${astvarlibdir}'])dnl
+ AC_SUBST([astkeydir],         ['${astvarlibdir}'])dnl
+ AC_SUBST([astspooldir],       ['${localstatedir}/spool/asterisk'])dnl

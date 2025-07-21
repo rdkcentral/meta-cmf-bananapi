@@ -1,0 +1,52 @@
+Index: git/configure.ac
+===================================================================
+--- git.orig/configure.ac
++++ git/configure.ac
+@@ -138,10 +138,14 @@ dnl
+ AC_C_BIGENDIAN
+ 
+ if test "x$ac_cv_c_bigendian" = "xyes"; then
+-  CFLAGS="$CFLAGS -DPJ_IS_BIG_ENDIAN=1 -DPJ_IS_LITTLE_ENDIAN=0"
++  PJ_PKGCONFIG_CFLAGS="-DPJ_IS_BIG_ENDIAN=1 -DPJ_IS_LITTLE_ENDIAN=0"
+ else
+-  CFLAGS="$CFLAGS -DPJ_IS_BIG_ENDIAN=0 -DPJ_IS_LITTLE_ENDIAN=1"
++  PJ_PKGCONFIG_CFLAGS="-DPJ_IS_BIG_ENDIAN=0 -DPJ_IS_LITTLE_ENDIAN=1"
+ fi
++CFLAGS="$CFLAGS $PJ_PKGCONFIG_CFLAGS"
++PJ_PKGCONFIG_CFLAGS="-DPJ_AUTOCONF=1 $PJ_PKGCONFIG_CFLAGS"
++
++AC_SUBST([PJ_PKGCONFIG_CFLAGS])
+ 
+ dnl
+ dnl Legacy macros
+Index: git/libpjproject.pc.in
+===================================================================
+--- git.orig/libpjproject.pc.in
++++ git/libpjproject.pc.in
+@@ -10,4 +10,4 @@ Description: Multimedia communication li
+ URL: http://www.pjsip.org
+ Version: @PJ_VERSION@
+ Libs: -L${libdir} @PJ_LDXXLIBS@
+-Cflags: -I${includedir} @PJ_INSTALL_CXXFLAGS@
++Cflags: -I${includedir} @PJ_PKGCONFIG_CFLAGS@
+Index: git/Makefile
+===================================================================
+--- git.orig/Makefile
++++ git/Makefile
+@@ -131,6 +131,7 @@ install:
+ 		sed -e "s/@PJ_VERSION@/$(PJ_VERSION)/" | \
+ 		sed -e "s!@PJ_LDLIBS@!!" | \
+ 		sed -e "s!@PJ_LDXXLIBS@!$(PJ_LDXXLIBS)!" | \
++		sed -e "s!@PJ_PKGCONFIG_CFLAGS@!${PJ_PKGCONFIG_CFLAGS}!" | \
+ 		sed -e "s!@PJ_INSTALL_CFLAGS@!!" | \
+ 		sed -e "s!@PJ_INSTALL_CXXFLAGS@!$(PJ_INSTALL_CXXFLAGS)!" > $(DESTDIR)/$(libdir)/pkgconfig/libpjproject.pc
+ 
+Index: git/build.mak.in
+===================================================================
+--- git.orig/build.mak.in
++++ git/build.mak.in
+@@ -317,3 +317,4 @@ export PJ_INSTALL_LIB_DIR := @libdir@
+ export PJ_INSTALL_CFLAGS := -I$(PJ_INSTALL_INC_DIR) -DPJ_AUTOCONF=1 @CFLAGS@
+ export PJ_INSTALL_CXXFLAGS := @CXXFLAGS@ $(PJ_INSTALL_CFLAGS)
+ export PJ_INSTALL_LDFLAGS := -L$(PJ_INSTALL_LIB_DIR) $(APP_LDLIBS)
++export PJ_PKGCONFIG_CFLAGS = @PJ_PKGCONFIG_CFLAGS@

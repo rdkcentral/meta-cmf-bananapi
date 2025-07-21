@@ -38,6 +38,10 @@ DISTRO_FEATURES_append = " partner_default_ext"
 #Enable SDcard image as default
 DISTRO_FEATURES_append = " sdmmc"
 
+DISTRO_FEATURE_append = " rdkb_voice_manager_dmltr104_v2"
+
+DISTRO_FEATURE_append = " telco_voice_feature_enable_persist"
+
 #PPP Feature
 #DISTRO_FEATURES_append = "ppp-enabled"
 

@@ -1,0 +1,31 @@
+Upstream-Status: Pending
+
+Subject: [PATCH 2/2] Use pkgconfig to find libxml2
+Organization: O.S. Systems Software LTDA.
+
+Signed-off-by: Fabio Berton <fabio.berton@ossystems.com.br>
+---
+ configure.ac            | 12 +-----------
+ menuselect/configure.ac | 11 +++--------
+ 2 files changed, 4 insertions(+), 19 deletions(-)
+
+Index: git/menuselect/configure.ac
+===================================================================
+--- git.orig/menuselect/configure.ac
++++ git/menuselect/configure.ac
+@@ -43,6 +43,7 @@ AH_BOTTOM([#endif])
+ 
+ # Checks for programs.
+ AC_PROG_CC
++AC_PROG_SED
+ AST_CHECK_GNU_MAKE
+ 
+ PKG_PROG_PKG_CONFIG
+@@ -91,6 +92,7 @@ else
+   AST_EXT_LIB_CHECK([TINFO], [tinfo], [keypad], [curses.h])
+ fi
+ 
++PKG_PROG_PKG_CONFIG()
+ AST_PKG_CONFIG_CHECK([LIBXML2], [libxml-2.0])
+ AST_EXT_TOOL_CHECK([LIBXML2], [xml2-config], , ,
+         [#include <libxml/tree.h>
