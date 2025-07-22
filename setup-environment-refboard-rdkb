@@ -60,22 +60,23 @@ sed -i '203 s/^/#/' ${_TOPDIR}/meta-cmf-filogic/recipes-ccsp/util/utopia.bbappen
 touch ${_TOPDIR}/meta-cmf-filogic/recipes-ccsp/util/utopia_changes_applied
 fi
 
-if [ ! -e ${_TOPDIR}/meta-cmf-filogic/recipes-ccsp/hal/rdkwifihal_changes_applied ]; then
-sed -i '9 s/^/#/' ${_TOPDIR}/meta-cmf-filogic/recipes-ccsp/hal/rdk-wifi-hal.bbappend
-sed -i '10 s/^/#/' ${_TOPDIR}/meta-cmf-filogic/recipes-ccsp/hal/rdk-wifi-hal.bbappend
-sed -i '11 s/^/#/' ${_TOPDIR}/meta-cmf-filogic/recipes-ccsp/hal/rdk-wifi-hal.bbappend
-sed -i '12 s/^/#/' ${_TOPDIR}/meta-cmf-filogic/recipes-ccsp/hal/rdk-wifi-hal.bbappend
-sed -i '13 s/^/#/' ${_TOPDIR}/meta-cmf-filogic/recipes-ccsp/hal/rdk-wifi-hal.bbappend
-sed -i '14 s/^/#/' ${_TOPDIR}/meta-cmf-filogic/recipes-ccsp/hal/rdk-wifi-hal.bbappend
-sed -i '15 s/^/#/' ${_TOPDIR}/meta-cmf-filogic/recipes-ccsp/hal/rdk-wifi-hal.bbappend
-sed -i '16 s/^/#/' ${_TOPDIR}/meta-cmf-filogic/recipes-ccsp/hal/rdk-wifi-hal.bbappend
-sed -i '17 s/^/#/' ${_TOPDIR}/meta-cmf-filogic/recipes-ccsp/hal/rdk-wifi-hal.bbappend
-touch ${_TOPDIR}/meta-cmf-filogic/recipes-ccsp/hal/rdkwifihal_changes_applied
-fi
-
-if [ ! -e ${_TOPDIR}/meta-cmf-filogic/recipes-ccsp/ccsp/onewifi_changes_applied ]; then
-sed -i 's/^SRC_URI +=/SRC_URI_append =/' ${_TOPDIR}/meta-cmf-filogic/recipes-ccsp/ccsp/ccsp-one-wifi.bbappend
-touch ${_TOPDIR}/meta-cmf-filogic/recipes-ccsp/ccsp/onewifi_changes_applied
+if [ "X$KERNEL_TYPE" != "Xkernel6-6" ]; then
+    if [ ! -e ${_TOPDIR}/meta-cmf-filogic/recipes-ccsp/hal/rdkwifihal_changes_applied ]; then
+         sed -i '9 s/^/#/' ${_TOPDIR}/meta-cmf-filogic/recipes-ccsp/hal/rdk-wifi-hal.bbappend
+         sed -i '10 s/^/#/' ${_TOPDIR}/meta-cmf-filogic/recipes-ccsp/hal/rdk-wifi-hal.bbappend
+         sed -i '11 s/^/#/' ${_TOPDIR}/meta-cmf-filogic/recipes-ccsp/hal/rdk-wifi-hal.bbappend
+         sed -i '12 s/^/#/' ${_TOPDIR}/meta-cmf-filogic/recipes-ccsp/hal/rdk-wifi-hal.bbappend
+         sed -i '13 s/^/#/' ${_TOPDIR}/meta-cmf-filogic/recipes-ccsp/hal/rdk-wifi-hal.bbappend
+         sed -i '14 s/^/#/' ${_TOPDIR}/meta-cmf-filogic/recipes-ccsp/hal/rdk-wifi-hal.bbappend
+         sed -i '15 s/^/#/' ${_TOPDIR}/meta-cmf-filogic/recipes-ccsp/hal/rdk-wifi-hal.bbappend
+         sed -i '16 s/^/#/' ${_TOPDIR}/meta-cmf-filogic/recipes-ccsp/hal/rdk-wifi-hal.bbappend
+         sed -i '17 s/^/#/' ${_TOPDIR}/meta-cmf-filogic/recipes-ccsp/hal/rdk-wifi-hal.bbappend
+         touch ${_TOPDIR}/meta-cmf-filogic/recipes-ccsp/hal/rdkwifihal_changes_applied
+    fi
+    if [ ! -e ${_TOPDIR}/meta-cmf-filogic/recipes-ccsp/ccsp/onewifi_changes_applied ]; then
+         sed -i 's/^SRC_URI +=/SRC_URI_append =/' ${_TOPDIR}/meta-cmf-filogic/recipes-ccsp/ccsp/ccsp-one-wifi.bbappend
+         touch ${_TOPDIR}/meta-cmf-filogic/recipes-ccsp/ccsp/onewifi_changes_applied
+    fi
 fi
 
 # commenting removing dbus.service from meta-cmf-filogic
@@ -106,6 +107,10 @@ if [ "X$FEATURE_TYPE" == "XExtender2" ]; then
     cp ${_TOPDIR}/meta-cmf-bananapi/meta-rdk-mtk-bpir4/recipes-ccsp/hal/files/InterfaceMap_em_ext1.json ${_TOPDIR}/meta-cmf-bananapi/meta-rdk-mtk-bpir4/recipes-ccsp/hal/files/InterfaceMap_em_ext.json
     sed -i 's/wifi1.1 info/wifi0.1 info/g' ${_TOPDIR}/meta-cmf-bananapi/meta-rdk-mtk-bpir4/recipes-ccsp/ccsp/files/onewifi_pre_start_em_ext.sh
     sed -i '/wifi1.1 type/s/^/#/' ${_TOPDIR}/meta-cmf-bananapi/meta-rdk-mtk-bpir4/recipes-ccsp/ccsp/files/onewifi_pre_start_em_ext.sh
+fi
+
+if [ "X$KERNEL_TYPE" == "Xkernel6-6" ]; then
+    sed -i '/kernel6-6/s/^#//' ${_TOPDIR}/meta-cmf-bananapi/conf/distro/include/rdk-bpi.inc
 fi
 
 if [ "X$BPI_IMG_TYPE" == "Xnand" ]; then

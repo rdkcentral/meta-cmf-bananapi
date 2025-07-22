@@ -11,6 +11,7 @@ SRC_URI_append = " ${@bb.utils.contains('DISTRO_FEATURES', 'HOSTAPD_2_11', 'file
 SRC_URI_append = " ${@bb.utils.contains('DISTRO_FEATURES', 'HOSTAPD_2_11', 'file://2.11/libhostap.mk', '', d)}"
 
 CFLAGS_append = " -D_PLATFORM_BANANAPI_R4_  -DCONFIG_SME -DCONFIG_GAS "
+CFLAGS_append = "${@bb.utils.contains('DISTRO_FEATURES', 'kernel6-6' , '-DCONFIG_AP','', d)}"
 
 do_configure_prepend() {
   cp ${WORKDIR}/2.11/libhostap.mk ${S}/source/hostap-${HOSTAPD_PV}/hostapd/
