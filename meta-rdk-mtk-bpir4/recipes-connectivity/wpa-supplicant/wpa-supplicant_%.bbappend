@@ -1,6 +1,6 @@
 EXTRA_OEMAKE = "CONFIG_BUILD_WPA_CLIENT_SO=y"
 FILES_SOLIBSDEV = ""
-do_install_append () {
+do_install:append () {
 	install -d ${D}${includedir}
 	install -d ${D}${libdir}
 	install -d ${D}/lib/rdk/

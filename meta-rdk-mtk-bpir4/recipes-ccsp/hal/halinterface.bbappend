@@ -1,5 +1,5 @@
-CFLAGS_append = " -DWIFI_HAL_VERSION_3"
-FILESEXTRAPATHS_prepend := "${THISDIR}/files:"
+CFLAGS:append = " -DWIFI_HAL_VERSION_3"
+FILESEXTRAPATHS:prepend := "${THISDIR}/files:"
 
 SRC_URI += "file://hal_interface.patch;apply=no "
 #need to remove this patch once this changes merged in rdk-next

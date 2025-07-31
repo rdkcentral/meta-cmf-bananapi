@@ -1,14 +1,14 @@
-LDFLAGS_append = " -Wl,--no-as-needed -lm -llog4c -lrdkloggers"
+LDFLAGS:append = " -Wl,--no-as-needed -lm -llog4c -lrdkloggers"
 inherit systemd coverity
  
-SRC_URI_append = " \
+SRC_URI:append = " \
         ${CMF_GIT_ROOT}/rdk/devices/raspberrypi/webpa-client;protocol=${CMF_GIT_PROTOCOL};branch=${CMF_GIT_BRANCH};destsuffix=git/devices;name=rdkbbpi \
 "
 SRCREV_rdkbbpi = "${AUTOREV}"
 do_fetch[vardeps] += "SRCREV_rdkbbpi"
 SRCREV_FORMAT .= "_rdkbbpi"
  
-do_install_append () {
+do_install:append () {
     install -d ${D}${systemd_unitdir}/system
     install -d ${D}${base_libdir_native}/rdk
     install -m 0644 ${S}/devices/broadband/parodus/systemd/parodus.service ${D}${systemd_unitdir}/system
@@ -16,9 +16,9 @@ do_install_append () {
     sed -i "s/eth0/lan0/g" ${D}${base_libdir_native}/rdk/parodus_start.sh
 }
 
-SYSTEMD_SERVICE_${PN}_append = " parodus.service"
+SYSTEMD_SERVICE_${PN}:append = " parodus.service"
  
-FILES_${PN}_append = " \
+FILES_${PN}:append = " \
      ${systemd_unitdir}/system/parodus.service \
      ${base_libdir_native}/rdk/* \
 "

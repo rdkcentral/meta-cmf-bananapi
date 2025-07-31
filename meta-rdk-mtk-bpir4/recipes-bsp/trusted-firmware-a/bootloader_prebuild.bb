@@ -17,7 +17,7 @@ do_configure[noexec] = "1"
 # since there is no 'main' package generated (empty)
 RDEPENDS_${PN}-dev = ""
 
-SRC_URI_append += " file://bpi-r4_sdmmc_bl2.img \
+SRC_URI:append += " file://bpi-r4_sdmmc_bl2.img \
                     file://bpi-r4_sdmmc_fip.bin"
 
 do_deploy() {

@@ -1,12 +1,12 @@
 #WebPA Feature
-IMAGE_INSTALL_append = " parodus parodus2ccsp"
+IMAGE_INSTALL:append = " parodus parodus2ccsp"
 
 #TR069 Feature
-IMAGE_INSTALL_append = " ccsp-tr069-pa"
-IMAGE_INSTALL_append = " bpi-serialnumber"
-IMAGE_INSTALL_append = " bpi-macaddress"
+IMAGE_INSTALL:append = " ccsp-tr069-pa"
+IMAGE_INSTALL:append = " bpi-serialnumber"
+IMAGE_INSTALL:append = " bpi-macaddress"
 
-ROOTFS_POSTPROCESS_COMMAND_append = "add_busybox_fixes; "
+ROOTFS_POSTPROCESS_COMMAND:append = "add_busybox_fixes; "
 
 #Emptying the PRSERV_HOST since builds are local
 PRSERV_HOST = ""
@@ -22,5 +22,5 @@ add_busybox_fixes() {
                 fi
 }
 
-IMAGE_INSTALL_remove = "${@bb.utils.contains('DISTRO_FEATURES', 'ppp-enabled', '', 'pptp-linux rp-pppoe xl2tpd', d)}"
-IMAGE_INSTALL_append = "${@bb.utils.contains('DISTRO_FEATURES', 'EasyMesh',' unified-wifi-mesh unified-wifi-mesh-cli','',d)}"
+IMAGE_INSTALL:remove = "${@bb.utils.contains('DISTRO_FEATURES', 'ppp-enabled', '', 'pptp-linux rp-pppoe xl2tpd', d)}"
+IMAGE_INSTALL:append = "${@bb.utils.contains('DISTRO_FEATURES', 'EasyMesh',' unified-wifi-mesh unified-wifi-mesh-cli','',d)}"

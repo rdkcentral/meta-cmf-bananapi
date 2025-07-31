@@ -9,7 +9,7 @@ SRC_URI = "git://github.com/rdkcentral/broadband-utils.git;branch=main;protocol=
 
 S = "${WORKDIR}/git"
 SRCREV = "${AUTOREV}"
-CXXFLAGS_append = "  -DAARCH64_BUILD"
+CXXFLAGS:append = "  -DAARCH64_BUILD"
 
 
 do_compile() {

@@ -74,7 +74,7 @@ touch ${_TOPDIR}/meta-cmf-filogic/recipes-ccsp/hal/rdkwifihal_changes_applied
 fi
 
 if [ ! -e ${_TOPDIR}/meta-cmf-filogic/recipes-ccsp/ccsp/onewifi_changes_applied ]; then
-sed -i 's/^SRC_URI +=/SRC_URI_append =/' ${_TOPDIR}/meta-cmf-filogic/recipes-ccsp/ccsp/ccsp-one-wifi.bbappend
+sed -i 's/^SRC_URI +=/SRC_URI:append =/' ${_TOPDIR}/meta-cmf-filogic/recipes-ccsp/ccsp/ccsp-one-wifi.bbappend
 touch ${_TOPDIR}/meta-cmf-filogic/recipes-ccsp/ccsp/onewifi_changes_applied
 fi
 

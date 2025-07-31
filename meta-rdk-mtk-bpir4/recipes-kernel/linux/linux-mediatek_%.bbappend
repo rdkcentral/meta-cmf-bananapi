@@ -1,4 +1,4 @@
-FILESEXTRAPATHS_prepend := "${THISDIR}/files:"
+FILESEXTRAPATHS:prepend := "${THISDIR}/files:"
 
 SRC_URI += "file://0001-add-support-for-port-triggering.patch"
 SRC_URI += "file://BPI-resolving-port-triggering-errors.patch"
@@ -13,4 +13,4 @@ SRC_URI += " \
     file://rdkb_cfg/wps_key.cfg \
 "
 
-CMDLINE_append = "${@bb.utils.contains('DISTRO_FEATURES','dac', 'cgroup_enable=cpuset cgroup_enable=memory cgroup_memory=1', '', d)}"
+CMDLINE:append = "${@bb.utils.contains('DISTRO_FEATURES','dac', 'cgroup_enable=cpuset cgroup_enable=memory cgroup_memory=1', '', d)}"
