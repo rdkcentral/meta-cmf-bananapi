@@ -5,7 +5,6 @@ SRCREV_FORMAT = "1.0.0"
 do_install_append () {
   #Webpa ServerURL
   echo "SERVERURL=https://webpa.rdkcentral.com:8080" >> ${D}${sysconfdir}/device.properties
-  echo "Box_Type=bpi" >> ${D}${sysconfdir}/device.properties
   ${@bb.utils.contains('DISTRO_FEATURES', 'OneWifi', 'echo "OneWiFiEnabled=true" >> ${D}${sysconfdir}/device.properties', '', d)}
 
    #self heal support
@@ -15,6 +14,7 @@ do_install_append () {
    install -m 0755 ${S}/devicebpi/scripts/self_heal_connectivity_test.sh ${D}/usr/ccsp/tad
    install -m 0755 ${S}/devicebpi/scripts/resource_monitor.sh ${D}/usr/ccsp/tad
    install -m 0755 ${S}/devicebpi/scripts/task_health_monitor.sh ${D}/usr/ccsp/tad
+   sed -i 's/^BOX_TYPE=rpi$/BOX_TYPE=bpi/; s/^MODEL_NAME=RPI$/MODEL_NAME=BPI/' ${D}${sysconfdir}/device.properties
 
    # Changing CLOUDURL and DCM_LOG_SERVER_URL values with migrated server
    sed -i -e 's|^CLOUDURL=.*$|CLOUDURL="https://xconf.rdkcentral.com/xconf/swu/stb?eStbMac="|' ${D}${sysconfdir}/include.properties
