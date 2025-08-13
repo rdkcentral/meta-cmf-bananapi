@@ -13,4 +13,11 @@ SRC_URI += " \
     file://rdkb_cfg/wps_key.cfg \
 "
 
+# Ensure DTBs are built even if we're using fitImage
+do_compile:append() {
+    if [ -n "${KERNEL_DEVICETREE}" ]; then
+        oe_runmake ${KERNEL_DEVICETREE}
+    fi
+}
+
 CMDLINE:append = "${@bb.utils.contains('DISTRO_FEATURES','dac', 'cgroup_enable=cpuset cgroup_enable=memory cgroup_memory=1', '', d)}"
