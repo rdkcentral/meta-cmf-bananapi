@@ -1,10 +1,10 @@
-FILESEXTRAPATHS_prepend := "${THISDIR}/parodus2ccsp:"
+FILESEXTRAPATHS:prepend := "${THISDIR}/parodus2ccsp:"
 
 SRC_URI += "\
     file://parodus_read_file.sh \
     file://parodus_create_file.sh \
 "
-SRC_URI_append = " \
+SRC_URI:append = " \
     ${CMF_GIT_ROOT}/rdk/devices/raspberrypi/webpa-client;protocol=${CMF_GIT_PROTOCOL};branch=${CMF_GIT_BRANCH};destsuffix=git/devices;name=rdkbbpi \
 "
 SRCREV_rdkbbpi = "${AUTOREV}"
@@ -15,7 +15,7 @@ inherit systemd coverity
 
 EXTRA_OECMAKE += "-DBUILD_BANANAPI_R4=ON "
  
-do_install_append () {
+do_install:append () {
     install -d ${D}${systemd_unitdir}/system
     install -d ${D}${base_libdir_native}/rdk
     install -m 0644 ${S}/devices/broadband/parodus2ccsp/systemd/webpabroadband.service ${D}${systemd_unitdir}/system
@@ -26,9 +26,9 @@ do_install_append () {
 
 }
 
-SYSTEMD_SERVICE_${PN}_append = " webpabroadband.service"
+SYSTEMD_SERVICE_${PN}:append = " webpabroadband.service"
  
-FILES_${PN}_append = " \
+FILES_${PN}:append = " \
      ${systemd_unitdir}/system/webpabroadband.service \
      ${base_libdir_native}/rdk/* \
      /etc/parodus/* \

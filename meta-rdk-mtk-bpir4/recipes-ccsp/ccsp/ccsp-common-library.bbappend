@@ -1,12 +1,12 @@
 include ccsp_common_bananapi.inc
 
-FILESEXTRAPATHS_prepend := "${THISDIR}/${PN}:${THISDIR}/files:"
-SRC_URI_append = " \
+FILESEXTRAPATHS:prepend := "${THISDIR}/${PN}:${THISDIR}/files:"
+SRC_URI:append = " \
                    file://gwprovapp.conf \
                 "
-CFLAGS_aarch64_append = " -Werror=format-truncation=1 "
+CFLAGS_aarch64:append = " -Werror=format-truncation=1 "
 
-do_install_append_class-target() {
+do_install:append_class-target() {
    sed -i 's#${PARODUS_START_LOG_FILE}#/rdklogs/logs/dcmrfc.log#g' ${D}${systemd_unitdir}/system/rfc.service
    sed -i 's/rfc.service /RFCbase.sh /g' ${D}${systemd_unitdir}/system/rfc.service
 
@@ -57,7 +57,7 @@ do_install_append_class-target() {
 }
 
 
-SYSTEMD_SERVICE_${PN}_remove_onewifi = " ccspwifiagent.service"
+SYSTEMD_SERVICE_${PN}:remove_onewifi = " ccspwifiagent.service"
 SYSTEMD_SERVICE_${PN} += "${@bb.utils.contains('DISTRO_FEATURES', 'OneWifi', 'onewifi.service ', '', d)}"
 SYSTEMD_SERVICE_${PN} += "${@bb.utils.contains('DISTRO_FEATURES', 'webconfig_bin', 'webconfig.service', '', d)}"
 SYSTEMD_SERVICE_${PN} += " CcspTelemetry.service"
@@ -65,12 +65,12 @@ SYSTEMD_SERVICE_${PN} += " notifyComp.service"
 SYSTEMD_SERVICE_${PN} += "gwprovapp.service"
 SYSTEMD_SERVICE_${PN} += "wan-initialized.target"
 SYSTEMD_SERVICE_${PN} += "wan-initialized.path"
-SYSTEMD_SERVICE_${PN}_remove = " utopia.service"
+SYSTEMD_SERVICE_${PN}:remove = " utopia.service"
 
-FILES_${PN}_remove_onewifi = "${systemd_unitdir}/system/ccspwifiagent.service"
-FILES_${PN}_remove = "${systemd_unitdir}/system/utopia.service" 
-FILES_${PN}_append = "${@bb.utils.contains('DISTRO_FEATURES', 'OneWifi', ' ${systemd_unitdir}/system/onewifi.service ', '', d)}"
-FILES_${PN}_append = " \
+FILES_${PN}:remove_onewifi = "${systemd_unitdir}/system/ccspwifiagent.service"
+FILES_${PN}:remove = "${systemd_unitdir}/system/utopia.service" 
+FILES_${PN}:append = "${@bb.utils.contains('DISTRO_FEATURES', 'OneWifi', ' ${systemd_unitdir}/system/onewifi.service ', '', d)}"
+FILES_${PN}:append = " \
    ${systemd_unitdir}/system/wan-initialized.target \
    ${systemd_unitdir}/system/wan-initialized.path \
    ${systemd_unitdir}/system/CcspTelemetry.service \

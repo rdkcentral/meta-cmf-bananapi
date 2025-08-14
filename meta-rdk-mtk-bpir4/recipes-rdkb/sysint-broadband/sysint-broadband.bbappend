@@ -1,11 +1,11 @@
-SRC_URI_append = " \
+SRC_URI:append = " \
     ${CMF_GITHUB_ROOT}/bananapi-sysint.git;;branch=${CMF_GIT_DEVELOP_BRANCH};protocol=${CMF_GIT_PROTOCOL};destsuffix=git/devicebpi;name=sysintdevicebpi \
 "
 SRCREV_sysintdevicebpi = "${AUTOREV}"
 SRCREV_FORMAT = "sysintgeneric_sysintdevicebpi"
 
 
-do_install_append () {
+do_install:append () {
   #Webpa ServerURL
   echo "SERVERURL=https://webpa.rdkcentral.com:8080" >> ${D}${sysconfdir}/device.properties
   echo "Box_Type=bpi" >> ${D}${sysconfdir}/device.properties

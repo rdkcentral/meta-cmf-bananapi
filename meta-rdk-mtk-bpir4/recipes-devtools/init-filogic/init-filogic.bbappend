@@ -1,4 +1,4 @@
-do_install_append(){
+do_install:append(){
 
    install -d ${D}${sbindir}
    sed -i '/brctl addif brlan0 lan0/d' ${D}${sbindir}/init-bridge.sh
@@ -20,7 +20,7 @@ fi' ${D}${sbindir}/init-bridge.sh
 }
 
 #ESDK support - Avoid conflict file is installed by both systemd and init-filogic in kirkstone
-SYSTEMD_SERVICE:${PN}_remove = "usb-mount@.service"
-do_install_append_broadband () {
+SYSTEMD_SERVICE:${PN}:remove = "usb-mount@.service"
+do_install:append_broadband () {
    rm ${D}${systemd_unitdir}/system/usb-mount@.service
 }
