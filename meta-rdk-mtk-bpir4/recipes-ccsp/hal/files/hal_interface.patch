@@ -1,10 +1,14 @@
-################################################
-#From: 2deb7d57df61e41ae71d8431bbc62dabeae8b660,
-#      a1a55d64c1240a1f9cf34dcd1cdde9b29070cc6d
-#Subject: Add callback func to get AKM and wpa3 comp enum
-#Source: COMCAST
-#Signed-off-by:Amalesh_Nandh@comcast.com
-################################################
+From 7ad13710dfcda6e00380f4a252bf1cb0f30dee7a Mon Sep 17 00:00:00 2001
+From: Jenkins Slave <jenkins@code.rdkcentral.com>
+Date: Thu, 14 Aug 2025 16:25:10 +0100
+Subject: [PATCH] hal_interface
+
+---
+ wifi_hal_ap.h        | 18 ++++++++++++++++--
+ wifi_hal_generic.h   |  2 +-
+ wifi_hal_telemetry.h |  3 ++-
+ 3 files changed, 19 insertions(+), 4 deletions(-)
+
 diff --git a/wifi_hal_ap.h b/wifi_hal_ap.h
 index 00134cc..dca93e7 100644
 --- a/wifi_hal_ap.h
@@ -69,7 +73,7 @@ index 00134cc..dca93e7 100644
 \ No newline at end of file
 +#endif
 diff --git a/wifi_hal_generic.h b/wifi_hal_generic.h
-index a55ede6..c172320 100644
+index 5dea4cc..87fc650 100644
 --- a/wifi_hal_generic.h
 +++ b/wifi_hal_generic.h
 @@ -357,7 +357,7 @@ typedef struct {
@@ -82,7 +86,7 @@ index a55ede6..c172320 100644
      wifi_security_modes_t    sec_mode;
      wifi_encryption_method_t enc_method;
 diff --git a/wifi_hal_telemetry.h b/wifi_hal_telemetry.h
-index 6867002..3596ea0 100644
+index aa2c4ad..7fd0f3c 100644
 --- a/wifi_hal_telemetry.h
 +++ b/wifi_hal_telemetry.h
 @@ -102,6 +102,7 @@ typedef struct _wifi_neighbor_ap2
@@ -100,3 +104,6 @@ index 6867002..3596ea0 100644
 -#endif
 \ No newline at end of file
 +#endif
+-- 
+2.50.1
+
