@@ -59,6 +59,7 @@ do_install_append_class-target() {
    sed -i '/^After=CcspPandMSsp\.service$/d' ${D}${systemd_unitdir}/system/onewifi.service
    sed -i '$a [Install]\nWantedBy=multi-user.target' ${D}${systemd_unitdir}/system/onewifi.service
    fi
+   sed -i '/IsErouterRunningStatus/,/fi/ s/^/#/' ${D}/usr/ccsp/ccspPAMCPCheck.sh
 }
 
 

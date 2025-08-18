@@ -108,7 +108,6 @@ if [ "X$FEATURE_TYPE" == "XExtender2" ]; then
     sed -i 's/wifi1.1 info/wifi0.1 info/g' ${_TOPDIR}/meta-cmf-bananapi/meta-rdk-mtk-bpir4/recipes-ccsp/ccsp/files/onewifi_pre_start_em_ext.sh
     sed -i '/wifi1.1 type/s/^/#/' ${_TOPDIR}/meta-cmf-bananapi/meta-rdk-mtk-bpir4/recipes-ccsp/ccsp/files/onewifi_pre_start_em_ext.sh
 fi
-
 if [ "X$KERNEL_TYPE" == "Xkernel6-6" ]; then
     sed -i '/kernel6-6/s/^#//' ${_TOPDIR}/meta-cmf-bananapi/conf/distro/include/rdk-bpi.inc
 fi

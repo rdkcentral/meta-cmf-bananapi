@@ -2,7 +2,7 @@ FILESEXTRAPATHS_prepend := "${THISDIR}/files:"
 
 SRC_URI += "file://0001-add-support-for-port-triggering.patch"
 SRC_URI += "${@bb.utils.contains('DISTRO_FEATURES','kernel6-6','file://BPI-resolving-port-triggering-errors_6_6.patch','file://BPI-resolving-port-triggering-errors.patch', d)}"
-SRC_URI += " \
+SRC_URI_append = " \
     file://rdkb_cfg/iptables_nf.cfg \
     file://rdkb_cfg/bridge_mode.cfg \
     file://rdkb_cfg/coredump.cfg \
