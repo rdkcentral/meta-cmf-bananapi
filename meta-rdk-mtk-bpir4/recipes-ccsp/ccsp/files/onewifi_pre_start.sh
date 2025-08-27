@@ -3,6 +3,7 @@ sleep 20
 iw phy phy0 interface add wifi0 type __ap
 iw phy phy0 interface add wifi1 type __ap
 iw phy phy0 interface add wifi2 type __ap
+iw phy phy0 interface add mld0 type __ap radios all
 
 #Obtain the wifi0 mac address
 wifi0_mac=`cat /nvram/mac_addresses.txt | grep -a wifi0 | cut -d " " -f 2`
