@@ -116,12 +116,12 @@ if [ "X$BPI_IMG_TYPE" == "Xnand" ]; then
     sed -i '/sdmmc/s/^/#/' ${_TOPDIR}/meta-cmf-bananapi/conf/distro/include/rdk-bpi.inc
 else # SD card image is default
     mkdir -p ${_TOPDIR}/downloads
-    if [ -f ${_TOPDIR}/downloads/bpi-r4_sdmmc_bl2.img ] && [ -f ${_TOPDIR}/downloads/bpi-r4_sdmmc_fip.bin ]; then
+    if [ -f ${_TOPDIR}/downloads/bpi-r4_sdmmc_bl2.img ] && [ -f ${_TOPDIR}/downloads/bpi-r4_sdmmc_fip.bin ] && [ -f ${_TOPDIR}/downloads/bpi-r4_sdmmc_bl2_B.img ] && [ -f ${_TOPDIR}/downloads/bpi-r4_sdmmc_fip_B.bin ]; then
         echo "Both bl2 and fip binaries are present in local workspace."
     else
         echo "**********************************************************************"
         echo "> CAUTION: YOU ARE TRYING TO BUILD SD CARD IMAGE WITHOUT BL2 AND FIP BINARIES."
-        echo "> Please download the binaries from https://artifactory.rdkcentral.com/artifactory/RDKB-Platform/BPI-R4/uboot-2024.04/bpi-r4_sdmmc_bl2.img and https://artifactory.rdkcentral.com/artifactory/RDKB-Platform/BPI-R4/uboot-2024.04/bpi-r4_sdmmc_fip.bin"
+	echo "> Please download the binaries from https://artifactory.rdkcentral.com/artifactory/RDKB-Platform/BPI-R4/uboot-2024.04/bpi-r4_sdmmc_bl2.img, https://artifactory.rdkcentral.com/artifactory/RDKB-Platform/BPI-R4/uboot-2024.04/bpi-r4_sdmmc_fip.bin, https://artifactory.rdkcentral.com/artifactory/RDKB-Platform/BPI-R4/uboot-2024.04/bpi-r4_sdmmc_bl2_B.img and https://artifactory.rdkcentral.com/artifactory/RDKB-Platform/BPI-R4/uboot-2024.04/bpi-r4_sdmmc_fip_B.bin"
         echo "> If you don't have access to above resources, please follow instruction in https://wiki.rdkcentral.com/pages/viewpage.action?pageId=354648448#SDMonoliticimagebuildandflashingstepsforBPIR4.-Buildingbl2.imgandfip.binincaseofnothavingaccesstoartifactoryrepository to build bl2 and fip binaries yourselves."
         echo "> Place those binaries under ${_TOPDIR}/downloads/"
         echo "> EXITING NOW."
