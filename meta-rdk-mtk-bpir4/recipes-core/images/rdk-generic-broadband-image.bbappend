@@ -19,3 +19,5 @@ add_busybox_fixes() {
 			cd -
                 fi
 }
+IMAGE_INSTALL_remove += " mtkhnat-util"
+
