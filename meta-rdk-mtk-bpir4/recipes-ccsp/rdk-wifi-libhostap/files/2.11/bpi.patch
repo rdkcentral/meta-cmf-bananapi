@@ -1,0 +1,35 @@
+##########################################
+Date: Jul 8, 2025 11:53 AM
+From:
+Subject: Fixed compilation issues
+Source: Comcast
+Upstream-Status: Pending
+Signed-off-by: Bogdan Bogush <bogdan.bogush@comcast.com>
+##########################################
+Index: git/source/hostap-2.11/hostapd/Makefile
+===================================================================
+--- git.orig/source/hostap-2.11/hostapd/Makefile
++++ git/source/hostap-2.11/hostapd/Makefile
+@@ -283,6 +283,7 @@ endif
+ 
+ ifndef CONFIG_NO_CTRL_IFACE
+ CFLAGS += -DCONFIG_CTRL_IFACE
++CFLAGS += -DCONFIG_CTRL_IFACE_MIB
+ endif
+ 
+ ifdef CONFIG_RSN_PREAUTH
+Index: git/source/hostap-2.11/wpa_supplicant/wpa_supplicant_i.h
+===================================================================
+--- git.orig/source/hostap-2.11/wpa_supplicant/wpa_supplicant_i.h
++++ git/source/hostap-2.11/wpa_supplicant/wpa_supplicant_i.h
+@@ -321,8 +321,9 @@ struct wpa_global {
+ #endif /* CONFIG_WIFI_DISPLAY */
+ 
+ 	struct psk_list_entry *add_psk; /* From group formation */
+-
++#ifdef UBUS_SUPPORT
+ 	struct ubus_object ubus_global;
++#endif
+ };
+ 
+ 

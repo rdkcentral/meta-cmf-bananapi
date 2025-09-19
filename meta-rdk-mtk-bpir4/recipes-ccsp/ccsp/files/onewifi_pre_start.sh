@@ -11,6 +11,7 @@ fi
 iw phy phy0 interface add wifi0 type __ap
 iw phy phy0 interface add wifi1 type __ap
 iw phy phy0 interface add wifi2 type __ap
+iw phy phy0 interface add mld0 type __ap radios all
 
 #Obtain the wifi0 mac address
 wifi0_mac=`cat /nvram/mac_addresses.txt | grep -a wifi0 | cut -d " " -f 2`
@@ -31,5 +32,15 @@ ip link set dev wifi2 address $wifi2_mac
 ifconfig wifi0 up
 ifconfig wifi1 up
 ifconfig wifi2 up
+
+# Set MLD interface address as wifi2 MAC address + 1
+prefix="${wifi2_mac%:*}"
+last_byte="${wifi2_mac##*:}"
+
+new_byte=$(printf "%02X" $(( (0x$last_byte + 1) & 0xFF )))
+new_mac="$prefix:$new_byte"
+
+ip link set dev "mld0" down
+ip link set dev "mld0" address "$new_mac"
 
 exit 0

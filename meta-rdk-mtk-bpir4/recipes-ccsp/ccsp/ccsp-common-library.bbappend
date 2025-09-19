@@ -30,6 +30,8 @@ do_install_append_class-target() {
    DISTRO_WAN_ENABLED="${@bb.utils.contains('DISTRO_FEATURES','rdkb_wan_manager','true','false',d)}"
    if [ $DISTRO_WAN_ENABLED = 'true' ]; then
        sed -i "s/After=CcspCrSsp.service utopia.service PsmSsp.service CcspEthAgent.service/After=CcspCrSsp.service PsmSsp.service/g" ${D}${systemd_unitdir}/system/RdkWanManager.service
+       install -D -m 0644 ${S}/systemd_units/CcspAdvSecuritySsp.service ${D}${systemd_unitdir}/system/CcspAdvSecuritySsp.service
+       sed -i "s/wan-initialized.target/multi-user.target/g" ${D}${systemd_unitdir}/system/CcspAdvSecuritySsp.service
     fi
     #Telemetry support
    install -D -m 0644 ${S}/systemd_units/CcspTelemetry.service ${D}${systemd_unitdir}/system/CcspTelemetry.service
@@ -47,6 +49,10 @@ do_install_append_class-target() {
 
    #SNMP SUPPORT
    sed -i "/tcp\:192.168.254.253\:705/a  ExecStart=\/usr\/bin\/snmp_subagent \&" ${D}${systemd_unitdir}/system/snmpSubAgent.service
+
+   #Updating the checkfilogicwifisupport.service
+   sed -i "s/forking/oneshot/g"  ${D}${systemd_unitdir}/system/checkfilogicwifisupport.service
+   sed -i "/ExecStart=/i RemainAfterExit=yes" ${D}${systemd_unitdir}/system/checkfilogicwifisupport.service
   
    if ${@bb.utils.contains('DISTRO_FEATURES', 'partner_default_ext', 'true', 'false', d)}; then
        sed -i "/^After=.*/a Requires=ApplySystemDefaults.service " ${D}${systemd_unitdir}/system/CcspPandMSsp.service
@@ -73,6 +79,7 @@ SYSTEMD_SERVICE_${PN} += "gwprovapp.service"
 SYSTEMD_SERVICE_${PN} += "wan-initialized.target"
 SYSTEMD_SERVICE_${PN} += "wan-initialized.path"
 SYSTEMD_SERVICE_${PN}_remove = " utopia.service"
+SYSTEMD_SERVICE_${PN} += " CcspAdvSecuritySsp.service"
 
 FILES_${PN}_remove_onewifi = "${systemd_unitdir}/system/ccspwifiagent.service"
 FILES_${PN}_remove = "${systemd_unitdir}/system/utopia.service" 
@@ -84,4 +91,5 @@ FILES_${PN}_append = " \
    ${systemd_unitdir}/system/notifyComp.service \
    ${systemd_unitdir}/system/gwprovapp.service \
    ${systemd_unitdir}/system/gwprovapp.service.d/gwprovapp.conf \
+   ${systemd_unitdir}/system/CcspAdvSecuritySsp.service \
    "

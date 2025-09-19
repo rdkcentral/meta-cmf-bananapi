@@ -5,7 +5,7 @@ LIC_FILES_CHKSUM = "file://LICENSE;md5=175792518e4ac015ab6696d16c4f607e"
 
 
 # Fetch the source code
-SRC_URI = "git://github.com/rdkcentral/broadband-utils.git;protocol=https;branch=develop"
+SRC_URI = "${CMF_GITHUB_ROOT}/broadband-utils.git;protocol=https;branch=develop"
 
 SRCREV = "8dc573c6b82ba5e164cf1287d4ab5c659bd38641"
 

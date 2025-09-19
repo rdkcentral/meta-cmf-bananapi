@@ -4,7 +4,7 @@ DISTRO_FEATURES_append = " halVersion3"
 DISTRO_FEATURES_append = " HOSTAPD_2_11"
 
 # OneWifi feature
-DISTRO_FEATURES_append = " OneWifi"
+DISTRO_FEATURES_append = " OneWifi onewifi_integration"
 
 # MacFilter Feature
 DISTRO_FEATURES_append = " acl_nl_support"
@@ -26,5 +26,8 @@ DISTRO_FEATURES_append = " EasyMesh"
 DISTRO_FEATURES_append = " sta_manager"
 DISTRO_FEATURES_append = " with_alsap" 
 
+# MLO
+DISTRO_FEATURES_append = " CONFIG_IEEE80211BE"
+DISTRO_FEATURES_append = " generic_mlo"
 #PPP Feature
 #DISTRO_FEATURES_append = "ppp-enabled"

@@ -24,6 +24,8 @@ do_configure_prepend(){
     sed -i "s/wlan1/wifi1/g" ${S}/rpi_wifi_hal_assoc_devices_details.c
     sed -i "s/wlan%d/wifi%d/g" ${S}/wifi_hal.c
     sed -i "s/wlan%d/wifi%d/g" ${S}/rpi_wifi_hal_assoc_devices_details.c
+    sed  -i '5063i # if 0' ${S}/devices_rpi/source/wifi/wifi_hal.c
+    sed  -i '5096i #endif' ${S}/devices_rpi/source/wifi/wifi_hal.c 
 }
 
 do_install_append(){

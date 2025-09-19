@@ -1,0 +1,47 @@
+##########################################
+Date: feb 21, 2024 07:12 PM
+From: I811f931d5121948445470e3a23edfc1f211f3cae
+Subject: WPS Cancel Session is not working
+Source: COMCAST
+Upstream-Status: Pending
+Signed-off-by: Roman Skakun <roman_skakun@comcast.com>
+##########################################
+diff -Naur git.orig/source/hostap-2.11/src/ap/drv_callbacks.c git/source/hostap-2.11/src/ap/drv_callbacks.c
+--- git.orig/source/hostap-2.11/src/ap/drv_callbacks.c	2025-04-02 11:49:38.673256364 +0100
++++ git/source/hostap-2.11/src/ap/drv_callbacks.c	2025-04-02 11:52:59.204464046 +0100
+@@ -2826,6 +2826,9 @@
+ 	case EVENT_WPS_BUTTON_PUSHED:
+ 		hostapd_wps_button_pushed(hapd, NULL);
+ 		break;
++	case EVENT_WPS_CANCEL:
++		hostapd_wps_cancel(hapd);
++		break;
+ #ifdef NEED_AP_MLME
+ 	case EVENT_TX_STATUS:
+ 		switch (data->tx_status.type) {
+diff -Naur git.orig/source/hostap-2.11/src/drivers/driver_common.c git/source/hostap-2.11/src/drivers/driver_common.c
+--- git.orig/source/hostap-2.11/src/drivers/driver_common.c	2025-04-02 11:49:38.689256619 +0100
++++ git/source/hostap-2.11/src/drivers/driver_common.c	2025-04-02 11:52:59.208464111 +0100
+@@ -101,6 +101,7 @@
+ 	E2S(TID_LINK_MAP);
+ 	E2S(LINK_RECONFIG);
+ 	E2S(MLD_INTERFACE_FREED);
++	E2S(WPS_CANCEL);
+ 	}
+ 
+ 	return "UNKNOWN";
+diff -Naur git.orig/source/hostap-2.11/src/drivers/driver.h git/source/hostap-2.11/src/drivers/driver.h
+--- git.orig/source/hostap-2.11/src/drivers/driver.h	2025-04-02 11:49:38.689256619 +0100
++++ git/source/hostap-2.11/src/drivers/driver.h	2025-04-02 11:52:59.204464046 +0100
+@@ -5810,6 +5810,11 @@
+ 	EVENT_WPS_BUTTON_PUSHED,
+ 
+ 	/**
++	 * EVENT_WPS_CANCEL - Terminate current WPS session
++	 */
++	EVENT_WPS_CANCEL,
++
++	/**
+ 	 * EVENT_TX_STATUS - Report TX status
+ 	 */
+ 	EVENT_TX_STATUS,

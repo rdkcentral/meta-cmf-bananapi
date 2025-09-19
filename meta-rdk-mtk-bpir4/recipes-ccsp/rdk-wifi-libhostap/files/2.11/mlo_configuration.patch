@@ -1,0 +1,60 @@
+##########################################
+Date: Apr 29, 2025 9:40 PM
+From:
+Subject: MLO configuration fix
+Source: Comcast
+Upstream-Status: Pending
+Signed-off-by: Narendra Varma <narendandu@gmail.com>
+##########################################
+diff --git a/src/ap/hostapd.c b/src/ap/hostapd.c
+index a05de030d..8a263af2b 100644
+--- a/source/hostap-2.11/src/ap/hostapd.c
++++ b/source/hostap-2.11/src/ap/hostapd.c
+@@ -4785,6 +4785,7 @@ void hostapd_ocv_check_csa_sa_query(void *eloop_ctx, void *timeout_ctx)
+ struct hostapd_data * hostapd_mld_get_link_bss(struct hostapd_data *hapd,
+ 					       u8 link_id)
+ {
++#ifndef RDK_ONEWIFI
+ 	struct hostapd_iface *iface;
+ 	struct hostapd_data *bss;
+ 	unsigned int i, j;
+@@ -4808,7 +4809,26 @@ struct hostapd_data * hostapd_mld_get_link_bss(struct hostapd_data *hapd,
+ 				return bss;
+ 		}
+ 	}
++#else
++	if(hapd->mld != NULL) {
++		struct hostapd_data *bss;
+ 
++		for_each_mld_link(bss, hapd) {
++			if (!bss->conf->mld_ap ||
++			    !hostapd_is_ml_partner(hapd, bss)) {
++				continue;
++			}
++
++			if (!bss->drv_priv) {
++				continue;
++			}
++
++			if (bss->mld_link_id == link_id) {
++				return bss;
++			}
++		}
++	}
++#endif /* RDK_ONEWIFI */
+ 	return NULL;
+ }
+ 
+@@ -4819,7 +4839,11 @@ bool hostapd_is_ml_partner(struct hostapd_data *hapd1,
+ 	if (!hapd1->conf->mld_ap || !hapd2->conf->mld_ap)
+ 		return false;
+ 
++#ifndef RDK_ONEWIFI
+ 	return !os_strcmp(hapd1->conf->iface, hapd2->conf->iface);
++#else
++	return (hapd1->mld != NULL && hapd2->mld != NULL && !os_strcmp(hapd1->mld->name, hapd2->mld->name));
++#endif /* RDK_ONEWIFI */
+ }
+ 
+ 
+

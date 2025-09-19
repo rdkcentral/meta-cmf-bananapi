@@ -1,0 +1,117 @@
+##########################################
+Date: Apr 16, 2024 1:00 PM
+From:
+Subject: Enable Tx Power Envelope tags and align to BCM driver
+Source: Comcast
+Upstream-Status: Pending
+Signed-off-by: Bogdan Bogush <bogdan.bogush@comcast.com>
+##########################################
+diff -Naur git.orig/source/hostap-2.11/src/ap/beacon.c git/source/hostap-2.11/src/ap/beacon.c
+--- git.orig/source/hostap-2.11/src/ap/beacon.c	2025-04-02 12:30:58.364921889 +0100
++++ git/source/hostap-2.11/src/ap/beacon.c	2025-04-02 12:39:51.917459966 +0100
+@@ -703,8 +703,8 @@
+ 		/* An additional Transmit Power Envelope element for
+ 		 * default client with unit interpretation of regulatory
+ 		 * client EIRP */
+-		if (hapd->iconf->reg_def_cli_eirp != -1 &&
+-		    he_reg_is_sp(hapd->iconf->he_6ghz_reg_pwr_type))
++		if (hapd->iconf->reg_def_cli_eirp != -1 /*&&
++		    he_reg_is_sp(hapd->iconf->he_6ghz_reg_pwr_type)*/)
+ 			len += 4;
+ 	}
+ #endif /* CONFIG_IEEE80211AX */
+diff -Naur git.orig/source/hostap-2.11/src/ap/ieee802_11.c git/source/hostap-2.11/src/ap/ieee802_11.c
+--- git.orig/source/hostap-2.11/src/ap/ieee802_11.c	2025-04-02 12:30:58.364921889 +0100
++++ git/source/hostap-2.11/src/ap/ieee802_11.c	2025-04-02 12:39:51.917459966 +0100
+@@ -7341,6 +7341,29 @@
+ 	return eid;
+ }
+ 
++static u8 * hostapd_add_tpe_info_psd(u8 *eid, u8 tx_pwr_count,
++				 enum max_tx_pwr_interpretation tx_pwr_intrpn,
++				 u8 tx_pwr_cat, u8 tx_pwr)
++{
++	unsigned int i;
++
++	*eid++ = WLAN_EID_TRANSMIT_POWER_ENVELOPE; /* Element ID */
++	*eid++ = 1 + (1 << tx_pwr_count); /* Length */
++
++	/*
++	 * Transmit Power Information field
++	 *	bits 0-2 : Maximum Transmit Power Count
++	 *	bits 3-5 : Maximum Transmit Power Interpretation
++	 *	bits 6-7 : Maximum Transmit Power Category
++	 */
++	*eid++ = (tx_pwr_count + 1) | (tx_pwr_intrpn << 3) | (tx_pwr_cat << 6);
++
++	/* Maximum Transmit Power field */
++	for (i = 0; i < (1 << tx_pwr_count); i++)
++		*eid++ = tx_pwr;
++
++	return eid;
++}
+ 
+ /*
+  * TODO: Extract power limits from channel data after 6G regulatory
+@@ -7387,8 +7410,41 @@
+ 		enum max_tx_pwr_interpretation tx_pwr_intrpn;
+ 		int err, max_eirp_psd, max_eirp_power;
+ 
+-		/* Same Maximum Transmit Power for all 20 MHz bands */
+-		tx_pwr_count = 0;
++		/*
++		 * The order and format of IEs should be the same as in
++		 * Broadcom driver so it can update parameters
++		 */
++		switch (hostapd_get_oper_chwidth(iconf)) {
++		case CONF_OPER_CHWIDTH_USE_HT:
++			if (iconf->secondary_channel == 0) {
++				/* Max Transmit Power count = 0 (20 MHz) */
++				tx_pwr_count = 0;
++			} else {
++				/* Max Transmit Power count = 1 (20, 40 MHz) */
++				tx_pwr_count = 1;
++			}
++			break;
++		case CONF_OPER_CHWIDTH_80MHZ:
++			/* Max Transmit Power count = 2 (20, 40, and 80 MHz) */
++			tx_pwr_count = 2;
++			break;
++		case CONF_OPER_CHWIDTH_80P80MHZ:
++		case CONF_OPER_CHWIDTH_160MHZ:
++			/* Max Transmit Power count = 3 (20, 40, 80, 160/80+80 MHz) */
++			tx_pwr_count = 3;
++			break;
++
++		default:
++			return eid;
++		}
++
++		if (iconf->reg_def_cli_eirp != -1 /*&&
++		    he_reg_is_sp(iconf->he_6ghz_reg_pwr_type)*/)
++			eid = hostapd_add_tpe_info(
++				eid, tx_pwr_count, REGULATORY_CLIENT_EIRP,
++				REG_DEFAULT_CLIENT,
++				hapd->iconf->reg_def_cli_eirp);
++
+ 		tx_pwr_intrpn = REGULATORY_CLIENT_EIRP_PSD;
+ 
+ 		/* Default Transmit Power Envelope for Global Operating Class */
+@@ -7401,7 +7457,7 @@
+ 				max_eirp_psd = REG_PSD_MAX_TXPOWER_FOR_DEFAULT_CLIENT * 2;
+ 		}
+ 
+-		eid = hostapd_add_tpe_info(eid, tx_pwr_count, tx_pwr_intrpn,
++		eid = hostapd_add_tpe_info_psd(eid, tx_pwr_count, tx_pwr_intrpn,
+ 					   REG_DEFAULT_CLIENT, max_eirp_psd);
+ 
+ 		/* Indoor Access Point must include an additional TPE for
+@@ -7414,7 +7470,7 @@
+ 				else
+ 					max_eirp_psd = REG_PSD_MAX_TXPOWER_FOR_SUBORDINATE_CLIENT * 2;
+ 			}
+-			eid = hostapd_add_tpe_info(eid, tx_pwr_count,
++			eid = hostapd_add_tpe_info_psd(eid, tx_pwr_count,
+ 						   tx_pwr_intrpn,
+ 						   REG_SUBORDINATE_CLIENT,
+ 						   max_eirp_psd);

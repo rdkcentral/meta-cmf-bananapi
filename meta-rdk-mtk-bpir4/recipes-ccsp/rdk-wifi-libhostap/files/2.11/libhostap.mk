@@ -52,6 +52,7 @@ LIB_OBJS += ../wpa_supplicant/config.o
 LIB_OBJS += ../wpa_supplicant/gas_query.o
 LIB_OBJS += ../wpa_supplicant/config_none.o
 LIB_OBJS += ../wpa_supplicant/ctrl_iface.o
+LIB_OBJS += ../wpa_supplicant/twt.o
 LIB_OBJS += ../wpa_supplicant/offchannel.o
 LIB_OBJS += ../wpa_supplicant/eap_register.o
 LIB_OBJS += ../wpa_supplicant/ap.o
