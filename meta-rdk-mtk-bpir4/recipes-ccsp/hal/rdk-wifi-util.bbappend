@@ -1,4 +1,0 @@
-SRC_URI:remove = "git://github.com/rdkcentral/rdk-wifi-hal.git;protocol=https;branch=main;name=rdk-wifi-util"
-
-SRC_URI = "git://github.com/rdkcentral/rdk-wifi-hal.git;protocol=https;branch=develop;name=rdk-wifi-util"
-SRCREV:rdk-wifi-util = "8a830706ac1d96a285bb13a13f8225ea9382238a"

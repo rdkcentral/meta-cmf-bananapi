@@ -76,7 +76,6 @@ do_install:append:class-target() {
    fi
    sed -i '/IsErouterRunningStatus/,/fi/ s/^/#/' ${D}/usr/ccsp/ccspPAMCPCheck.sh
    sed -i '/ExecStart=/i ExecStartPre=/usr/bin/start_cron' ${D}${libdir}/systemd/system/RdkFwUpgradeManager.service
-   sed -i 's/ RdkWanManager.service//g' ${D}${systemd_unitdir}/system/CcspEthAgent.service
 }
 
 
