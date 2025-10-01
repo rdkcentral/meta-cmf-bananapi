@@ -316,12 +316,12 @@
   <Record name="dmsb.l2net.1.Standard" type="astr">BRG_STD_8021Q_2005</Record>
   <Record name="dmsb.l2net.1.InstanceNum" type="astr">1</Record>
   <Record name="dmsb.l2net.1.Type" type="astr">Bridge</Record>
-  <Record name="dmsb.l2net.1.Members.SW" type="astr">sw_1 sw_2 sw_3 sw_4 sw_5</Record>
-  <Record name="dmsb.l2net.1.Members.Eth" type="astr"> </Record>
+  <Record name="dmsb.l2net.1.Members.SW" type="astr"> </Record>
+  <Record name="dmsb.l2net.1.Members.Eth" type="astr">lan1 lan2 lan3</Record>
   <Record name="dmsb.l2net.1.Members.Moca" type="astr"> </Record>
   <Record name="dmsb.l2net.1.Members.Gre" type="astr"> </Record>
-  <Record name="dmsb.l2net.1.Members.WiFi" type="astr">ath0 ath1</Record>
-  <Record name="dmsb.l2net.1.Members.Link" type="astr">l2sd0-t</Record>
+  <Record name="dmsb.l2net.1.Members.WiFi" type="astr">wifi0 wifi1 wifi2</Record>
+  <Record name="dmsb.l2net.1.Members.Link" type="astr"> </Record>
 
   <Record name="dmsb.l2net.1.Vlan.1.Alias" type="astr">CPE-VLAN1</Record>
   <Record name="dmsb.l2net.1.Vlan.1.InstanceNum" type="astr">1</Record>
@@ -344,8 +344,8 @@
   <Record name="dmsb.l2net.1.Port.2.PriorityTag" type="astr">FALSE</Record>
   <Record name="dmsb.l2net.1.Port.2.Enable" type="astr">TRUE</Record>
   <Record name="dmsb.l2net.1.Port.2.Alias" type="astr">Port2</Record>
-  <Record name="dmsb.l2net.1.Port.2.Name" type="astr">sw_1</Record>
-  <Record name="dmsb.l2net.1.Port.2.LinkName" type="astr">sw_1</Record>
+  <Record name="dmsb.l2net.1.Port.2.Name" type="astr">lan1</Record>
+  <Record name="dmsb.l2net.1.Port.2.LinkName" type="astr">lan1</Record>
   <Record name="dmsb.l2net.1.Port.2.LinkType" type="astr">Ethernet</Record>
   <Record name="dmsb.l2net.1.Port.2.Management" type="astr">FALSE</Record>
   <Record name="dmsb.l2net.1.Port.2.Mode" type="astr">Tagging</Record>
@@ -357,8 +357,8 @@
   <Record name="dmsb.l2net.1.Port.3.PriorityTag" type="astr">FALSE</Record>
   <Record name="dmsb.l2net.1.Port.3.Enable" type="astr">TRUE</Record>
   <Record name="dmsb.l2net.1.Port.3.Alias" type="astr">Port3</Record>
-  <Record name="dmsb.l2net.1.Port.3.Name" type="astr">sw_2</Record>
-  <Record name="dmsb.l2net.1.Port.3.LinkName" type="astr">sw_2</Record>
+  <Record name="dmsb.l2net.1.Port.3.Name" type="astr">lan2</Record>
+  <Record name="dmsb.l2net.1.Port.3.LinkName" type="astr">lan2</Record>
   <Record name="dmsb.l2net.1.Port.3.LinkType" type="astr">Ethernet</Record>
   <Record name="dmsb.l2net.1.Port.3.Management" type="astr">FALSE</Record>
   <Record name="dmsb.l2net.1.Port.3.Mode" type="astr">Tagging</Record>
@@ -370,8 +370,8 @@
   <Record name="dmsb.l2net.1.Port.4.PriorityTag" type="astr">FALSE</Record>
   <Record name="dmsb.l2net.1.Port.4.Enable" type="astr">TRUE</Record>
   <Record name="dmsb.l2net.1.Port.4.Alias" type="astr">Port4</Record>
-  <Record name="dmsb.l2net.1.Port.4.Name" type="astr">sw_3</Record>
-  <Record name="dmsb.l2net.1.Port.4.LinkName" type="astr">sw_3</Record>
+  <Record name="dmsb.l2net.1.Port.4.Name" type="astr">lan3</Record>
+  <Record name="dmsb.l2net.1.Port.4.LinkName" type="astr">lan3</Record>
   <Record name="dmsb.l2net.1.Port.4.LinkType" type="astr">Ethernet</Record>
   <Record name="dmsb.l2net.1.Port.4.Management" type="astr">FALSE</Record>
   <Record name="dmsb.l2net.1.Port.4.Mode" type="astr">Tagging</Record>
@@ -383,9 +383,9 @@
   <Record name="dmsb.l2net.1.Port.5.PriorityTag" type="astr">FALSE</Record>
   <Record name="dmsb.l2net.1.Port.5.Enable" type="astr">TRUE</Record>
   <Record name="dmsb.l2net.1.Port.5.Alias" type="astr">Port5</Record>
-  <Record name="dmsb.l2net.1.Port.5.Name" type="astr">sw_5</Record>
-  <Record name="dmsb.l2net.1.Port.5.LinkName" type="astr">sw_5</Record>
-  <Record name="dmsb.l2net.1.Port.5.LinkType" type="astr">Moca</Record>
+  <Record name="dmsb.l2net.1.Port.5.Name" type="astr">wifi0</Record>
+  <Record name="dmsb.l2net.1.Port.5.LinkName" type="astr">wifi0</Record>
+  <Record name="dmsb.l2net.1.Port.5.LinkType" type="astr">WiFi</Record>
   <Record name="dmsb.l2net.1.Port.5.Management" type="astr">FALSE</Record>
   <Record name="dmsb.l2net.1.Port.5.Mode" type="astr">Tagging</Record>
   <Record name="dmsb.l2net.1.Port.5.InstanceNum" type="astr">5</Record>
@@ -396,8 +396,8 @@
   <Record name="dmsb.l2net.1.Port.6.PriorityTag" type="astr">FALSE</Record>
   <Record name="dmsb.l2net.1.Port.6.Enable" type="astr">TRUE</Record>
   <Record name="dmsb.l2net.1.Port.6.Alias" type="astr">Port6</Record>
-  <Record name="dmsb.l2net.1.Port.6.Name" type="astr">ath0</Record>
-  <Record name="dmsb.l2net.1.Port.6.LinkName" type="astr">ath0</Record>
+  <Record name="dmsb.l2net.1.Port.6.Name" type="astr">wifi1</Record>
+  <Record name="dmsb.l2net.1.Port.6.LinkName" type="astr">wifi1</Record>
   <Record name="dmsb.l2net.1.Port.6.LinkType" type="astr">WiFi</Record>
   <Record name="dmsb.l2net.1.Port.6.Management" type="astr">FALSE</Record>
   <Record name="dmsb.l2net.1.Port.6.Mode" type="astr">Tagging</Record>
@@ -409,39 +409,13 @@
   <Record name="dmsb.l2net.1.Port.7.PriorityTag" type="astr">FALSE</Record>
   <Record name="dmsb.l2net.1.Port.7.Enable" type="astr">TRUE</Record>
   <Record name="dmsb.l2net.1.Port.7.Alias" type="astr">Port7</Record>
-  <Record name="dmsb.l2net.1.Port.7.Name" type="astr">ath1</Record>
-  <Record name="dmsb.l2net.1.Port.7.LinkName" type="astr">ath1</Record>
+  <Record name="dmsb.l2net.1.Port.7.Name" type="astr">wifi2</Record>
+  <Record name="dmsb.l2net.1.Port.7.LinkName" type="astr">wifi2</Record>
   <Record name="dmsb.l2net.1.Port.7.LinkType" type="astr">WiFi</Record>
   <Record name="dmsb.l2net.1.Port.7.Management" type="astr">FALSE</Record>
   <Record name="dmsb.l2net.1.Port.7.Mode" type="astr">Tagging</Record>
   <Record name="dmsb.l2net.1.Port.7.InstanceNum" type="astr">7</Record>
   <Record name="dmsb.l2net.1.Port.7.Upstream" type="astr">FALSE</Record>
-
-  <Record name="dmsb.l2net.1.Port.8.AllowDelete" type="astr">FALSE</Record>
-  <Record name="dmsb.l2net.1.Port.8.Pvid" type="astr">100</Record>
-  <Record name="dmsb.l2net.1.Port.8.PriorityTag" type="astr">FALSE</Record>
-  <Record name="dmsb.l2net.1.Port.8.Enable" type="astr">TRUE</Record>
-  <Record name="dmsb.l2net.1.Port.8.Alias" type="astr">Port8</Record>
-  <Record name="dmsb.l2net.1.Port.8.Name" type="astr">sw_4</Record>
-  <Record name="dmsb.l2net.1.Port.8.LinkName" type="astr">sw_4</Record>
-  <Record name="dmsb.l2net.1.Port.8.LinkType" type="astr">Ethernet</Record>
-  <Record name="dmsb.l2net.1.Port.8.Management" type="astr">FALSE</Record>
-  <Record name="dmsb.l2net.1.Port.8.Mode" type="astr">Tagging</Record>
-  <Record name="dmsb.l2net.1.Port.8.InstanceNum" type="astr">8</Record>
-  <Record name="dmsb.l2net.1.Port.8.Upstream" type="astr">FALSE</Record>
-
-  <Record name="dmsb.l2net.1.Port.9.AllowDelete" type="astr">FALSE</Record>
-  <Record name="dmsb.l2net.1.Port.9.Pvid" type="astr">100</Record>
-  <Record name="dmsb.l2net.1.Port.9.PriorityTag" type="astr">FALSE</Record>
-  <Record name="dmsb.l2net.1.Port.9.Enable" type="astr">FALSE</Record>
-  <Record name="dmsb.l2net.1.Port.9.Alias" type="astr">Port9</Record>
-  <Record name="dmsb.l2net.1.Port.9.Name" type="astr"> </Record>
-  <Record name="dmsb.l2net.1.Port.9.LinkName" type="astr">lbr0</Record>
-  <Record name="dmsb.l2net.1.Port.9.LinkType" type="astr">Ethernet</Record>
-  <Record name="dmsb.l2net.1.Port.9.Management" type="astr">FALSE</Record>
-  <Record name="dmsb.l2net.1.Port.9.Mode" type="astr">Tagging</Record>
-  <Record name="dmsb.l2net.1.Port.9.InstanceNum" type="astr">9</Record>
-  <Record name="dmsb.l2net.1.Port.9.Upstream" type="astr">FALSE</Record>
 
   <Record name="dmsb.l2net.2.AllowDelete" type="astr">FALSE</Record>
   <Record name="dmsb.l2net.2.Name" type="astr">brlan1</Record>
@@ -994,7 +968,7 @@
   <Record name="dmsb.MultiLAN.HomeSecurity_l2net" type="astr" contentType="uint">2</Record>
   <Record name="dmsb.MultiLAN.HomeSecurity_HsPorts" type="astr">2</Record>
   <Record name="dmsb.MultiLAN.HomeSecurity_DHCPv4ServerPool" type="astr" contentType="uint">2</Record>
-  <Record name="dmsb.MultiLAN.PrimaryLAN_brport" type="astr" contentType="uint">9</Record>
+  <Record name="dmsb.MultiLAN.PrimaryLAN_brport" type="astr" contentType="uint">7</Record>
 
   <Record name="dmsb.MultiLAN.PrimaryLAN_DHCPv4ServerPool" type="astr" contentType="uint">1</Record>
   <Record name="dmsb.MultiLAN.HomeSecurity_WiFiRadio" type="astr" contentType="uint">1</Record>
