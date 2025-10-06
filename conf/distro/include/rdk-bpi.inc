@@ -57,7 +57,7 @@ DISTRO_FEATURES_append = " wps_support"
 DISTRO_FEATURES_append = " resource_optimization"
 
 #Enable kernel_6_6 support
-#DISTRO_FEATURES_append = " kernel6-6"
+DISTRO_FEATURES_append = " kernel6-6"
 
 DISTRO_FEATURES_append = " CONFIG_IEEE80211BE"
 
