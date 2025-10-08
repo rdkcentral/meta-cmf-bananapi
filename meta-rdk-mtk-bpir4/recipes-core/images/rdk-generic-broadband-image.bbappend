@@ -15,7 +15,7 @@ add_busybox_fixes() {
                 if [  -d ${IMAGE_ROOTFS}/bin ]; then
                         cd ${IMAGE_ROOTFS}/bin/ 
                         rm ps
-                        rm ../usr/bin/awk
+                        rm -f ../usr/bin/awk
                         ln -sf  /bin/busybox.nosuid  ps
                         ln -sf  /bin/busybox.nosuid  ${IMAGE_ROOTFS}/usr/bin/awk
 			cd -

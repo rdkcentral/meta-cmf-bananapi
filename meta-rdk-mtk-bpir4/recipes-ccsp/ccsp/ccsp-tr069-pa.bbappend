@@ -1,6 +1,7 @@
 include ccsp_common_bananapi.inc
 
 LDFLAGS += "-Wl,--no-as-needed -lulog"
+TARGET_CFLAGS += "-Wno-error=address"
 
 do_install:append () {
     # Config files and scripts
@@ -21,12 +22,12 @@ do_install:append () {
     echo "5555" > ${D}/usr/ccsp/tr069pa/sharedkey
 }
 
-FILES_${PN}-ccsp += " \
+FILES:${PN}-ccsp += " \
     ${prefix}/ccsp/tr069pa/CcspTr069PaSsp \
     ${prefix}/ccsp/tr069pa/url \
 "
 
-FILES_${PN} += " \
+FILES:${PN} += " \
     /fss/gw/usr/ccsp/ \
     /fss/gw/version.txt \
     /etc/url \

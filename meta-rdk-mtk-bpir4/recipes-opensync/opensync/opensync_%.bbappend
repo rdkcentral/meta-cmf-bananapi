@@ -11,4 +11,4 @@ do_compile:prepend_broadband(){
 	rm -rf src
 	cd -
 }
-FILES_${PN} += "${includedir}/src"
+FILES:${PN} += "${includedir}/src"

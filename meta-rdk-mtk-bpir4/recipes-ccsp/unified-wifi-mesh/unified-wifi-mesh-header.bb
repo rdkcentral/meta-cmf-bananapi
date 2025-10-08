@@ -14,4 +14,4 @@ do_install() {
     install -m 644 ${S}/inc/*  ${D}/usr/include/ccsp
 }
 
-FILES_${PN} += "/usr/include/ccsp/* "
+FILES:${PN} += "/usr/include/ccsp/* "

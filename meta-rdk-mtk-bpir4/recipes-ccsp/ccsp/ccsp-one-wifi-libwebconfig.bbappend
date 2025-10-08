@@ -20,7 +20,8 @@ do_install:append() {
       install -m 644 ${S}/include/webconfig_external_proto_easymesh.h  ${D}/usr/include/ccsp
 }
 
-FILES_${PN} += " \
-    ${libdir}/libwifi_bus.so* \
+FILES:${PN} += " \
+    ${libdir}/libwifi_bus.so.* \
 "
-
+FILES_SOLIBSDEV = ""
+INSANE_SKIP_${PN} += "dev-so"
