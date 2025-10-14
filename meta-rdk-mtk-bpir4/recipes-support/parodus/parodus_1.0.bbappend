@@ -10,15 +10,16 @@ SRCREV_FORMAT .= "_rdkbbpi"
  
 do_install:append () {
     install -d ${D}${systemd_unitdir}/system
-    install -d ${D}${base_libdir_native}/rdk
+    install -d ${D}${base_libdir}
+    install -d ${D}${base_libdir}/rdk
     install -m 0644 ${S}/devices/broadband/parodus/systemd/parodus.service ${D}${systemd_unitdir}/system
-    install -m 0755 ${S}/devices/broadband/parodus/scripts/parodus_start.sh ${D}${base_libdir_native}/rdk
-    sed -i "s/eth0/lan0/g" ${D}${base_libdir_native}/rdk/parodus_start.sh
+    install -m 0755 ${S}/devices/broadband/parodus/scripts/parodus_start.sh ${D}${base_libdir}/rdk
+    sed -i "s/eth0/lan0/g" ${D}${base_libdir}/rdk/parodus_start.sh
 }
 
-SYSTEMD_SERVICE_${PN}:append = " parodus.service"
+SYSTEMD_SERVICE:${PN}:append = " parodus.service"
  
-FILES_${PN}:append = " \
+FILES:${PN}:append = " \
      ${systemd_unitdir}/system/parodus.service \
-     ${base_libdir_native}/rdk/* \
+     ${base_libdir}/rdk/* \
 "

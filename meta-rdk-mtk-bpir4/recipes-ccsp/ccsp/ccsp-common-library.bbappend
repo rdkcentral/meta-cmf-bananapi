@@ -56,21 +56,26 @@ do_install:append_class-target() {
     fi 
 }
 
+TARGET_CFLAGS += " \
+    -Wno-error=address \
+    -Wno-error=implicit-function-declaration \
+    -Wno-error=format-truncation \
+"
 
-SYSTEMD_SERVICE_${PN}:remove_onewifi = " ccspwifiagent.service"
-SYSTEMD_SERVICE_${PN} += "${@bb.utils.contains('DISTRO_FEATURES', 'OneWifi', 'onewifi.service ', '', d)}"
-SYSTEMD_SERVICE_${PN} += "${@bb.utils.contains('DISTRO_FEATURES', 'webconfig_bin', 'webconfig.service', '', d)}"
-SYSTEMD_SERVICE_${PN} += " CcspTelemetry.service"
-SYSTEMD_SERVICE_${PN} += " notifyComp.service"
-SYSTEMD_SERVICE_${PN} += "gwprovapp.service"
-SYSTEMD_SERVICE_${PN} += "wan-initialized.target"
-SYSTEMD_SERVICE_${PN} += "wan-initialized.path"
-SYSTEMD_SERVICE_${PN}:remove = " utopia.service"
+SYSTEMD_SERVICE:${PN}:remove_onewifi = " ccspwifiagent.service"
+SYSTEMD_SERVICE:${PN} += "${@bb.utils.contains('DISTRO_FEATURES', 'OneWifi', 'onewifi.service', '', d)}"
+SYSTEMD_SERVICE:${PN} += "${@bb.utils.contains('DISTRO_FEATURES', 'webconfig_bin', 'webconfig.service', '', d)}"
+SYSTEMD_SERVICE:${PN} += "notifyComp.service"
+SYSTEMD_SERVICE:${PN} += "CcspTelemetry.service"
+SYSTEMD_SERVICE:${PN} += "gwprovapp.service"
+SYSTEMD_SERVICE:${PN} += "wan-initialized.target"
+SYSTEMD_SERVICE:${PN} += "wan-initialized.path"
+SYSTEMD_SERVICE:${PN}:remove = " utopia.service"
 
-FILES_${PN}:remove_onewifi = "${systemd_unitdir}/system/ccspwifiagent.service"
-FILES_${PN}:remove = "${systemd_unitdir}/system/utopia.service" 
-FILES_${PN}:append = "${@bb.utils.contains('DISTRO_FEATURES', 'OneWifi', ' ${systemd_unitdir}/system/onewifi.service ', '', d)}"
-FILES_${PN}:append = " \
+FILES:${PN}:remove_onewifi = "${systemd_unitdir}/system/ccspwifiagent.service"
+FILES:${PN}:remove = "${systemd_unitdir}/system/utopia.service"
+FILES:${PN} += "${@bb.utils.contains('DISTRO_FEATURES', 'OneWifi', '${systemd_unitdir}/system/onewifi.service', '', d)}"
+FILES:${PN} += "\
    ${systemd_unitdir}/system/wan-initialized.target \
    ${systemd_unitdir}/system/wan-initialized.path \
    ${systemd_unitdir}/system/CcspTelemetry.service \

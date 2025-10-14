@@ -31,9 +31,18 @@ do_install:append(){
     install -m 644 ${WORKDIR}/wifi_defaults.txt ${D}/nvram/
 }
 
-FILES_${PN} += " \
+TARGET_CFLAGS:append = " \
+    -Wno-error=address \
+    -Wno-error=sign-compare \
+    -Wno-error=use-after-free \
+    -Wno-error=maybe-uninitialized \
+    -Wno-error=format \
+    -Wno-error=enum-int-mismatch \
+"
+FILES:${PN} += " \
     ${prefix}/ccsp/wifi/checkwifi.sh \
     ${prefix}/ccsp/wifi/onewifi_pre_start.sh \
     /usr/bin/wifi_events_consumer \
     /nvram/wifi_defaults.txt \
 "
+

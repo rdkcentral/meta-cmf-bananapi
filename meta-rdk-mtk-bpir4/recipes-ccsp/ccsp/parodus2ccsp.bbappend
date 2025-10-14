@@ -17,19 +17,27 @@ EXTRA_OECMAKE += "-DBUILD_BANANAPI_R4=ON "
  
 do_install:append () {
     install -d ${D}${systemd_unitdir}/system
-    install -d ${D}${base_libdir_native}/rdk
+    install -d ${D}${base_libdir}/rdk
     install -m 0644 ${S}/devices/broadband/parodus2ccsp/systemd/webpabroadband.service ${D}${systemd_unitdir}/system
-    install -m 0755 ${S}/devices/broadband/parodus2ccsp/scripts/webpa_pre_setup.sh ${D}${base_libdir_native}/rdk
+    install -m 0755 ${S}/devices/broadband/parodus2ccsp/scripts/webpa_pre_setup.sh ${D}${base_libdir}/rdk
     install -d ${D}/etc/parodus
     install -m 777 ${WORKDIR}/parodus_read_file.sh ${D}/etc/parodus/
     install -m 777 ${WORKDIR}/parodus_create_file.sh ${D}/etc/parodus/
 
 }
 
-SYSTEMD_SERVICE_${PN}:append = " webpabroadband.service"
+SYSTEMD_SERVICE:${PN}:append = " webpabroadband.service"
  
-FILES_${PN}:append = " \
+FILES:${PN} += "${libdir}/libprivilege.so.*"
+FILES:${PN}-dev += " \
+    ${libdir}/libprivilege.so \
+    ${libdir}/libprivilege.a \
+"
+
+FILES:${PN}:append = " \
      ${systemd_unitdir}/system/webpabroadband.service \
-     ${base_libdir_native}/rdk/* \
+     ${base_libdir}/rdk/* \
      /etc/parodus/* \
+     ${bindir}/webpa \
+     ${exec_prefix}/ccsp \
      "

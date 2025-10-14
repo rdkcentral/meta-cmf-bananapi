@@ -23,6 +23,6 @@ do_install:append() {
   install -m 0644 ${WORKDIR}/EasymeshCfg.json  ${D}/nvram 
 }
 
-FILES_${PN} += " \
+FILES:${PN} += " \
   /nvram/* \
 "

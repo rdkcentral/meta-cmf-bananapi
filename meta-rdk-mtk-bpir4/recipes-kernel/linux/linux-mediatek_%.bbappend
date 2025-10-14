@@ -13,10 +13,29 @@ SRC_URI += " \
     file://rdkb_cfg/wps_key.cfg \
 "
 
+# Tell kernel to actually apply them
+KERNEL_CONFIG_FRAGMENTS += " \
+    mediatek/filogic.cfg \
+"
+#KERNEL_AUTO_APPEND_CONFIG = "1"
+
 # Ensure DTBs are built even if we're using fitImage
 do_compile:append() {
     if [ -n "${KERNEL_DEVICETREE}" ]; then
         oe_runmake ${KERNEL_DEVICETREE}
+    fi
+}
+
+python __anonymous() {
+    # Use the correct package name; often the package is 'kernel-module-*' or 'kernel-6'
+    d.delVar("pkg_postinst:kernel-6")
+    # also target the generated package name if different; check build output and change above accordingly
+}
+
+# Add on-target depmod instead
+pkg_postinst_ontarget:kernel-6 () {
+    if [ -x /sbin/depmod ] || [ -x /usr/sbin/depmod ]; then
+        depmod -a || true
     fi
 }
 

@@ -34,5 +34,5 @@ do_install:append(){
 CFLAGS:append = " -DWIFI_HAL_VERSION_3 "
 CFLAGS:append = " ${@bb.utils.contains('DISTRO_FEATURES', 'OneWifi', ' -D_ONE_WIFI_ ', '', d)}"
 
-RDEPENDS_${PN} += "wpa-supplicant"
+RDEPENDS:${PN} += "wpa-supplicant"
 

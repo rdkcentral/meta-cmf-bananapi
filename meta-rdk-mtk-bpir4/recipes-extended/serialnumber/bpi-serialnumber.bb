@@ -22,7 +22,7 @@ do_install() {
 #	install -D -m 0644 ${S}/rdkmmap/rdkmmap.service ${D}${systemd_unitdir}/system/rdkmmap.service
 }
 
-#SYSTEMD_SERVICE_${PN} += " rdkmmap.service"
+#SYSTEMD_SERVICE:${PN} += " rdkmmap.service"
 
 #FILES_${PN}:append = "${systemd_unitdir}/system/rdkmmap.service"
 
