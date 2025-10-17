@@ -2,6 +2,7 @@ FILESEXTRAPATHS_prepend := "${THISDIR}/files:"
 
 SRC_URI_append = " file://Add_ipv6_changes.patch"
 SRC_URI_append = " file://bpi_serial_no_fix.patch"
+SRC_URI_append = " file://hal-function-changes.patch"
 
 do_configure_append() {
      #For trimming the spaces

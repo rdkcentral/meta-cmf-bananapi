@@ -1278,5 +1278,7 @@
   <Record name="dmsb.wanmanager.if.2.VirtualInterface.1.VlanCount" type="astr">0</Record>
   <Record name="dmsb.wanmanager.if.2.VirtualInterface.1.MarkingCount" type="astr">0</Record>
   <!-- Webconfig.service auto start record -->
-  <Record name="eRT.com.cisco.spvtg.ccsp.webpa.WebConfigRfcEnable" type="astr">true</Record>	  
+  <Record name="eRT.com.cisco.spvtg.ccsp.webpa.WebConfigRfcEnable" type="astr">true</Record>	 
+  <!-- Default WPA3 transition start record -->
+  <Record name="Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.WPA3_Personal_Transition.Enable" type="astr">1</Record> 
 </Provision>

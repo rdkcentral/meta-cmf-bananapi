@@ -1,0 +1,17 @@
+SOURCE:mediatek
+
+diff --git a/include/wifi_hal_generic.h b/include/wifi_hal_generic.h
+index b81ad05..2a6f33e 100644
+--- a/include/wifi_hal_generic.h
++++ b/include/wifi_hal_generic.h
+@@ -328,7 +328,9 @@ typedef enum{
+     WIFI_CHANNELBANDWIDTH_80MHZ = 0x4,
+     WIFI_CHANNELBANDWIDTH_160MHZ = 0x8,
+     WIFI_CHANNELBANDWIDTH_80_80MHZ = 0x10,
+-    WIFI_CHANNELBANDWIDTH_320MHZ = 0x20
++    WIFI_CHANNELBANDWIDTH_320MHZ = 0x20,
++    WIFI_CHANNELBANDWIDTH_320_1MHZ = 0x40,
++    WIFI_CHANNELBANDWIDTH_320_2MHZ = 0x80
+ } wifi_channelBandwidth_t;
+ 
+ /**

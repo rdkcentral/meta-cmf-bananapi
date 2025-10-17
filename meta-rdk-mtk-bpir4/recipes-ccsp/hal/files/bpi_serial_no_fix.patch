@@ -1,18 +1,20 @@
---- a/rdkb_hal/src/platform/platform_hal_o.c	2025-01-27 11:50:30.901265821 +0000
-+++ b/rdkb_hal/src/platform/platform_hal.c	2025-01-27 11:51:17.596684633 +0000
-@@ -106,7 +106,8 @@
+Index: platform/rdkb_hal/src/platform/platform_hal.c
+===================================================================
+--- platform.orig/rdkb_hal/src/platform/platform_hal.c
++++ platform/rdkb_hal/src/platform/platform_hal.c
+@@ -106,19 +106,21 @@ INT platform_hal_GetSerialNumber(CHAR* p
  	if (pValue != NULL)
  	{
  		INT arr[6] = {0};
 -		const char *path = "/sys/class/net/eth1/address";
 +		const char *path = "/etc/machine-id";
-+		//const char *path = "/sys/class/net/eth1/address";
  		FILE *fp = fopen(path, "r");
  		if (fp != NULL)
  		{
-@@ -114,11 +115,12 @@
+ 			char *end;
  			char buf[64] = {0};
  			fgets(buf, sizeof(buf), fp);
++			buf[strcspn(buf, "\n")] = '\0';
  			fclose(fp);
 -			if(6  == sscanf(buf, "%02x:%02x:%02x:%02x:%02x:%02x",&arr[0],&arr[1],&arr[2],&arr[3],&arr[4],&arr[5]))
 +			/*if(6  == sscanf(buf, "%02x:%02x:%02x:%02x:%02x:%02x",&arr[0],&arr[1],&arr[2],&arr[3],&arr[4],&arr[5]))
@@ -21,7 +23,16 @@
  				return RETURN_OK;
 -			}	
 +			}*/
-+		        sprintf(pValue,"%s",buf);	
++		       sprintf(pValue,"%s",buf);
  		}
  	}
  	return RETURN_ERR;
+@@ -171,7 +173,7 @@ INT platform_hal_GetBaseMacAddress(CHAR
+ {
+ 	if (pValue != NULL)
+ 	{
+-		const char *path = "/sys/class/net/eth1/address";
++		const char *path = "/sys/class/net/erouter0/address";
+ 		FILE *fp = fopen(path, "r");
+ 		if (fp != NULL)
+ 		{

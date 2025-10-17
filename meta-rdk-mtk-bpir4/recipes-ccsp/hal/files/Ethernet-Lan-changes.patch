@@ -1,0 +1,84 @@
+Index: ethsw/rdkb_hal/src/ethsw/ccsp_hal_ethsw.c
+===================================================================
+--- ethsw.orig/rdkb_hal/src/ethsw/ccsp_hal_ethsw.c
++++ ethsw/rdkb_hal/src/ethsw/ccsp_hal_ethsw.c
+@@ -179,9 +179,13 @@ CcspHalEthSwGetPortStatus
+ #ifdef THREE_GMACS_SUPPORT
+     if(PortId == 5){
+         sprintf(ifName,"%s", "eth3");
+-    }else
++    }
+ #endif
++    else if (PortId == 1)
+     {
++	sprintf(ifName,"%s", "erouter0");
++    }
++    else{
+         sprintf(ifName, "lan%d", (PortId-1));
+     }
+     sprintf(path, "/sys/class/net/%s/carrier", ifName);
+@@ -337,8 +341,13 @@ CcspHalEthSwGetPortCfg
+ #ifdef THREE_GMACS_SUPPORT
+     if(PortId == 5){
+         sprintf(ifName,"%s", "eth3");
+-    }else
++    }
+ #endif
++    else if (PortId == 1)
++    {
++        sprintf(ifName,"%s", "erouter0");
++    }
++    else
+     {
+         sprintf(ifName, "lan%d", (PortId-1));
+     }
+@@ -469,7 +478,7 @@ CcspHalEthSwSetPortCfg
+ {
+     CcspHalEthSwTrace(("set port %d LinkRate to %d, DuplexMode to %d", PortId, LinkRate, DuplexMode));
+     
+-    if(PortId < 1 || PortId > MAX_LAN_PORT)
++    if(PortId <= 1 || PortId > MAX_LAN_PORT)
+         return  RETURN_ERR;
+ 
+     char cmd[128] = {0};
+@@ -579,7 +588,10 @@ CcspHalEthSwGetPortAdminStatus
+     }
+ 
+     memset(&ifr, 0, sizeof(ifr));
+-    snprintf(ifr.ifr_name, sizeof(ifr.ifr_name), "%s", "eth1");
++    if (PortId == 1)
++	snprintf(ifr.ifr_name, sizeof(ifr.ifr_name), "erouter0");
++    else
++        snprintf(ifr.ifr_name, sizeof(ifr.ifr_name),"lan",(PortId-1));
+ 
+     if (ioctl(sockfd, SIOCGIFFLAGS, &ifr) < 0)
+     {
+@@ -594,8 +606,8 @@ CcspHalEthSwGetPortAdminStatus
+     else
+         *pAdminStatus   = CCSP_HAL_ETHSW_AdminDown;
+     
+-    if(admin_status)
+-        *pAdminStatus   = CCSP_HAL_ETHSW_AdminDown;
++    /*if(admin_status)
++        *pAdminStatus   = CCSP_HAL_ETHSW_AdminDown; */
+ 	
+   return RETURN_OK;
+ }
+@@ -629,14 +641,14 @@ CcspHalEthSwSetPortAdminStatus
+     CcspHalEthSwTrace(("set port %d AdminStatus to %d", PortId, AdminStatus));
+     if(AdminStatus < CCSP_HAL_ETHSW_AdminUp || AdminStatus > CCSP_HAL_ETHSW_AdminTest)
+         return  RETURN_ERR;
+-    if(PortId < 1 || PortId > MAX_LAN_PORT)
++    if(PortId <= 1 || PortId > MAX_LAN_PORT)
+         return  RETURN_ERR;
+     
+     char cmd1[32] = {0};
+     char cmd2[32] = {0};
+ 
+-    sprintf(cmd1,"ip link set lan%d up",PortId);
+-    sprintf(cmd2,"ip link set lan%d down",PortId);
++    sprintf(cmd1,"ip link set lan%d up",(PortId-1));
++    sprintf(cmd2,"ip link set lan%d down",(PortId-1));
+ 
+     switch (PortId)
+     {

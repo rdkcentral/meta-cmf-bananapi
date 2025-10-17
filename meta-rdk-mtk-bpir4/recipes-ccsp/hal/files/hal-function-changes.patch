@@ -1,0 +1,67 @@
+Index: platform/rdkb_hal/src/platform/platform_hal.c
+===================================================================
+--- platform.orig/rdkb_hal/src/platform/platform_hal.c
++++ platform/rdkb_hal/src/platform/platform_hal.c
+@@ -120,8 +120,10 @@ INT platform_hal_GetSerialNumber(CHAR* p
+ 				sprintf(pValue,"%02x%02x%02x%02x%02x%02x",arr[0],arr[1],arr[2],arr[3],arr[4],arr[5]);
+ 				return RETURN_OK;
+ 			}*/
+-		       sprintf(pValue,"%s",buf);
++		        sprintf(pValue,"%s",buf);
+ 		}
++		///RDKBACCL-920
++		return RETURN_OK;
+ 	}
+ 	return RETURN_ERR;
+ 
+@@ -144,12 +146,13 @@ INT platform_hal_GetHardware(CHAR *pValu
+ 	char buf[64] = {0};
+ 	char cmd[128] = {0};
+ 
+-  
++
+ 	if (pValue == NULL)
+ 	{
+ 		return RETURN_ERR;
+ 	}
+-	snprintf(cmd,128, "cat /proc/partitions | grep mtdblock5 | awk '/mtdblock5/ {print $3}'");
++	//RDKBACCL-924
++	snprintf(cmd,128, "cat /proc/partitions | grep mtdblock4 | awk '/mtdblock4/ {print $3}'");
+ 	fp = popen(cmd,"r");
+ 	if(fp == NULL)
+ 	{
+@@ -318,13 +321,13 @@ INT platform_hal_GetModelName(CHAR* pVal
+ 	FILE *fp = NULL;
+ 	char buf[64] = {0};
+ 	int count = 0;
+-  
++
+ 	if (pValue == NULL)
+ 	{
+ 		return RETURN_ERR;
+ 	}
+ 
+-	fp = popen("cat /proc/device-tree/model","r");
++	fp = popen("cat /proc/device-tree/model | tr -d ' '","r");
+ 	if(fp == NULL)
+ 	{
+ 		return RETURN_ERR;
+@@ -384,7 +387,8 @@ INT platform_hal_GetSoftwareVersion(CHAR
+ INT platform_hal_GetFirmwareName(CHAR* pValue, ULONG maxSize)
+ {
+ 	FILE *fp;
+-	char buff[64]={0};
++//RDKBACCL-927
++	char buff[128]={0};
+   
+ 	if (pValue == NULL)
+ 	{
+@@ -397,7 +401,7 @@ INT platform_hal_GetFirmwareName(CHAR* p
+ 		return RETURN_ERR;
+ 	}
+ 
+-	while(fgets(buff, 64, fp) != NULL)
++	while(fgets(buff, 128, fp) != NULL)
+ 	{
+ 		if(strstr(buff, "imagename") != NULL)
+ 		{
