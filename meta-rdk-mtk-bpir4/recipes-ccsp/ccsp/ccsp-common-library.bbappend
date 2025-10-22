@@ -53,7 +53,8 @@ do_install:append_class-target() {
            sed -i "/^After=/ s/$/ ApplySystemDefaults.service /g" ${D}${systemd_unitdir}/system/RdkWanManager.service
            sed -i "/^After=/ s/$/ ApplySystemDefaults.service /g" ${D}${systemd_unitdir}/system/RdkVlanManager.service
        fi
-    fi 
+    fi
+    sed -i '/IsErouterRunningStatus/,/fi/ s/^/#/' ${D}/usr/ccsp/ccspPAMCPCheck.sh
 }
 
 TARGET_CFLAGS += " \
