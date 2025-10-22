@@ -90,6 +90,11 @@ sed -i '/python/d' ${_TOPDIR}/meta-cmf-filogic/recipes-core/images/image-exclude
 touch ${_TOPDIR}/meta-cmf-filogic/recipes-core/images/python_binary_removed
 fi
 
+if [ ! -e ${_TOPDIR}/meta-filogic/recipes-wifi/hal/mt76_hal_change ];then
+echo "DEPENDS += \"rdk-wifi-halif\"" >> ${_TOPDIR}/meta-filogic/recipes-wifi/hal/hal-wifi-mt76.bb
+echo "DEPENDS += \"rdk-wifi-halif\"" >> ${_TOPDIR}/meta-cmf-broadband/recipes-ccsp/hal/hal-wifi-cfg80211_git.bb
+touch ${_TOPDIR}/meta-filogic/recipes-wifi/hal/mt76_hal_change
+fi
 
 if [ "X$FEATURE_TYPE" == "XEasyMesh" ]; then
     sed -i '/EasyMesh/s/^#//' ${_TOPDIR}/meta-cmf-bananapi/conf/distro/include/rdk-bpi.inc
@@ -107,6 +112,7 @@ fi
 
 if [ "X$KERNEL_TYPE" == "Xkernel6-6" ]; then
     sed -i '/kernel6-6/s/^#//' ${_TOPDIR}/meta-cmf-bananapi/conf/distro/include/rdk-bpi.inc
+    echo 'RDEPENDS:${PN}-dev = ""' >> ${_TOPDIR}/meta-filogic/recipes-kernel/linux6-6-libc-headers/linux-libc-headers.inc
 fi
 
 if [ "X$BPI_IMG_TYPE" == "Xnand" ]; then

@@ -1,0 +1,53 @@
+diff --git a/wpa_supplicant/wpa_supplicant.c b/wpa_supplicant/wpa_supplicant.c
+index da471c9b8..a1a442403 100644
+--- a/wpa_supplicant/wpa_supplicant.c
++++ b/wpa_supplicant/wpa_supplicant.c
+@@ -7999,7 +7999,7 @@ struct wpa_supplicant * wpa_supplicant_add_iface(struct wpa_global *global,
+ 	}
+ #endif /* CONFIG_P2P */
+ 
+-	wpas_ubus_add_bss(wpa_s);
++	//wpas_ubus_add_bss(wpa_s);
+ 	wpas_ucode_add_bss(wpa_s);
+ 
+ 	return wpa_s;
+@@ -8029,7 +8029,7 @@ int wpa_supplicant_remove_iface(struct wpa_global *global,
+ #endif /* CONFIG_MESH */
+ 
+ 	wpas_ucode_free_bss(wpa_s);
+-	wpas_ubus_free_bss(wpa_s);
++	//wpas_ubus_free_bss(wpa_s);
+ 
+ 	/* Remove interface from the global list of interfaces */
+ 	prev = global->ifaces;
+diff --git a/wpa_supplicant/wpa_supplicant_i.h b/wpa_supplicant/wpa_supplicant_i.h
+index 1c1e69d3b..3532b5803 100644
+--- a/wpa_supplicant/wpa_supplicant_i.h
++++ b/wpa_supplicant/wpa_supplicant_i.h
+@@ -21,7 +21,7 @@
+ #include "config_ssid.h"
+ #include "wmm_ac.h"
+ #include "pasn/pasn_common.h"
+-#include "ubus.h"
++//#include "ubus.h"
+ #include "ucode.h"
+ 
+ extern const char *const wpa_supplicant_version;
+@@ -322,7 +322,7 @@ struct wpa_global {
+ 
+ 	struct psk_list_entry *add_psk; /* From group formation */
+ 
+-	struct ubus_object ubus_global;
++	//struct ubus_object ubus_global;
+ };
+ 
+ 
+@@ -697,7 +697,7 @@ struct wpa_supplicant {
+ 	unsigned char own_addr[ETH_ALEN];
+ 	unsigned char perm_addr[ETH_ALEN];
+ 	char ifname[100];
+-	struct wpas_ubus_bss ubus;
++	//struct wpas_ubus_bss ubus;
+ 	struct wpas_ucode_bss ucode;
+ #ifdef CONFIG_MATCH_IFACE
+ 	int matched;
