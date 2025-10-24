@@ -48,4 +48,9 @@ pkg_postinst_ontarget:kernel-6 () {
     fi
 }
 
+do_install:append() {
+    # Remove any empty directories under /etc in ${D}
+    find ${D}${sysconfdir} -type d -empty -delete
+}
+
 CMDLINE:append = "${@bb.utils.contains('DISTRO_FEATURES','dac', 'cgroup_enable=cpuset cgroup_enable=memory cgroup_memory=1', '', d)}"

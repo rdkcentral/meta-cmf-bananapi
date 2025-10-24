@@ -1,7 +1,6 @@
 EXTRA_OEMAKE = "CONFIG_BUILD_WPA_CLIENT_SO=y"
 FILES_SOLIBSDEV = ""
 
-SRCREV = "${SRCREV_kernel6-6}"
 
 do_install:append () {
 	install -d ${D}${includedir}
