@@ -1,0 +1,12 @@
+[Unit]
+Description=Service for the 802.15.4 co-processor communication daemon
+StartLimitIntervalSec=300
+StartLimitBurst=5
+[Service]
+Type=simple
+Restart=always
+RestartSec=5
+TimeoutStartSec=60
+ExecStart=/usr/bin/cpcd -c /etc/cpcd.conf
+[Install]
+WantedBy=multi-user.target

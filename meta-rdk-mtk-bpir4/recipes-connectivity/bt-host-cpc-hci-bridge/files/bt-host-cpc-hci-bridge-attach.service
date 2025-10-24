@@ -1,0 +1,14 @@
+[Unit]
+Description=Attach Bluetooth HCI Bridge
+After=bt-host-cpc-hci-bridge.service
+Requires=bt-host-cpc-hci-bridge.service
+
+[Service]
+Type=simple
+ExecStartPre=/bin/sh -c 'while [ ! -e /dev/pts/0 ]; do sleep 1; done'
+ExecStart=/usr/bin/btattach -B /dev/pts/0 -S 115200
+Restart=always
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target
