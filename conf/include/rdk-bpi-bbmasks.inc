@@ -12,3 +12,4 @@ BBMASK .= "${@bb.utils.contains('DISTRO_FEATURES','EasyMesh','|meta-cmf-filogic/
 BBMASK .= "|meta-cmf-filogic/recipes-ccsp/util/utopia-headers.bb"
 BBMASK .= "|meta-cmf-filogic/recipes-ccsp/hal/halinterface.bbappend"
 BBMASK .= "|meta-filogic/recipes-wifi/hal/halinterface.bbappend"
+BBMASK .= "|meta-rdk-ext/recipes-telephony/asterisk/asterisk_18.5.0.bb"

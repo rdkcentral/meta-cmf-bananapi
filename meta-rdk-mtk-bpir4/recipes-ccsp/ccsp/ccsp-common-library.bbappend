@@ -82,6 +82,7 @@ do_install_append_class-target() {
 SYSTEMD_SERVICE_${PN}_remove_onewifi = " ccspwifiagent.service"
 SYSTEMD_SERVICE_${PN} += "${@bb.utils.contains('DISTRO_FEATURES', 'OneWifi', 'onewifi.service ', '', d)}"
 SYSTEMD_SERVICE_${PN} += "${@bb.utils.contains('DISTRO_FEATURES', 'webconfig_bin', 'webconfig.service', '', d)}"
+SYSTEMD_SERVICE_${PN} += "${@bb.utils.contains('DISTRO_FEATURES', 'rdkb_wan_manager', 'RdkTelcoVoiceManager.service', '', d)}"
 SYSTEMD_SERVICE_${PN} += " CcspTelemetry.service"
 SYSTEMD_SERVICE_${PN} += " notifyComp.service"
 SYSTEMD_SERVICE_${PN} += "gwprovapp.service"
