@@ -27,14 +27,21 @@ add_busybox_fixes() {
                 fi
 }
 
-do_filogic_gen_image(){
+python __anonymous () {
+    if "sd" in d.getVar('MACHINEOVERRIDES', True):
+        d.setVar('do_filogic_gen_image', 'do_filogic_gen_image_sdcard')
+        bb.build.exec_func('bbnote', d, "Overriding do_filogic_gen_image for SD distro with custom do_filogic_gen_image_sdcard task")
+    else:
+        bb.build.exec_func('bbnote', d, "do_filogic_gen_image remains unchanged for non-SD distros.")
+}
+
+do_filogic_gen_image_sdcard(){
         if ${@bb.utils.contains('DISTRO_FEATURES','kernel_in_ubi','true','false',d)}; then
         # create sysupgrade image align to openwrt
                 rm -rf ${IMGDEPLOYDIR}/sysupgrade-${PN}-${MACHINE}
                 rm -rf ${IMGDEPLOYDIR}/${PN}-${MACHINE}-sysupgrade.bin
 
                 mkdir ${IMGDEPLOYDIR}/sysupgrade-${PN}-${MACHINE}
-
                 cp ${DEPLOY_DIR_IMAGE}/fitImage ${IMGDEPLOYDIR}/sysupgrade-${PN}-${MACHINE}/kernel
                 cp ${IMGDEPLOYDIR}/${PN}-${MACHINE}.squashfs-xz ${IMGDEPLOYDIR}/sysupgrade-${PN}-${MACHINE}/root
                 if ${@bb.utils.contains('DISTRO_FEATURES','kernel6-6','true','false',d)}; then

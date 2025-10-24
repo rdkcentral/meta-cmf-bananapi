@@ -13,7 +13,7 @@ SRC_URI_append = " \
     file://rdkb_cfg/wps_key.cfg \
     file://enable_sdcard_6_6.patch;apply=no \
 "
-
+SRC_URI_append_kernel6-6 = "${@bb.utils.contains('DISTRO_FEATURES','sdmmc','','file://rdkb_cfg/kernel_6_6_nand.cfg', d)}"
 CMDLINE_append = "${@bb.utils.contains('DISTRO_FEATURES','dac', 'cgroup_enable=cpuset cgroup_enable=memory cgroup_memory=1', '', d)}"
 
 do_filogic_patches_append() {

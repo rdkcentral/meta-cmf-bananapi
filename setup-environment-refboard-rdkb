@@ -78,7 +78,10 @@ if [ "X$KERNEL_TYPE" != "Xkernel6-6" ]; then
          touch ${_TOPDIR}/meta-cmf-filogic/recipes-ccsp/ccsp/onewifi_changes_applied
     fi
 fi
-
+if [ "X$KERNEL_TYPE" = "Xkernel6-6" ] && [ ! -e ${_TOPDIR}/meta-filogic/recipes-kernel/linux/linux_changes_applied ]; then
+   sed -i '80 s/^/#/' ${_TOPDIR}/meta-filogic/recipes-kernel/linux/linux-mediatek_6.6.bb
+   touch ${_TOPDIR}/meta-filogic/recipes-kernel/linux/linux_changes_applied
+fi
 # commenting removing dbus.service from meta-cmf-filogic
 if [ ! -e ${_TOPDIR}/meta-cmf-filogic/recipes-core/dbus/dbus_change ]; then
 sed -i '19 s/^/#/' ${_TOPDIR}/meta-cmf-filogic/recipes-core/dbus/dbus_%.bbappend
