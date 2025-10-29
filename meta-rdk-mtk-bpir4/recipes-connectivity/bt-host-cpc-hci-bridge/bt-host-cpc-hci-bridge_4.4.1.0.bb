@@ -1,5 +1,5 @@
 DESCRIPTION = "Bluetooth CPC HCI Bridge"
-LICENSE = "CLOSED"
+LICENSE = "Proprietary"
 
 # GSDK path definition
 GSDK_DIR = "${WORKDIR}/git/gsdk"
