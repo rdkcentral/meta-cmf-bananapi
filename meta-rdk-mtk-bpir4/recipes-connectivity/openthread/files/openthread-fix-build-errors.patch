@@ -1,3 +1,13 @@
+From: RDKM
+Date: Wed, 29 Oct 2025
+Subject: [PATCH] Fix namespace and constant usage in CPC and vendor spinel
+
+Update OpenThread namespace usage and time constants for compatibility
+with newer OpenThread versions. Moves GetRadioSpinel declaration to
+external linkage.
+
+Source: RDKM
+
 diff --git a/protocol/openthread/platform-abstraction/posix/cpc_interface.cpp b/protocol/openthread/platform-abstraction/posix/cpc_interface.cpp
 index 67799f6aa..8bd809e2b 100644
 --- a/protocol/openthread/platform-abstraction/posix/cpc_interface.cpp
