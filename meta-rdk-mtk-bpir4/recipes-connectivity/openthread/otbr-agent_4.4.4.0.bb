@@ -97,7 +97,7 @@ update_otbr() {
     rm -rf ${GSDK_OT_DIR}
 
     ln -sf ${OTBR_DIR} ${GSDK_OTBR_DIR}
-    ln -sf I${OTBR_OT_DIR} ${GSDK_OT_DIR}
+    ln -sf ${OTBR_OT_DIR} ${GSDK_OT_DIR}
 }
 
 do_install_append() {
