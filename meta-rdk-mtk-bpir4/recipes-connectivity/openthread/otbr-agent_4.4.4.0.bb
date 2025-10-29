@@ -2,7 +2,7 @@ DESCRIPTION = "OpenThread Border Router Agent"
 HOMEPAGE = "https://github.com/openthread/ot-br-posix"
 
 
-LICENSE = "BSD-3-Clause & MIT"
+LICENSE = "BSD-3-Clause"
 LIC_FILES_CHKSUM = "file://LICENSE;md5=87109e44b2fda96a8991f27684a7349c \
                     file://third_party/openthread/repo/LICENSE;md5=543b6fe90ec5901a683320a36390c65f \
 "
