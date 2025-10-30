@@ -27,7 +27,7 @@ SYSTEMD_TOOLS = "systemd-analyze systemd-bootchart"
 # systemd-bootchart doesn't currently build with musl libc
 SYSTEMD_TOOLS_remove_libc-musl = "systemd-bootchart"
 
-DEPENDS += "cryptsetup-native"
+DEPENDS += "cryptsetup-native fit-rootfs-hash-tool-native"
 
 IMAGE_INSTALL += " \
     ${SYSTEMD_TOOLS} \
@@ -59,7 +59,8 @@ IMAGE_INSTALL += " \
     strongswan \
     libpcap \
     tcpdump \
-    perf \
+    ${@bb.utils.contains('DISTRO_FEATURES','kernel6-6','linux-firmware-mt7988  fitblk','',d)} \
+    ${@bb.utils.contains('DISTRO_FEATURES','kernel6-6','','perf',d)} \
     ${@bb.utils.contains('DISTRO_FEATURES','mt76','packagegroup-filogic-mt76','',d)} \
     ${@bb.utils.contains('DISTRO_FEATURES','em_extender','packagegroup-ap-extender','',d)} \
     ${@bb.utils.contains('DISTRO_FEATURES','logan','packagegroup-filogic-logan','',d)} \
@@ -113,6 +114,9 @@ do_filogic_gen_image(){
             cp ${DEPLOY_DIR_IMAGE}/fitImage ${IMGDEPLOYDIR}/sysupgrade-${PN}-${MACHINE}/kernel
             cp ${IMGDEPLOYDIR}/${PN}-${MACHINE}.squashfs-xz ${IMGDEPLOYDIR}/sysupgrade-${PN}-${MACHINE}/root
 
+            if ${@bb.utils.contains('DISTRO_FEATURES','kernel6-6','true','false',d)}; then
+                fit-rootfs-hash-tool ${IMGDEPLOYDIR}/sysupgrade-${PN}-${MACHINE}/kernel ${IMGDEPLOYDIR}/sysupgrade-${PN}-${MACHINE}/root
+            fi
             cd ${IMGDEPLOYDIR}
             tar cvf ${PN}-${MACHINE}-sysupgrade.bin sysupgrade-${PN}-${MACHINE}
             mv ${PN}-${MACHINE}-sysupgrade.bin ${DEPLOY_DIR_IMAGE}/
@@ -128,6 +132,9 @@ do_filogic_gen_image(){
 
             cp ${IMGDEPLOYDIR}/${PN}-${MACHINE}.squashfs-xz ${IMGDEPLOYDIR}/sysupgrade-${PN}-${MACHINE}-sb/root
 
+            if ${@bb.utils.contains('DISTRO_FEATURES','kernel6-6','true','false',d)}; then
+                fit-rootfs-hash-tool ${IMGDEPLOYDIR}/sysupgrade-${PN}-${MACHINE}-sb/kernel ${IMGDEPLOYDIR}/sysupgrade-${PN}-${MACHINE}-sb/root
+            fi
             cd ${IMGDEPLOYDIR}
 
             tar cvf ${PN}-${MACHINE}-sb-sysupgrade.bin sysupgrade-${PN}-${MACHINE}-sb

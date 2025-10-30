@@ -31,3 +31,6 @@ DISTRO_FEATURES_append = " CONFIG_IEEE80211BE"
 DISTRO_FEATURES_append = " generic_mlo"
 #PPP Feature
 #DISTRO_FEATURES_append = "ppp-enabled"
+
+# Kernel 6.6
+#DISTRO_FEATURES_append = " kernel6-6"

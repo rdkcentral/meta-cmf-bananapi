@@ -9,7 +9,7 @@ SRC_URI = "${CMF_GITHUB_ROOT}/broadband-utils;protocol=https;branch=develop"
 
 S = "${WORKDIR}/git"
 PV = "1.0.0"
-SRCREV = "e2060a77127aff5c2a49cb4b5957597acb642db2"
+SRCREV = "55d70f1560fc9092c037d869aae450524b5c6ae8"
 
 CXXFLAGS_append = "  -DAARCH64_BUILD"
 CXXFLAGS_append = "  ${@bb.utils.contains('DISTRO_FEATURES', 'EasyMesh', bb.utils.contains('DISTRO_FEATURES', 'em_extender', ' -D_EM_EXT_BUILD_ -D_EM_BUILD_ ',' -D_EM_BUILD_ ', d), ' ', d)}"

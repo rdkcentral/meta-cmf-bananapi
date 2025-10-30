@@ -1,0 +1,1939 @@
+SOURCE:RDKM
+
+diff --git a/wifi_hal.c b/wifi_hal.c
+index faee674..ecf1f17 100644
+--- a/wifi_hal.c
++++ b/wifi_hal.c
+@@ -479,7 +479,10 @@ INT radio_index_to_phy(int radioIndex)
+     char cmd[128] = {0};
+     char buf[64] = {0};
+     int phyIndex = 0;
+-    snprintf(cmd, sizeof(cmd), "ls /tmp | grep wifi%d | cut -d '-' -f1 | tr -d '\n'", radioIndex);
++    if(radioIndex==2)
++	    snprintf(cmd, sizeof(cmd), "ls /tmp | grep wifi16 | cut -d '-' -f1 | tr -d '\n'");
++    else
++	    snprintf(cmd, sizeof(cmd), "ls /tmp | grep wifi%d | cut -d '-' -f1 | tr -d '\n'", radioIndex);
+     _syscmd(cmd, buf, sizeof(buf));
+ 
+     if (strlen(buf) == 0 || strstr(buf, "phy") == NULL) {
+@@ -560,7 +563,11 @@ wifi_band wifi_index_to_band(int apIndex)
+     WIFI_ENTRY_EXIT_DEBUG("Inside %s:%d\n",__func__, __LINE__);
+ 
+     wifi_getMaxRadioNumber(&max_radio_num);
+-    radioIndex = apIndex % max_radio_num;
++    if(apIndex<16)
++	    radioIndex=(apIndex%2==0)?0:1;
++    else if(apIndex>=16 && apIndex<=23)
++	    radioIndex=2;
++
+     snprintf(config_file, sizeof(config_file), "%s%d.conf", CONFIG_PREFIX, apIndex);
+     wifi_hostapdRead(config_file, "op_class", buf, sizeof(buf));
+     if (strlen(buf) > 0)
+@@ -791,9 +798,17 @@ INT wifi_setApBeaconRate(INT radioIndex,CHAR *beaconRate)
+         params.value = buf;
+     }
+ 
+-    sprintf(config_file, "%s%d.conf", CONFIG_PREFIX, radioIndex);
++    if(radioIndex==2)
++	    sprintf(config_file, "%s16.conf", CONFIG_PREFIX);
++    else
++	    sprintf(config_file, "%s%d.conf", CONFIG_PREFIX, radioIndex);
++
+     wifi_hostapdWrite(config_file, &params, 1);
+-    wifi_hostapdProcessUpdate(radioIndex, &params, 1);
++
++    if(radioIndex==2)
++	    wifi_hostapdProcessUpdate(16, &params, 1);
++    else
++	    wifi_hostapdProcessUpdate(radioIndex, &params, 1);
+     WIFI_ENTRY_EXIT_DEBUG("Exiting %s:%d\n",__func__, __LINE__);
+ 
+     return RETURN_OK;
+@@ -811,7 +826,11 @@ INT wifi_getApBeaconRate(INT radioIndex, CHAR *beaconRate)
+     if (NULL == beaconRate)
+         return RETURN_ERR;
+ 
+-    sprintf(config_file, "%s%d.conf", CONFIG_PREFIX, radioIndex);
++    if(radioIndex==2)
++	    sprintf(config_file, "%s16.conf", CONFIG_PREFIX);
++    else
++	    sprintf(config_file, "%s%d.conf", CONFIG_PREFIX, radioIndex);
++
+     wifi_hostapdRead(config_file, "beacon_rate", buf, sizeof(buf));
+     // Hostapd unit is 100kbps. To convert to 100kbps to Mbps, the value need to divide 10.
+     if(strlen(buf) > 0) {
+@@ -823,7 +842,11 @@ INT wifi_getApBeaconRate(INT radioIndex, CHAR *beaconRate)
+         }
+     } else {
+         // config not set, so we would use lowest rate as default
+-        sprintf(cmd, "hostapd_cli -i wifi%d status | grep supported_rates | sed 's/=/ 0x/' | awk '{print $2}'", radioIndex);
++        if(radioIndex==2)
++		sprintf(cmd, "hostapd_cli -i wifi16 status | grep supported_rates | sed 's/=/ 0x/' | awk '{print $2}'");
++	else
++		sprintf(cmd, "hostapd_cli -i wifi%d status | grep supported_rates | sed 's/=/ 0x/' | awk '{print $2}'", radioIndex);
++
+         _syscmd(cmd, buf, sizeof(buf));
+         snprintf(temp_output, sizeof(temp_output), "%dMbps", strtol(buf, NULL, 0)*5/10);
+     }
+@@ -949,7 +972,10 @@ INT wifi_factoryResetRadio(int radioIndex) 	//RDKB
+     _syscmd(cmd, buf, sizeof(buf));
+ 
+     WIFI_ENTRY_EXIT_DEBUG("Inside %s:%d\n",__func__, __LINE__);
+-    snprintf(cmd, sizeof(cmd), "rm /nvram/hostapd%d* %s%d.txt", radioIndex, GUARD_INTERVAL_FILE, radioIndex);
++    if(radioIndex==2)
++	    snprintf(cmd, sizeof(cmd), "rm /nvram/hostapd16* %s16.txt", GUARD_INTERVAL_FILE);
++    else
++	    snprintf(cmd, sizeof(cmd), "rm /nvram/hostapd%d* %s%d.txt", radioIndex, GUARD_INTERVAL_FILE, radioIndex);
+     _syscmd(cmd, buf, sizeof(buf));
+ 
+     snprintf(cmd, sizeof(cmd), "systemctl start hostapd.service");
+@@ -1169,8 +1195,10 @@ INT wifi_getRadioCountryCode(INT radioIndex, CHAR *output_string)
+     if(!output_string || (radioIndex >= MAX_NUM_RADIOS))
+         return RETURN_ERR;
+ 
+-    if (wifi_GetInterfaceName(radioIndex, interface_name) != RETURN_OK)
+-        return RETURN_ERR;
++    if(radioIndex==2)
++	    strncpy(interface_name, "wifi16", sizeof(interface_name));
++    else if(wifi_GetInterfaceName(radioIndex, interface_name) != RETURN_OK)
++	    return RETURN_ERR;
+     sprintf(cmd,"hostapd_cli -i %s status driver | grep country | cut -d '=' -f2", interface_name);
+     _syscmd(cmd, buf, sizeof(buf));
+     if(strlen(buf) > 0)
+@@ -1198,7 +1226,10 @@ INT wifi_setRadioCountryCode(INT radioIndex, CHAR *CountryCode)
+ 
+     params.name = "country_code";
+     params.value = CountryCode;
+-    sprintf(config_file,"%s%d.conf",CONFIG_PREFIX, radioIndex);
++    if(radioIndex==2)
++	    sprintf(config_file,"%s16.conf",CONFIG_PREFIX);
++    else
++	    sprintf(config_file,"%s%d.conf",CONFIG_PREFIX, radioIndex);
+     int ret = wifi_hostapdWrite(config_file, &params, 1);
+     if (ret) {
+         WIFI_ENTRY_EXIT_DEBUG("Inside %s: wifi_hostapdWrite() return %d\n"
+@@ -1231,8 +1262,10 @@ INT wifi_getRadioChannelStats2(INT radioIndex, wifi_channelStats2_t *outputChann
+ 
+     WIFI_ENTRY_EXIT_DEBUG("Inside %s:%d\n",__func__, __LINE__);
+ 
+-    if (wifi_GetInterfaceName(radioIndex, interface_name) != RETURN_OK)
+-        return RETURN_ERR;
++    if(radioIndex == 2)
++	    strcpy(interface_name,"wifi16");
++    else if(wifi_GetInterfaceName(radioIndex, interface_name) != RETURN_OK)
++	    return RETURN_ERR;
+     snprintf(cmd, sizeof(cmd), "iw %s scan | grep signal | awk '{print $2}' | sort -n | tail -n1", interface_name);
+     _syscmd(cmd, buf, sizeof(buf));
+     outputChannelStats2->ch_Max80211Rssi = strtol(buf, NULL, 10);
+@@ -1270,7 +1303,10 @@ INT wifi_getRadioChannelStats2(INT radioIndex, wifi_channelStats2_t *outputChann
+     pclose(f);
+ 
+     // The file should store the last active, busy and transmit time
+-    snprintf(channel_util_file, sizeof(channel_util_file), "%s%d.txt", CHANNEL_STATS_FILE, radioIndex);
++    if(radioIndex==2)
++	    snprintf(channel_util_file, sizeof(channel_util_file), "%s16.txt", CHANNEL_STATS_FILE);
++    else
++	    snprintf(channel_util_file, sizeof(channel_util_file), "%s%d.txt", CHANNEL_STATS_FILE, radioIndex);
+     f = fopen(channel_util_file, "r");
+     if (f != NULL) {
+         read = getline(&line, &len, f);
+@@ -1338,21 +1374,36 @@ INT wifi_getRadioEnable(INT radioIndex, BOOL *output_bool)      //RDKB
+     if (radioIndex >= max_radio_num)
+         return RETURN_ERR;
+ 
+-	/* loop all interface in radio, if any is enable, reture true, else return false */
+-	for(apIndex=radioIndex; apIndex<MAX_APS; apIndex+=max_radio_num)
+-	{
+-		if (wifi_GetInterfaceName(apIndex, interface_name) != RETURN_OK)
+-			continue;
+-		sprintf(cmd, "hostapd_cli -i %s status | grep state | cut -d '=' -f2", interface_name);
+-		_syscmd(cmd, buf, sizeof(buf));
++    if(radioIndex<2){
++	    for(apIndex=radioIndex;apIndex<16;apIndex+=2){
++		    if (wifi_GetInterfaceName(apIndex, interface_name) != RETURN_OK)
++			    continue;
++		    sprintf(cmd, "hostapd_cli -i %s status | grep state | cut -d '=' -f2", interface_name);
++		    _syscmd(cmd, buf, sizeof(buf));
++		    sprintf(cmd, "hostapd_cli -i %s status | grep state | cut -d '=' -f2", interface_name);
++		    _syscmd(cmd, buf, sizeof(buf));
++		    if(strncmp(buf, "ENABLED", 7) == 0 || strncmp(buf, "ACS", 3) == 0 ||
++				    strncmp(buf, "HT_SCAN", 7) == 0 || strncmp(buf, "DFS", 3) == 0) {
++			    //  return true if any interface is eanble
++			    *output_bool = TRUE;
++			    break;
++		    }
++	    }
++    }
++    else if(radioIndex==2){
++	    for(apIndex=16; apIndex<MAX_APS; apIndex++){
++		    strncpy(interface_name, "wifi16", sizeof(interface_name));
++		    sprintf(cmd, "hostapd_cli -i %s status | grep state | cut -d '=' -f2", interface_name);
++		    _syscmd(cmd, buf, sizeof(buf));
++		    if(strncmp(buf, "ENABLED", 7) == 0 || strncmp(buf, "ACS", 3) == 0 ||
++				    strncmp(buf, "HT_SCAN", 7) == 0 || strncmp(buf, "DFS", 3) == 0) {
++			    /* return true if any interface is eanble */
++			    *output_bool = TRUE;
++			    break;
++		    }
++	    }
++    }
+ 
+-		if(strncmp(buf, "ENABLED", 7) == 0 || strncmp(buf, "ACS", 3) == 0 ||
+-			strncmp(buf, "HT_SCAN", 7) == 0 || strncmp(buf, "DFS", 3) == 0) {
+-			/* return true if any interface is eanble */
+-			*output_bool = TRUE;
+-			break;
+-		}
+-	}
+     return RETURN_OK;
+ }
+ 
+@@ -1374,55 +1425,121 @@ INT wifi_setRadioEnable(INT radioIndex, BOOL enable)
+     if(enable==FALSE)
+     {
+         /* disable from max apindex to min, to avoid fail in mbss case */
+-		for(apIndex=(MAX_APS-max_radio_num+radioIndex); apIndex>=0; apIndex-=max_radio_num)
+-        {
+-            if (wifi_GetInterfaceName(apIndex, interface_name) != RETURN_OK)
+-                continue;
+-
+-            //Detaching %s%d from hostapd daemon
+-            snprintf(cmd, sizeof(cmd), "hostapd_cli -i global raw REMOVE %s", interface_name);
+-            _syscmd(cmd, buf, sizeof(buf));
+-            if(strncmp(buf, "OK", 2))
+-                fprintf(stderr, "Could not detach %s from hostapd daemon", interface_name);
+-
+-            if (!(apIndex/max_radio_num)) {
+-                snprintf(cmd, sizeof(cmd), "iw %s del", interface_name);
+-                _syscmd(cmd, buf, sizeof(buf));
+-            }
+-        }
++	if(radioIndex==0){
++		for(apIndex=14;apIndex>=0;apIndex-=2)
++		{
++			if (wifi_GetInterfaceName(apIndex, interface_name) != RETURN_OK)
++				continue;
++
++			//Detaching %s%d from hostapd daemon
++			snprintf(cmd, sizeof(cmd), "hostapd_cli -i global raw REMOVE %s", interface_name);
++			_syscmd(cmd, buf, sizeof(buf));
++			if(strncmp(buf, "OK", 2))
++				fprintf(stderr, "Could not detach %s from hostapd daemon", interface_name);
++
++			if (!(apIndex/max_radio_num)) {
++				snprintf(cmd, sizeof(cmd), "iw %s del", interface_name);
++				_syscmd(cmd, buf, sizeof(buf));
++			}
++		}
++	}
++	if(radioIndex==1){
++		for(apIndex=15;apIndex>0;apIndex-=2){
++			if (wifi_GetInterfaceName(apIndex, interface_name) != RETURN_OK)
++				continue;
++			
++			//Detaching %s%d from hostapd daemon
++			snprintf(cmd, sizeof(cmd), "hostapd_cli -i global raw REMOVE %s", interface_name);
++			_syscmd(cmd, buf, sizeof(buf));
++			if(strncmp(buf, "OK", 2))
++				fprintf(stderr, "Could not detach %s from hostapd daemon", interface_name);
++
++			if (!(apIndex/max_radio_num)) {
++				snprintf(cmd, sizeof(cmd), "iw %s del", interface_name);
++				_syscmd(cmd, buf, sizeof(buf));
++			}
++		}
++	}
++	else if(radioIndex==2){
++		for(apIndex=23;apIndex>=16;apIndex--){
++			if (wifi_GetInterfaceName(apIndex, interface_name) != RETURN_OK)
++				continue;
++
++			//Detaching %s%d from hostapd daemon
++			snprintf(cmd, sizeof(cmd), "hostapd_cli -i global raw REMOVE %s", interface_name);
++			_syscmd(cmd, buf, sizeof(buf));
++			if(strncmp(buf, "OK", 2))
++				fprintf(stderr, "Could not detach %s from hostapd daemon", interface_name);
++
++			if (!((apIndex-16)/max_radio_num)) {
++				snprintf(cmd, sizeof(cmd), "iw %s del", interface_name);
++				_syscmd(cmd, buf, sizeof(buf));
++			}
++		}
++	}
+     }
+     else
+     {
+-        for(apIndex=radioIndex; apIndex<MAX_APS; apIndex+=max_radio_num)
+-        {
+-            if (wifi_GetInterfaceName(apIndex, interface_name) != RETURN_OK)
+-                continue;
+-
+-            snprintf(cmd, sizeof(cmd), "cat %s | grep %s= | cut -d'=' -f2", VAP_STATUS_FILE, interface_name);
+-            _syscmd(cmd, buf, sizeof(buf));
+-            if(*buf == '1') {
+-                if (!(apIndex/max_radio_num)) {
+-                    if (single_wiphy)
+-                        snprintf(cmd, sizeof(cmd), "iw phy0 interface add %s type __ap radios %d", interface_name, radioIndex);
+-                    else
+-                        snprintf(cmd, sizeof(cmd), "iw phy%d interface add %s type __ap", phyId, interface_name);
+-                    ret = _syscmd(cmd, buf, sizeof(buf));
+-                    if ( ret == RETURN_ERR) {
+-                        fprintf(stderr, "VAP interface creation failed\n");
+-                        continue;
+-                    }
+-                }
+-                if (single_wiphy)
+-                    snprintf(cmd, sizeof(cmd), "hostapd_cli -i global raw ADD bss_config=phy0.%d:/nvram/hostapd%d.conf",
+-                             radioIndex, apIndex);
+-                else
+-                    snprintf(cmd, sizeof(cmd), "hostapd_cli -i global raw ADD bss_config=phy%d:/nvram/hostapd%d.conf",
+-                             phyId, apIndex);
+-                _syscmd(cmd, buf, sizeof(buf));
+-                if(strncmp(buf, "OK", 2))
+-                    fprintf(stderr, "Could not detach %s from hostapd daemon", interface_name);
+-            }
+-        }
++	    if(radioIndex<2){
++		    for(apIndex=radioIndex; apIndex<16; apIndex+=2)
++		    {
++			    if (wifi_GetInterfaceName(apIndex, interface_name) != RETURN_OK)
++				    continue;
++			    
++			    snprintf(cmd, sizeof(cmd), "cat %s | grep %s= | cut -d'=' -f2", VAP_STATUS_FILE, interface_name);
++			    _syscmd(cmd, buf, sizeof(buf));
++			    if(*buf == '1') {
++				    if (!(apIndex/max_radio_num)) {
++					    if (single_wiphy){
++						    snprintf(cmd, sizeof(cmd), "iw phy0 interface add %s type __ap radios %d", interface_name, radioIndex);
++					    }
++					    else
++						    snprintf(cmd, sizeof(cmd), "iw phy%d interface add %s type __ap", phyId, interface_name);
++					    ret = _syscmd(cmd, buf, sizeof(buf));
++					    if ( ret == RETURN_ERR) {
++						    fprintf(stderr, "VAP interface creation failed\n");
++						    continue;
++					    }
++				    }
++				    if (single_wiphy)
++					    snprintf(cmd, sizeof(cmd), "hostapd_cli -i global raw ADD bss_config=phy0.%d:/nvram/hostapd%d.conf", radioIndex, apIndex);
++				    else
++					    snprintf(cmd, sizeof(cmd), "hostapd_cli -i global raw ADD bss_config=phy%d:/nvram/hostapd%d.conf", phyId, apIndex);
++				    _syscmd(cmd, buf, sizeof(buf));
++				    if(strncmp(buf, "OK", 2))
++					    fprintf(stderr, "Could not detach %s from hostapd daemon", interface_name);
++			    }
++		    }
++	    }
++	    else if(radioIndex==2){
++		    for(apIndex=16; apIndex<MAX_APS; apIndex++){
++			    if (wifi_GetInterfaceName(apIndex, interface_name) != RETURN_OK)
++				    continue;
++
++			    snprintf(cmd, sizeof(cmd), "cat %s | grep %s= | cut -d'=' -f2", VAP_STATUS_FILE, interface_name);
++			    _syscmd(cmd, buf, sizeof(buf));
++			    if(*buf == '1') {
++				    if (!((apIndex-16)/max_radio_num)) {
++					    if (single_wiphy)
++						    snprintf(cmd, sizeof(cmd), "iw phy0 interface add %s type __ap radios %d", interface_name, radioIndex);
++					    else
++						    snprintf(cmd, sizeof(cmd), "iw phy%d interface add %s type __ap", phyId, interface_name);
++					    ret = _syscmd(cmd, buf, sizeof(buf));
++					    if ( ret == RETURN_ERR) {
++						    fprintf(stderr, "VAP interface creation failed\n");
++						    continue;
++					    }
++				    }
++				    if (single_wiphy)
++					    snprintf(cmd, sizeof(cmd), "hostapd_cli -i global raw ADD bss_config=phy0.%d:/nvram/hostapd%d.conf", radioIndex, apIndex);
++				    else
++					    snprintf(cmd, sizeof(cmd), "hostapd_cli -i global raw ADD bss_config=phy%d:/nvram/hostapd%d.conf", phyId, apIndex);
++				    _syscmd(cmd, buf, sizeof(buf));
++				    if(strncmp(buf, "OK", 2))
++					    fprintf(stderr, "Could not detach %s from hostapd daemon", interface_name);
++			    }
++		    }
++	    }
+     }
+ 
+     WIFI_ENTRY_EXIT_DEBUG("Exiting %s:%d\n",__func__, __LINE__);
+@@ -1443,7 +1560,12 @@ INT wifi_getRadioIfName(INT radioIndex, CHAR *output_string) //Tr181
+ {
+     if (NULL == output_string || radioIndex>=MAX_NUM_RADIOS || radioIndex<0)
+         return RETURN_ERR;
+-    return wifi_GetInterfaceName(radioIndex, output_string);
++    if(radioIndex==2){
++	    strncpy(output_string, "wifi16", sizeof(output_string));
++	    return RETURN_OK;
++    }
++    else
++	    return wifi_GetInterfaceName(radioIndex, output_string);
+ }
+ 
+ //Get the maximum PHY bit rate supported by this interface. eg: "216.7 Mb/s", "1.3 Gb/s"
+@@ -1596,7 +1718,10 @@ INT wifi_getRadioSupportedFrequencyBands(INT radioIndex, CHAR *output_string)	//
+     if (NULL == output_string)
+         return RETURN_ERR;
+ 
+-    band = wifi_index_to_band(radioIndex);
++    if(radioIndex==2)
++	    band = band_6;
++    else
++	    band = wifi_index_to_band(radioIndex);
+ 
+     memset(output_string, 0, 10);
+     if (band == band_2_4)
+@@ -1695,7 +1820,13 @@ INT wifi_getRadioOperatingFrequencyBand(INT radioIndex, CHAR *output_string) //T
+     WIFI_ENTRY_EXIT_DEBUG("Inside %s:%d\n",__func__, __LINE__);
+     if (NULL == output_string)
+         return RETURN_ERR;
+-    band = wifi_index_to_band(radioIndex);
++
++    if(radioIndex == 2) {
++	    snprintf(output_string, 64, "6GHz");
++	    return RETURN_OK;
++    }
++    else
++	    band = wifi_index_to_band(radioIndex);
+ 
+     if (band == band_2_4) 
+         snprintf(output_string, 64, "2.4GHz");
+@@ -1801,7 +1932,10 @@ INT wifi_getRadioSupportedStandards(INT radioIndex, CHAR *output_string) //Tr181
+     if (NULL == output_string)
+         return RETURN_ERR;
+ 
+-    band = wifi_index_to_band(radioIndex);
++    if (radioIndex==2)
++	    band=band_6;
++    else
++	    band = wifi_index_to_band(radioIndex);
+     switch (band) {
+         case band_2_4:
+             band_remap = 1;
+@@ -1965,11 +2099,17 @@ INT wifi_getRadioMode(INT radioIndex, CHAR *output_string, UINT *pureMode)
+         return RETURN_ERR;
+ 
+     // grep all of the ieee80211 protocol config set to 1
+-    snprintf(config_file, sizeof(config_file), "%s%d.conf", CONFIG_PREFIX, radioIndex);
++    if(radioIndex==2)
++	    snprintf(config_file, sizeof(config_file), "%s16.conf", CONFIG_PREFIX);
++    else
++	    snprintf(config_file, sizeof(config_file), "%s%d.conf", CONFIG_PREFIX, radioIndex);
+     snprintf(cmd, sizeof(cmd), "cat %s | grep -E \"ieee.*=1\" | cut -d '=' -f1 | sed \"s/ieee80211\\.*/\1/\"", config_file);
+     _syscmd(cmd, buf, sizeof(buf));
+ 
+-    band = wifi_index_to_band(radioIndex);
++    if(radioIndex==2)
++	    band=band_6;
++    else
++	    band = wifi_index_to_band(radioIndex);
+     // puremode is a bit map
+     *pureMode = 0;
+     if (band == band_2_4) {
+@@ -2133,7 +2273,10 @@ INT wifi_setRadioMode(INT radioIndex, CHAR *channelMode, UINT pureMode)
+     list[1].name = "ieee80211ac";
+     list[2].name = "ieee80211ax";
+     list[3].name = "ieee80211be";
+-    snprintf(config_file, sizeof(config_file), "%s%d.conf", CONFIG_PREFIX, radioIndex);
++    if(radioIndex==2)
++	    snprintf(config_file, sizeof(config_file), "%s16.conf", CONFIG_PREFIX);
++    else
++	    snprintf(config_file, sizeof(config_file), "%s%d.conf", CONFIG_PREFIX, radioIndex);
+ 
+     // check the bit map from n to ax, and set hostapd config
+     if (pureMode & WIFI_MODE_N)
+@@ -2179,7 +2322,10 @@ INT wifi_setRadioMode(INT radioIndex, CHAR *channelMode, UINT pureMode)
+     writeBandWidth(radioIndex, bandwidth);
+     wifi_setRadioOperatingChannelBandwidth(radioIndex, bandwidth);
+ 
+-    wifi_reloadAp(radioIndex);
++    if(radioIndex==2)
++	    wifi_reloadAp(16);
++    else
++	    wifi_reloadAp(radioIndex);
+     WIFI_ENTRY_EXIT_DEBUG("Exiting %s:%d\n",__func__, __LINE__);
+ 
+     return RETURN_OK;
+@@ -2194,7 +2340,10 @@ INT wifi_setRadioHwMode(INT radioIndex, CHAR *hw_mode) {
+ 
+     WIFI_ENTRY_EXIT_DEBUG("Inside %s:%d\n", __func__, __LINE__);
+ 
+-    band = wifi_index_to_band(radioIndex);
++    if(radioIndex==2)
++	    band=band_6;
++    else
++	    band = wifi_index_to_band(radioIndex);
+ 
+     if (strncmp(hw_mode, "a", 1) == 0 && (band != band_5 && band != band_6))
+         return RETURN_ERR;
+@@ -2203,7 +2352,10 @@ INT wifi_setRadioHwMode(INT radioIndex, CHAR *hw_mode) {
+     else if ((strncmp(hw_mode, "a", 1) && strncmp(hw_mode, "b", 1) && strncmp(hw_mode, "g", 1)) || band == band_invalid)
+         return RETURN_ERR;
+ 
+-    sprintf(config_file, "%s%d.conf", CONFIG_PREFIX, radioIndex);
++    if(radioIndex==2)
++	    sprintf(config_file, "%s16.conf", CONFIG_PREFIX);
++    else
++	    sprintf(config_file, "%s%d.conf", CONFIG_PREFIX, radioIndex);
+     params.name = "hw_mode";
+     params.value = hw_mode;
+     wifi_hostapdWrite(config_file, &params, 1);
+@@ -2238,9 +2390,15 @@ INT wifi_setNoscan(INT radioIndex, CHAR *noscan)
+ 
+     WIFI_ENTRY_EXIT_DEBUG("Inside %s:%d\n", __func__, __LINE__);
+ 
+-    band = wifi_index_to_band(radioIndex);
++    if(radioIndex==2){
++	    band=band_6;
++	    sprintf(config_file, "%s16.conf", CONFIG_PREFIX);
++    }
++    else{
++	    band = wifi_index_to_band(radioIndex);
++	    sprintf(config_file, "%s%d.conf", CONFIG_PREFIX, radioIndex);
++    }
+ 
+-    sprintf(config_file, "%s%d.conf", CONFIG_PREFIX, radioIndex);
+     params.name = "noscan";
+     params.value = noscan;
+     wifi_hostapdWrite(config_file, &params, 1);
+@@ -2263,7 +2421,10 @@ INT wifi_getRadioPossibleChannels(INT radioIndex, CHAR *output_string)	//RDKB
+     int phyId = 0, band_remap = 0, range_remap = 0;
+     wifi_band band = band_invalid;
+ 
+-    band = wifi_index_to_band(radioIndex);
++    if(radioIndex ==2)
++	    band = band_6;
++    else
++	    band = wifi_index_to_band(radioIndex);
+     switch (band) {
+         case band_2_4:
+             band_remap = 1;
+@@ -2321,8 +2482,10 @@ INT wifi_getRadioChannelsInUse(INT radioIndex, CHAR *output_string)	//RDKB
+     if (NULL == output_string)
+         return RETURN_ERR;
+ 
+-    if (wifi_GetInterfaceName(radioIndex, interface_name) != RETURN_OK)
+-        return RETURN_ERR;
++    if(radioIndex == 2)
++	    strcpy(interface_name,"wifi16");
++    else if (wifi_GetInterfaceName(radioIndex, interface_name) != RETURN_OK)
++	    return RETURN_ERR;
+     sprintf(cmd, "iw %s info | grep channel | sed -e 's/[^0-9 ]//g'", interface_name);
+     _syscmd(cmd, buf, sizeof(buf));
+     if (strlen(buf) == 0) {
+@@ -2338,7 +2501,10 @@ INT wifi_getRadioChannelsInUse(INT radioIndex, CHAR *output_string)	//RDKB
+ 
+     center_channel = ieee80211_frequency_to_channel(center_freq);
+ 
+-    band = wifi_index_to_band(radioIndex);
++    if(radioIndex == 2)
++	    band = band_6;
++    else
++	    band = wifi_index_to_band(radioIndex);
+     if (band == band_2_4 && bandwidth == 40) {
+         sprintf(config_file, "%s%d.conf", CONFIG_PREFIX, radioIndex);
+         memset(buf, 0, sizeof(buf));
+@@ -2378,7 +2544,10 @@ INT wifi_getRadioChannel(INT radioIndex,ULONG *output_ulong)	//RDKB
+     if (output_ulong == NULL)
+         return RETURN_ERR;
+ 
+-    snprintf(config_file, sizeof(config_file), "%s%d.conf", CONFIG_PREFIX, radioIndex);
++    if(radioIndex == 2)
++	    snprintf(config_file, sizeof(config_file), "%s16.conf", CONFIG_PREFIX);
++    else
++	    snprintf(config_file, sizeof(config_file), "%s%d.conf", CONFIG_PREFIX, radioIndex);
+     wifi_hostapdRead(config_file, "channel", channel_str, sizeof(channel_str));
+ 
+     *output_ulong = strtoul(channel_str, NULL, 10);
+@@ -2415,12 +2584,17 @@ INT wifi_storeprevchanval(INT radioIndex)
+     char buf[256] = {0};
+     char output[4]={'\0'};
+     char config_file[MAX_BUF_SIZE] = {0};
+-    sprintf(config_file,"%s%d.conf",CONFIG_PREFIX,radioIndex);
++    if(radioIndex == 2)
++	    sprintf(config_file,"%s16.conf",CONFIG_PREFIX);
++    else
++	    sprintf(config_file,"%s%d.conf",CONFIG_PREFIX,radioIndex);
+     wifi_hostapdRead(config_file, "channel", output, sizeof(output));
+     if(radioIndex == 0)
+         sprintf(buf,"%s%s%s","echo ",output," > /var/prevchanval2G_AutoChannelEnable");
+     else if(radioIndex == 1)
+         sprintf(buf,"%s%s%s","echo ",output," > /var/prevchanval5G_AutoChannelEnable");
++    else if(radioIndex == 2)
++        sprintf(buf,"%s%s%s","echo ",output," > /var/prevchanval6G_AutoChannelEnable");
+     system(buf);
+     Radio_flag = FALSE;
+     return RETURN_OK;
+@@ -2458,10 +2632,15 @@ INT wifi_setRadioChannel(INT radioIndex, ULONG channel)	//RDKB	//AP only
+     list.name = "channel";
+     list.value = str_channel;
+     wifi_getMaxRadioNumber(&max_radio_num);
+-    for(int i=0; i<=MAX_APS/max_radio_num;i++)
++    for(int i=0; i<MAX_APS/max_radio_num;i++)
+     {
+-        sprintf(config_file, "%s%d.conf", CONFIG_PREFIX, radioIndex+(max_radio_num*i));
+-        wifi_hostapdWrite(config_file, &list, 1);
++	    if(radioIndex<2)
++		    sprintf(config_file, "%s%d.conf", CONFIG_PREFIX, radioIndex+((max_radio_num-1)*i));
++	    else{
++		    int j=i+16;
++		    sprintf(config_file, "%s%d.conf", CONFIG_PREFIX, j);
++	    }
++	    wifi_hostapdWrite(config_file, &list, 1);
+     }
+ 
+     WIFI_ENTRY_EXIT_DEBUG("Exiting %s:%d\n", __func__, __LINE__);
+@@ -2478,7 +2657,10 @@ INT wifi_setRadioCenterChannel(INT radioIndex, ULONG channel)
+     wifi_band band = band_invalid;
+     bool eht_support = FALSE;
+ 
+-    band = wifi_index_to_band(radioIndex);
++    if(radioIndex==2)
++	    band = band_6;
++    else
++	    band = wifi_index_to_band(radioIndex);
+     if (band == band_2_4)
+         return RETURN_OK;
+ 
+@@ -2495,13 +2677,18 @@ INT wifi_setRadioCenterChannel(INT radioIndex, ULONG channel)
+     list[2].value = str_idx;
+ 
+     wifi_getMaxRadioNumber(&max_num_radios);
+-    for(int i=0; i<=MAX_APS/max_num_radios; i++)
+-    {
+-        snprintf(config_file, sizeof(config_file), "%s%d.conf", CONFIG_PREFIX, radioIndex+(max_num_radios*i));
+-        if (eht_support)
+-            wifi_hostapdWrite(config_file, list, 3);
+-        else
+-            wifi_hostapdWrite(config_file, list, 2);
++    for(int i=0; i<MAX_APS/max_num_radios; i++)
++    {
++	    if(radioIndex<2)
++		    snprintf(config_file, sizeof(config_file), "%s%d.conf", CONFIG_PREFIX, radioIndex+((max_num_radios-1)*i));
++	    else if(radioIndex==2){
++		    int j=i+16;
++		    snprintf(config_file, sizeof(config_file), "%s%d.conf", CONFIG_PREFIX, j);
++	    }
++	    if (eht_support)
++		    wifi_hostapdWrite(config_file, list, 3);
++	    else
++		    wifi_hostapdWrite(config_file, list, 2);
+     }
+ 
+     return RETURN_OK;
+@@ -2574,9 +2761,7 @@ INT wifi_factoryResetAP(int apIndex)
+     sprintf(ap_config_file, "%s%d.conf", CONFIG_PREFIX, apIndex);
+     sprintf(cmd, "rm %s && sh /lib/rdk/hostapd-init.sh", ap_config_file);
+     _syscmd(cmd, buf, sizeof(buf));
+-    wifi_getMaxRadioNumber(&max_radio_num);
+-    if (apIndex <= max_radio_num)       // The ap is default radio interface, we should default up it.
+-        wifi_setApEnable(apIndex, TRUE);
++    wifi_setApEnable(apIndex, TRUE);
+ 
+     WIFI_ENTRY_EXIT_DEBUG("Exiting %s:%d\n",__func__, __LINE__);
+ 
+@@ -2644,7 +2829,10 @@ INT wifi_getRadioDfsSupport(INT radioIndex, BOOL *output_bool) //Tr181
+         return RETURN_ERR;
+     *output_bool=FALSE;
+ 
+-    band = wifi_index_to_band(radioIndex);
++    if(radioIndex==2)
++	    band=band_6;
++    else
++	    band = wifi_index_to_band(radioIndex);
+     if (band == band_5)
+         *output_bool = TRUE;
+     return RETURN_OK;
+@@ -2738,7 +2926,10 @@ INT wifi_setRadioDfsEnable(INT radioIndex, BOOL enable)	//Tr181
+ 
+     params.name = "acs_exclude_dfs";
+     params.value = enable?"0":"1";
+-    sprintf(config_file, "%s%d.conf", CONFIG_PREFIX, radioIndex);
++    if(radioIndex==2)
++	    snprintf(config_file, sizeof(config_file), "%s16.conf", CONFIG_PREFIX);
++    else
++	    sprintf(config_file, "%s%d.conf", CONFIG_PREFIX, radioIndex);
+     wifi_hostapdWrite(config_file, &params, 1);
+     wifi_hostapdProcessUpdate(radioIndex, &params, 1);
+ 
+@@ -2780,7 +2971,10 @@ INT getEHT320ChannelBandwidthSet(int radioIndex, int *BandwidthSet)
+     char config_file[32] = {0};
+     char buf[32] = {0};
+ 
+-    snprintf(config_file, sizeof(config_file), "%s%d.conf", CONFIG_PREFIX, radioIndex);
++    if(radioIndex == 2)
++	    snprintf(config_file, sizeof(config_file), "%s16.conf", CONFIG_PREFIX);
++    else
++	    snprintf(config_file, sizeof(config_file), "%s%d.conf", CONFIG_PREFIX, radioIndex);
+     wifi_hostapdRead(config_file, "eht_oper_centr_freq_seg0_idx", buf, sizeof(buf));
+ 
+     center_channel = strtoul(buf, NULL, 10);
+@@ -2815,7 +3009,10 @@ INT wifi_getRadioOperatingChannelBandwidth(INT radioIndex, CHAR *output_string)
+     if (radio_enable != TRUE)
+         return RETURN_OK;
+ 
+-    band = wifi_index_to_band(radioIndex);
++    if(radioIndex == 2)
++	    band = band_6;
++    else
++	    band = wifi_index_to_band(radioIndex);
+     if (band == band_2_4) {
+         wifi_getRadioExtChannel(radioIndex, extchannel);
+         if (strncmp(extchannel, "Auto", 4) == 0)    // Auto means that we did not set ht_capab HT40+/-
+@@ -2823,9 +3020,13 @@ INT wifi_getRadioOperatingChannelBandwidth(INT radioIndex, CHAR *output_string)
+         else
+             snprintf(output_string, 64, "40MHz");
+ 
+-    } else {
+-        snprintf(config_file, sizeof(config_file), "%s%d.conf", CONFIG_PREFIX, radioIndex);
+-        wifi_hostapdRead(config_file, "he_oper_chwidth", buf, sizeof(buf));
++    } 
++    else {
++	    if(radioIndex == 2)
++		    snprintf(config_file, sizeof(config_file), "%s16.conf", CONFIG_PREFIX);
++	    else
++		    snprintf(config_file, sizeof(config_file), "%s%d.conf", CONFIG_PREFIX, radioIndex);
++	    wifi_hostapdRead(config_file, "he_oper_chwidth", buf, sizeof(buf));
+         if (strncmp(buf, "0", 1) == 0) {        // Check whether we set central channel
+             wifi_hostapdRead(config_file, "he_oper_centr_freq_seg0_idx", buf, sizeof(buf));
+             if (strncmp(buf, "0", 1) == 0)
+@@ -2898,13 +3099,18 @@ INT wifi_setRadioOperatingChannelBandwidth(INT radioIndex, CHAR *bandwidth) //Tr
+         params[2].value = set_value;
+ 
+     wifi_getMaxRadioNumber(&max_radio_num);
+-    for(int i=0; i<=MAX_APS/max_radio_num; i++)
+-    {
+-        snprintf(config_file, sizeof(config_file), "%s%d.conf", CONFIG_PREFIX, radioIndex+(max_radio_num*i));
+-        if (eht_support == TRUE)
+-            wifi_hostapdWrite(config_file, params, 3);
+-        else
+-            wifi_hostapdWrite(config_file, params, 2);
++    for(int i=0; i<MAX_APS/max_radio_num; i++)
++    {
++	    if(radioIndex==2){
++		    int j=i+16;
++		    snprintf(config_file, sizeof(config_file), "%s%d.conf", CONFIG_PREFIX, j);
++	    }
++	    else if(radioIndex<2)
++		    snprintf(config_file, sizeof(config_file), "%s%d.conf", CONFIG_PREFIX, radioIndex+((max_radio_num-1)*i));
++	    if (eht_support == TRUE)
++		    wifi_hostapdWrite(config_file, params, 3);
++	    else
++		    wifi_hostapdWrite(config_file, params, 2);
+     }
+ 
+     WIFI_ENTRY_EXIT_DEBUG("Exiting %s:%d\n",__func__, __LINE__);
+@@ -2935,11 +3141,17 @@ INT wifi_getRadioExtChannel(INT radioIndex, CHAR *output_string) //Tr181
+     if (output_string == NULL)
+         return RETURN_ERR;
+ 
+-    band = wifi_index_to_band(radioIndex);
++    if(radioIndex == 2)
++	    band = band_6;
++    else
++	    band = wifi_index_to_band(radioIndex);
+     if (band == band_invalid)
+         return RETURN_ERR;
+ 
+-    snprintf(config_file, sizeof(config_file), "%s%d.conf", CONFIG_PREFIX, radioIndex);
++    if(radioIndex == 2)
++	    snprintf(config_file, sizeof(config_file), "%s16.conf", CONFIG_PREFIX);
++    else
++	    snprintf(config_file, sizeof(config_file), "%s%d.conf", CONFIG_PREFIX, radioIndex);
+ 
+     snprintf(output_string, 64, "Auto");
+     wifi_halgetRadioExtChannel(config_file, output_string);
+@@ -2958,7 +3170,10 @@ INT wifi_RemoveRadioExtChannel(INT radioIndex, CHAR *ext_str)
+     int max_radio_num =0;
+     bool stbcEnable = FALSE;
+ 
+-    sprintf(config_file, "%s%d.conf", CONFIG_PREFIX, radioIndex);
++    if(radioIndex==2)
++	    sprintf(config_file, "%s16.conf", CONFIG_PREFIX);
++    else
++	    sprintf(config_file, "%s%d.conf", CONFIG_PREFIX, radioIndex);
+     snprintf(cmd, sizeof(cmd), "cat %s | grep STBC", config_file);
+     _syscmd(cmd, buf, sizeof(buf));
+     if (strlen(buf) != 0)
+@@ -2969,10 +3184,15 @@ INT wifi_RemoveRadioExtChannel(INT radioIndex, CHAR *ext_str)
+     params.name = "ht_capab";
+ 
+     wifi_getMaxRadioNumber(&max_radio_num);
+-    for(int i=0; i<=MAX_APS/max_radio_num; i++)
++    for(int i=0; i<MAX_APS/max_radio_num; i++)
+     {
+-        sprintf(config_file, "%s%d.conf", CONFIG_PREFIX, radioIndex+(max_radio_num*i));
+-        wifi_hostapdWrite(config_file, &params, 1);
++	    if(radioIndex<2)
++		    sprintf(config_file, "%s%d.conf", CONFIG_PREFIX, radioIndex+((max_radio_num-1)*i));
++	    else if(radioIndex==2){
++		    int j=i+16;
++		    sprintf(config_file, "%s%d.conf", CONFIG_PREFIX, j);
++	    }
++	    wifi_hostapdWrite(config_file, &params, 1);
+     }
+     wifi_setRadioSTBCEnable(radioIndex, stbcEnable);
+     return RETURN_OK;
+@@ -2993,7 +3213,10 @@ INT wifi_setRadioExtChannel(INT radioIndex, CHAR *string) //Tr181	//AP only
+     params.name = "ht_capab";
+     wifi_band band;
+ 
+-    sprintf(config_file, "%s%d.conf", CONFIG_PREFIX, radioIndex);
++    if(radioIndex == 2)
++	    sprintf(config_file, "%s16.conf", CONFIG_PREFIX);
++    else
++	    sprintf(config_file, "%s%d.conf", CONFIG_PREFIX, radioIndex);
+     snprintf(cmd, sizeof(cmd), "cat %s | grep STBC", config_file);
+     _syscmd(cmd, buf, sizeof(buf));
+     if (strlen(buf) != 0)
+@@ -3011,7 +3234,10 @@ INT wifi_setRadioExtChannel(INT radioIndex, CHAR *string) //Tr181	//AP only
+     if (bandwidth == 20 || strstr(buf, "80+80") != NULL)
+         return RETURN_ERR;
+ 
+-    band = wifi_index_to_band(radioIndex);
++    if(radioIndex == 2)
++	    band = band_6;
++    else
++	    band = wifi_index_to_band(radioIndex);
+     if (band == band_invalid)
+         return RETURN_ERR;
+ 
+@@ -3039,10 +3265,15 @@ INT wifi_setRadioExtChannel(INT radioIndex, CHAR *string) //Tr181	//AP only
+     params.value = ext_channel;
+ 
+     wifi_getMaxRadioNumber(&max_radio_num);
+-    for(int i=0; i<=MAX_APS/max_radio_num; i++)
++    for(int i=0; i<MAX_APS/max_radio_num; i++)
+     {
+-        sprintf(config_file,"%s%d.conf",CONFIG_PREFIX,radioIndex+(max_radio_num*i));
+-        wifi_hostapdWrite(config_file, &params, 1);
++	    if(radioIndex<2)
++		    sprintf(config_file,"%s%d.conf",CONFIG_PREFIX,radioIndex+((max_radio_num-1)*i));
++	    else if(radioIndex==2){
++		    int j=i+16;
++		    sprintf(config_file,"%s%d.conf",CONFIG_PREFIX, j);
++	    }
++	    wifi_hostapdWrite(config_file, &params, 1);
+     }
+     wifi_setRadioSTBCEnable(radioIndex, stbcEnable);
+ 
+@@ -3118,8 +3349,10 @@ INT wifi_getRadioMCS(INT radioIndex, INT *output_int) //Tr181
+     WIFI_ENTRY_EXIT_DEBUG("Inside %s:%d\n",__func__, __LINE__);
+     if(output_int == NULL)
+         return RETURN_ERR;
+-    snprintf(mcs_file, sizeof(mcs_file), "%s%d.txt", MCS_FILE, radioIndex);
+-
++    if(radioIndex==2)
++	    snprintf(mcs_file, sizeof(mcs_file), "%s16.txt", MCS_FILE);
++    else
++	    snprintf(mcs_file, sizeof(mcs_file), "%s%d.txt", MCS_FILE, radioIndex);
+     snprintf(cmd, sizeof(cmd), "cat %s 2> /dev/null", mcs_file);
+     _syscmd(cmd, buf, sizeof(buf));
+     if (strlen(buf) > 0)
+@@ -3156,7 +3389,10 @@ INT wifi_setRadioMCS(INT radioIndex, INT MCS) //Tr181
+ 
+     WIFI_ENTRY_EXIT_DEBUG("Inside %s:%d\n",__func__, __LINE__);
+ 
+-    snprintf(config_file, sizeof(config_file), "%s%d.conf", CONFIG_PREFIX, radioIndex);
++    if(radioIndex==2)
++	    snprintf(config_file, sizeof(config_file), "%s16.conf", CONFIG_PREFIX);
++    else
++	    snprintf(config_file, sizeof(config_file), "%s%d.conf", CONFIG_PREFIX, radioIndex);
+ 
+     // -1 means auto
+     if (MCS > 15 || MCS < -1) {
+@@ -3178,7 +3414,10 @@ INT wifi_setRadioMCS(INT radioIndex, INT MCS) //Tr181
+     wifi_hostapdProcessUpdate(radioIndex, &set_config, 1);
+ 
+     // For pass tdk test, we need to record last MCS setting. No matter whether it is effective or not.
+-    snprintf(mcs_file, sizeof(mcs_file), "%s%d.txt", MCS_FILE, radioIndex);
++    if(radioIndex==2)
++	    snprintf(mcs_file, sizeof(mcs_file), "%s16.txt", MCS_FILE);
++    else
++	    snprintf(mcs_file, sizeof(mcs_file), "%s%d.txt", MCS_FILE, radioIndex);
+     f = fopen(mcs_file, "w");
+     if (f == NULL) {
+         fprintf(stderr, "%s: fopen failed\n", __func__);
+@@ -3284,8 +3523,10 @@ INT wifi_setRadioTransmitPower(INT radioIndex, ULONG TransmitPower)	//RDKB
+ 
+     WIFI_ENTRY_EXIT_DEBUG("Inside %s:%d\n",__func__, __LINE__);
+ 
+-    if (wifi_GetInterfaceName(radioIndex, interface_name) != RETURN_OK)
+-        return RETURN_ERR;
++    if(radioIndex==2)
++	    strcpy(interface_name, "wifi16");
++    else if(wifi_GetInterfaceName(radioIndex, interface_name) != RETURN_OK)
++	    return RETURN_ERR;
+ 
+     // Get the Tx power supported list and check that is the input in the list
+     snprintf(txpower_str, sizeof(txpower_str), "%lu", TransmitPower);
+@@ -3337,7 +3578,10 @@ INT wifi_getRadioIEEE80211hEnabled(INT radioIndex, BOOL *enable) //Tr181
+     if(enable == NULL)
+         return RETURN_ERR;
+ 
+-    sprintf(config_file, "%s%d.conf", CONFIG_PREFIX, radioIndex);
++    if(radioIndex==2)
++	    sprintf(config_file, "%s16.conf", CONFIG_PREFIX);
++    else
++	    sprintf(config_file, "%s%d.conf", CONFIG_PREFIX, radioIndex);
+     wifi_hostapdRead(config_file, "ieee80211h", buf, sizeof(buf));
+ 
+     if (strncmp(buf, "1", 1) == 0)
+@@ -3364,7 +3608,10 @@ INT wifi_setRadioIEEE80211hEnabled(INT radioIndex, BOOL enable)  //Tr181
+         params.value = "0";
+     }
+ 
+-    sprintf(config_file, "%s%d.conf", CONFIG_PREFIX, radioIndex);
++    if(radioIndex==2)
++	    sprintf(config_file, "%s16.conf", CONFIG_PREFIX);
++    else
++	    sprintf(config_file, "%s%d.conf", CONFIG_PREFIX, radioIndex);
+     wifi_hostapdWrite(config_file, &params, 1);
+     
+     wifi_hostapdProcessUpdate(radioIndex, &params, 1);
+@@ -3409,8 +3656,10 @@ INT wifi_getRadioBeaconPeriod(INT radioIndex, UINT *output)
+     if(output == NULL)
+         return RETURN_ERR;
+ 
+-    if (wifi_GetInterfaceName(radioIndex, interface_name) != RETURN_OK)
+-        return RETURN_ERR;
++    if(radioIndex == 2)
++	    strcpy(interface_name, "wifi16");
++    else if(wifi_GetInterfaceName(radioIndex, interface_name) != RETURN_OK)
++	    return RETURN_ERR;
+     snprintf(cmd, sizeof(cmd),  "hostapd_cli -i %s status | grep beacon_int | cut -d '=' -f2 | tr -d '\n'", interface_name);
+     _syscmd(cmd, buf, sizeof(buf));
+     *output = atoi(buf);
+@@ -3433,7 +3682,10 @@ INT wifi_setRadioBeaconPeriod(INT radioIndex, UINT BeaconPeriod)
+     snprintf(buf, sizeof(buf), "%u", BeaconPeriod);
+     params.value = buf;
+ 
+-    sprintf(config_file, "%s%d.conf", CONFIG_PREFIX, radioIndex);
++    if(radioIndex==2)
++	    sprintf(config_file, "%s16.conf", CONFIG_PREFIX);
++    else
++	    sprintf(config_file, "%s%d.conf", CONFIG_PREFIX, radioIndex);
+     wifi_hostapdWrite(config_file, &params, 1);
+     
+     wifi_hostapdProcessUpdate(radioIndex, &params, 1);
+@@ -3453,7 +3705,10 @@ INT wifi_getRadioBasicDataTransmitRates(INT radioIndex, CHAR *output)
+     WIFI_ENTRY_EXIT_DEBUG("Inside %s:%d\n",__func__, __LINE__);
+     if (NULL == output)
+         return RETURN_ERR;
+-    sprintf(config_file,"%s%d.conf",CONFIG_PREFIX,radioIndex);
++    if(radioIndex==2)
++	    sprintf(config_file,"%s16.conf",CONFIG_PREFIX);
++    else
++	    sprintf(config_file,"%s%d.conf",CONFIG_PREFIX,radioIndex);
+     wifi_hostapdRead(config_file,"basic_rates",temp_TransmitRates,64);
+  
+     if (strlen(temp_TransmitRates) == 0) {  // config not set, use supported rate
+@@ -3495,7 +3750,12 @@ INT wifi_setRadioBasicDataTransmitRates(INT radioIndex, CHAR *TransmitRates)
+     int flag=0, i=0;
+     struct params params={'\0'};
+     char config_file[MAX_BUF_SIZE] = {0};
+-    wifi_band band = wifi_index_to_band(radioIndex);
++    wifi_band band;
++
++    if(radioIndex==2)
++	    band = band_6;
++    else
++	    band = wifi_index_to_band(radioIndex);
+ 
+     WIFI_ENTRY_EXIT_DEBUG("Inside %s:%d\n",__func__, __LINE__);
+     if(NULL == TransmitRates)
+@@ -3581,7 +3841,10 @@ INT wifi_setRadioBasicDataTransmitRates(INT radioIndex, CHAR *TransmitRates)
+     wifi_dbg_printf("\n%s:",__func__);
+     wifi_dbg_printf("\nparams.value=%s\n",params.value);
+     wifi_dbg_printf("\n******************Transmit rates=%s\n",TransmitRates);
+-    sprintf(config_file,"%s%d.conf",CONFIG_PREFIX,radioIndex);
++    if(radioIndex==2)
++	    sprintf(config_file,"%s16.conf",CONFIG_PREFIX);
++    else
++	    sprintf(config_file,"%s%d.conf",CONFIG_PREFIX,radioIndex);
+     wifi_hostapdWrite(config_file,&params,1);
+     WIFI_ENTRY_EXIT_DEBUG("Exiting %s:%d\n",__func__, __LINE__);
+     return RETURN_OK;
+@@ -3756,24 +4019,47 @@ INT wifi_getRadioTrafficStats2(INT radioIndex, wifi_radioTrafficStats2_t *output
+ 
+ 	memset(output_struct, 0, sizeof(wifi_radioTrafficStats2_t));
+ 
+-	for(apIndex = radioIndex; apIndex < MAX_APS; apIndex += max_radio_num) {
+-	    if (wifi_GetInterfaceName(apIndex, interface_name) != RETURN_OK)
+-	        continue;
+-	    wifi_getApEnable(radioIndex, &iface_status);
+-
+-	    if (iface_status == TRUE)
+-	        wifi_halGetIfStats(interface_name, &radioTrafficStats);
+-	    else
+-	        wifi_halGetIfStatsNull(&radioTrafficStats);     // just set some transmission statistic value to 0
+-
+-		    output_struct->radio_BytesSent += radioTrafficStats.radio_BytesSent;
+-		    output_struct->radio_BytesReceived += radioTrafficStats.radio_BytesReceived;
+-		    output_struct->radio_PacketsSent += radioTrafficStats.radio_PacketsSent;
+-		    output_struct->radio_PacketsReceived += radioTrafficStats.radio_PacketsReceived;
+-		    output_struct->radio_ErrorsSent += radioTrafficStats.radio_ErrorsSent;
+-		    output_struct->radio_ErrorsReceived += radioTrafficStats.radio_ErrorsReceived;
+-		    output_struct->radio_DiscardPacketsSent += radioTrafficStats.radio_DiscardPacketsSent;
+-		    output_struct->radio_DiscardPacketsReceived += radioTrafficStats.radio_DiscardPacketsReceived;
++	if(radioIndex<2){
++		for(apIndex = radioIndex; apIndex < MAX_APS/max_radio_num; apIndex += (max_radio_num-1)) {
++			if (wifi_GetInterfaceName(apIndex, interface_name) != RETURN_OK)
++				continue;
++			wifi_getApEnable(radioIndex, &iface_status);
++			
++			if (iface_status == TRUE)
++				wifi_halGetIfStats(interface_name, &radioTrafficStats);
++			else
++				wifi_halGetIfStatsNull(&radioTrafficStats);     // just set some transmission statistic value to 0
++
++			output_struct->radio_BytesSent += radioTrafficStats.radio_BytesSent;
++			output_struct->radio_BytesReceived += radioTrafficStats.radio_BytesReceived;
++			output_struct->radio_PacketsSent += radioTrafficStats.radio_PacketsSent;
++			output_struct->radio_PacketsReceived += radioTrafficStats.radio_PacketsReceived;
++			output_struct->radio_ErrorsSent += radioTrafficStats.radio_ErrorsSent;
++			output_struct->radio_ErrorsReceived += radioTrafficStats.radio_ErrorsReceived;
++			output_struct->radio_DiscardPacketsSent += radioTrafficStats.radio_DiscardPacketsSent;
++			output_struct->radio_DiscardPacketsReceived += radioTrafficStats.radio_DiscardPacketsReceived;
++		}
++	}
++	else if(radioIndex==2){
++		for(apIndex = 16; apIndex < MAX_APS; apIndex++) {
++			if (wifi_GetInterfaceName(apIndex, interface_name) != RETURN_OK)
++				continue;
++			wifi_getApEnable(radioIndex, &iface_status);
++
++			if (iface_status == TRUE)
++				wifi_halGetIfStats(interface_name, &radioTrafficStats);
++			else
++				wifi_halGetIfStatsNull(&radioTrafficStats);     // just set some transmission statistic value to 0
++
++			output_struct->radio_BytesSent += radioTrafficStats.radio_BytesSent;
++			output_struct->radio_BytesReceived += radioTrafficStats.radio_BytesReceived;
++    			output_struct->radio_PacketsSent += radioTrafficStats.radio_PacketsSent;
++    			output_struct->radio_PacketsReceived += radioTrafficStats.radio_PacketsReceived;
++    			output_struct->radio_ErrorsSent += radioTrafficStats.radio_ErrorsSent;
++    			output_struct->radio_ErrorsReceived += radioTrafficStats.radio_ErrorsReceived;
++    			output_struct->radio_DiscardPacketsSent += radioTrafficStats.radio_DiscardPacketsSent;
++    			output_struct->radio_DiscardPacketsReceived += radioTrafficStats.radio_DiscardPacketsReceived;
++		}
+ 	}
+ 
+     output_struct->radio_PLCPErrorCount = 0;				  //The number of packets that were received with a detected Physical Layer Convergence Protocol (PLCP) header error.
+@@ -3846,7 +4132,11 @@ INT wifi_getSSIDRadioIndex(INT ssidIndex, INT *radioIndex)
+         return RETURN_ERR;
+     int max_radio_num = 0;
+     wifi_getMaxRadioNumber(&max_radio_num);
+-    *radioIndex = ssidIndex%max_radio_num;
++    if(ssidIndex<16)
++	    *radioIndex=(ssidIndex%2==0)?0:1;
++    else if(ssidIndex>=16 && ssidIndex<=23)
++	    *radioIndex=2;
++
+     return RETURN_OK;
+ }
+ 
+@@ -3967,7 +4257,10 @@ INT wifi_applySSIDSettings(INT ssidIndex)
+ 
+     wifi_getMaxRadioNumber(&max_radio_num);
+ 
+-    radioIndex = ssidIndex % max_radio_num;
++    if(ssidIndex<16)
++	    radioIndex=(ssidIndex%2==0)?0:1;
++    else if(ssidIndex>=16 && ssidIndex<=23)
++	    radioIndex=2;
+ 
+     wifi_getApEnable(ssidIndex,&status);
+     // Do not apply when ssid index is disabled
+@@ -3988,13 +4281,16 @@ INT wifi_applySSIDSettings(INT ssidIndex)
+      * then all vaps other vaps on same phy are removed
+      * after calling setApEnable to false readd all enabled vaps */
+     for(int i=0; i < MAX_APS/max_radio_num; i++) {
+-        apIndex = max_radio_num*i+radioIndex;
+-        if (wifi_GetInterfaceName(apIndex, interface_name) != RETURN_OK)
+-            continue;
+-        snprintf(cmd, sizeof(cmd), "cat %s | grep %s= | cut -d'=' -f2", VAP_STATUS_FILE, interface_name);
+-        _syscmd(cmd, buf, sizeof(buf));
+-        if(*buf == '1')
+-               wifi_setApEnable(apIndex, true);
++	    if(radioIndex<2)
++		    apIndex = ((max_radio_num-1)*i)+radioIndex;
++	    else if(radioIndex==2)
++		    apIndex = i+16;
++	    if (wifi_GetInterfaceName(apIndex, interface_name) != RETURN_OK)
++		    continue;
++	    snprintf(cmd, sizeof(cmd), "cat %s | grep %s= | cut -d'=' -f2", VAP_STATUS_FILE, interface_name);
++	    _syscmd(cmd, buf, sizeof(buf));
++	    if(*buf == '1')
++		    wifi_setApEnable(apIndex, true);
+     }
+ 
+     return ret;
+@@ -4016,8 +4312,10 @@ int get_noise(int radioIndex, struct channels_noise *channels_noise_arr, int cha
+     ssize_t read = 0;
+     int tmp = 0, arr_index = -1;
+ 
+-    if (wifi_GetInterfaceName(radioIndex, interface_name) != RETURN_OK)
+-        return RETURN_ERR;
++    if(radioIndex==2)
++	    strcpy(interface_name, "wifi16");
++    else if(wifi_GetInterfaceName(radioIndex, interface_name) != RETURN_OK)
++	    return RETURN_ERR;
+     sprintf(cmd, "iw dev %s survey dump | grep 'frequency\\|noise' | awk '{print $2}'", interface_name);
+ 
+     if ((f = popen(cmd, "r")) == NULL) {
+@@ -4067,10 +4365,16 @@ INT wifi_getNeighboringWiFiDiagnosticResult2(INT radioIndex, wifi_neighbor_ap2_t
+ 
+     WIFI_ENTRY_EXIT_DEBUG("Inside %s: %d\n", __func__, __LINE__);
+ 
+-    if (wifi_GetInterfaceName(radioIndex, interface_name) != RETURN_OK)
+-        return RETURN_ERR;
++    if(radioIndex==2){
++	    strcpy(interface_name, "wifi16");
++	    snprintf(file_name, sizeof(file_name), "%s16.txt", ESSID_FILE);
++    }
++    else{
++	    if(wifi_GetInterfaceName(radioIndex, interface_name) != RETURN_OK)
++		    return RETURN_ERR;
++	    snprintf(file_name, sizeof(file_name), "%s%d.txt", ESSID_FILE, radioIndex);
++    }
+ 
+-    snprintf(file_name, sizeof(file_name), "%s%d.txt", ESSID_FILE, radioIndex);
+     f = fopen(file_name, "r");
+     if (f != NULL) {
+         fgets(buf, sizeof(file_name), f);
+@@ -4837,7 +5141,10 @@ INT wifi_setRadioSTBCEnable(INT radioIndex, BOOL STBC_Enable)
+ 
+     WIFI_ENTRY_EXIT_DEBUG("Inside %s:%d\n",__func__, __LINE__);
+ 
+-    band = wifi_index_to_band(radioIndex);
++    if(radioIndex==2)
++	    band=band_6;
++    else
++	    band = wifi_index_to_band(radioIndex);
+     if (band == band_invalid)
+         return RETURN_ERR;
+ 
+@@ -4857,7 +5164,10 @@ INT wifi_setRadioSTBCEnable(INT radioIndex, BOOL STBC_Enable)
+         return RETURN_OK;
+     }
+ 
+-    snprintf(config_file, sizeof(config_file), "%s%d.conf", CONFIG_PREFIX, radioIndex);
++    if(radioIndex==2)
++	    snprintf(config_file, sizeof(config_file), "%s16.conf", CONFIG_PREFIX);
++    else
++	    snprintf(config_file, sizeof(config_file), "%s%d.conf", CONFIG_PREFIX, radioIndex);
+ 
+     // set ht and vht config
+     for (int i = 0; i < iterator; i++) {
+@@ -4895,7 +5205,10 @@ INT wifi_setRadioSTBCEnable(INT radioIndex, BOOL STBC_Enable)
+         wifi_hostapdProcessUpdate(radioIndex, &list, 1);
+     }
+ 
+-    wifi_reloadAp(radioIndex);
++    if(radioIndex==2)
++	    wifi_reloadAp(16);
++    else
++	    wifi_reloadAp(radioIndex);
+ 
+     WIFI_ENTRY_EXIT_DEBUG("Exiting %s:%d\n",__func__, __LINE__);
+     return RETURN_OK;
+@@ -4913,8 +5226,10 @@ INT wifi_getRadioAMSDUEnable(INT radioIndex, BOOL *output_bool)
+     if(output_bool == NULL)
+         return RETURN_ERR;
+ 
+-    if (wifi_GetInterfaceName(radioIndex, interface_name) != RETURN_OK)
+-        return RETURN_ERR;
++    if(radioIndex==2)
++	    strcpy(interface_name, "wifi16");
++    else if(wifi_GetInterfaceName(radioIndex, interface_name) != RETURN_OK)
++	    return RETURN_ERR;
+ 
+     sprintf(cmd, "hostapd_cli -i %s get_amsdu | awk '{print $3}'", interface_name);
+     _syscmd(cmd, buf, sizeof(buf));
+@@ -4943,12 +5258,18 @@ INT wifi_setRadioAMSDUEnable(INT radioIndex, BOOL amsduEnable)
+     if (amsduEnable == enable)
+         return RETURN_OK;
+ 
+-    snprintf(config_file, sizeof(config_file), "%s%d.conf", CONFIG_PREFIX, radioIndex);
++    if(radioIndex==2)
++	    snprintf(config_file, sizeof(config_file), "%s16.conf", CONFIG_PREFIX);
++    else
++	    snprintf(config_file, sizeof(config_file), "%s%d.conf", CONFIG_PREFIX, radioIndex);
+     list.name = "amsdu";
+     list.value = amsduEnable? "1":"0";
+     wifi_hostapdWrite(config_file, &list, 1);
+     wifi_hostapdProcessUpdate(radioIndex, &list, 1);
+-    wifi_reloadAp(radioIndex);
++    if(radioIndex==2)
++	    wifi_reloadAp(16);
++    else
++	    wifi_reloadAp(radioIndex);
+ 
+     WIFI_ENTRY_EXIT_DEBUG("Exiting %s:%d\n",__func__, __LINE__);
+     return RETURN_OK;
+@@ -4982,14 +5303,20 @@ INT fitChainMask(INT radioIndex, int antcount)
+     wifi_band band;
+     struct params list[2] = {0};
+ 
+-    band = wifi_index_to_band(radioIndex);
++    if(radioIndex==2)
++	    band=band_6;
++    else
++	    band = wifi_index_to_band(radioIndex);
+     if (band == band_invalid)
+         return RETURN_ERR;
+ 
+     list[0].name = "he_mu_beamformer";
+     list[1].name = "he_su_beamformer";
+ 
+-    snprintf(config_file, sizeof(config_file), "%s%d.conf", CONFIG_PREFIX, radioIndex);
++    if(radioIndex==2)
++	    snprintf(config_file, sizeof(config_file), "%s16.conf", CONFIG_PREFIX);
++    else
++	    snprintf(config_file, sizeof(config_file), "%s%d.conf", CONFIG_PREFIX, radioIndex);
+     if (antcount == 1) {
+         // remove config about multiple antennas
+         snprintf(cmd, sizeof(cmd), "sed -r -i 's/\\[TX-STBC(-2BY1)?*\\]//' %s", config_file);
+@@ -5205,7 +5532,7 @@ INT wifi_getRadio11nGreenfieldEnable(INT radioIndex, BOOL *output_bool)
+ //Set radio 11n pure mode enable setting
+ INT wifi_setRadio11nGreenfieldEnable(INT radioIndex, BOOL enable)
+ {
+-    return RETURN_ERR;
++    return RETURN_OK;
+ }
+ 
+ //Get radio IGMP snooping enable setting
+@@ -5227,8 +5554,10 @@ INT wifi_getRadioIGMPSnoopingEnable(INT radioIndex, BOOL *output_bool)
+     if (strncmp(buf, "1", 1) == 0)
+         bridge = TRUE;
+ 
+-    if (wifi_GetInterfaceName(radioIndex, interface_name) != RETURN_OK)
+-        return RETURN_ERR;
++    if(radioIndex==2)
++	    strncpy(interface_name, "wifi16", sizeof(interface_name));
++    else if (wifi_GetInterfaceName(radioIndex, interface_name) != RETURN_OK)
++	    return RETURN_ERR;
+     snprintf(cmd, sizeof(cmd),  "cat /sys/devices/virtual/net/%s/brif/%s/multicast_to_unicast", BRIDGE_NAME, interface_name);
+     _syscmd(cmd, buf, sizeof(buf));
+     if (strncmp(buf, "1", 1) == 0)
+@@ -5258,11 +5587,14 @@ INT wifi_setRadioIGMPSnoopingEnable(INT radioIndex, BOOL enable)
+     wifi_getMaxRadioNumber(&max_num_radios);
+     // mac80211
+     for (int i = 0; i < MAX_NUM_VAP_PER_RADIO; i++) {
+-        apIndex = radioIndex + i*max_num_radios;
+-        if (wifi_GetInterfaceName(apIndex, interface_name) != RETURN_OK)
+-            continue;
+-        snprintf(cmd, sizeof(cmd),  "echo %d > /sys/devices/virtual/net/%s/brif/%s/multicast_to_unicast", enable, BRIDGE_NAME, interface_name);
+-        _syscmd(cmd, buf, sizeof(buf));
++	    if(radioIndex<2)
++		    apIndex = radioIndex + i*(max_num_radios-1);
++	    else
++		    apIndex = i+16;
++	    if (wifi_GetInterfaceName(apIndex, interface_name) != RETURN_OK)
++		    continue;
++	    snprintf(cmd, sizeof(cmd),  "echo %d > /sys/devices/virtual/net/%s/brif/%s/multicast_to_unicast", enable, BRIDGE_NAME, interface_name);
++	    _syscmd(cmd, buf, sizeof(buf));
+     }
+     WIFI_ENTRY_EXIT_DEBUG("Exiting %s:%d\n",__func__, __LINE__);
+     return RETURN_OK;
+@@ -5749,7 +6081,10 @@ INT wifi_getApRadioIndex(INT apIndex, INT *output_int)
+         return RETURN_ERR;
+     int max_radio_num = 0;
+     wifi_getMaxRadioNumber(&max_radio_num);
+-    *output_int = apIndex%max_radio_num;
++    if(apIndex<16)
++	    *output_int=(apIndex%2==0)?0:1;
++    else if(apIndex>=16 && apIndex<=23)
++	    *output_int=2;
+     return RETURN_OK;
+ }
+ 
+@@ -5799,7 +6134,7 @@ INT wifi_getApDevicesAssociated(INT apIndex, CHAR *macArray, UINT buf_size)
+     char interface_name[16] = {0};
+     char cmd[128];
+ 
+-    if(apIndex > 3) //Currently supporting apIndex upto 3
++    if(apIndex != 0 || apIndex != 1 || apIndex != 16) //Currently supporting apIndex upto 3
+         return RETURN_ERR;
+     if (wifi_GetInterfaceName(apIndex, interface_name) != RETURN_OK)
+         return RETURN_ERR;
+@@ -6289,6 +6624,7 @@ INT wifi_setApEnable(INT apIndex, BOOL enable)
+     BOOL status;
+     int  max_radio_num = 0;
+     int phyId = 0;
++    int radioIndex;
+ 
+     wifi_getApEnable(apIndex,&status);
+ 
+@@ -6300,12 +6636,17 @@ INT wifi_setApEnable(INT apIndex, BOOL enable)
+         return RETURN_ERR;
+ 
+     if (enable == TRUE) {
+-        int radioIndex = apIndex % max_radio_num;
++	if(apIndex<16)
++		radioIndex=(apIndex%2==0)?0:1;
++	else if(apIndex>=16 && apIndex<=23)
++		radioIndex=2;
++
+         phyId = radio_index_to_phy(radioIndex);
+         sprintf(config_file,"%s%d.conf",CONFIG_PREFIX,apIndex);
+         //Hostapd will bring up this interface
+         sprintf(cmd, "hostapd_cli -i global raw REMOVE %s", interface_name);
+         _syscmd(cmd, buf, sizeof(buf));
++	if(radioIndex<2){
+         if (!(apIndex/max_radio_num)) {
+ 	        sprintf(cmd, "iw %s del", interface_name);
+ 	        _syscmd(cmd, buf, sizeof(buf));
+@@ -6320,6 +6661,23 @@ INT wifi_setApEnable(INT apIndex, BOOL enable)
+         else
+             sprintf(cmd, "hostapd_cli -i global raw ADD bss_config=phy%d:%s", phyId, config_file);
+         _syscmd(cmd, buf, sizeof(buf));
++	}
++	else if(radioIndex==2){
++            if (!((apIndex-16)/max_radio_num)) {
++                sprintf(cmd, "iw %s del", interface_name);
++                _syscmd(cmd, buf, sizeof(buf));
++            if (single_wiphy)
++                sprintf(cmd, "iw phy phy0 interface add %s type __ap radios %d", interface_name, radioIndex);
++            else
++                    sprintf(cmd, "iw phy phy%d interface add %s type __ap", phyId, interface_name);
++                _syscmd(cmd, buf, sizeof(buf));
++        }
++        if (single_wiphy)
++            sprintf(cmd, "hostapd_cli -i global raw ADD bss_config=phy0.%d:%s", radioIndex, config_file);
++        else
++            sprintf(cmd, "hostapd_cli -i global raw ADD bss_config=phy%d:%s", phyId, config_file);
++        _syscmd(cmd, buf, sizeof(buf));
++        }
+     }
+     else {
+         sprintf(cmd, "hostapd_cli -i global raw REMOVE %s", interface_name);
+@@ -6461,7 +6819,10 @@ INT wifi_getApUAPSDCapability(INT apIndex, BOOL *output)
+     WIFI_ENTRY_EXIT_DEBUG("Inside %s:%d\n",__func__, __LINE__);
+ 
+     wifi_getMaxRadioNumber(&max_radio_num);
+-    radioIndex = apIndex % max_radio_num;
++    if(apIndex<16)
++	    radioIndex=(apIndex%2==0)?0:1;
++    else if(apIndex>=16 && apIndex<=23)
++	    radioIndex=2;
+     phyId = radio_index_to_phy(radioIndex);
+     snprintf(cmd, sizeof(cmd), "iw phy phy%d info | grep u-APSD", phyId);
+     _syscmd(cmd,buf, sizeof(buf));
+@@ -8556,9 +8917,11 @@ INT wifi_pushChannel(INT radioIndex, UINT channel)
+     char buf[1024];
+     int  apIndex;
+ 
+-    apIndex=(radioIndex==0)?0:1;	
+-    if (wifi_GetInterfaceName(radioIndex, interface_name) != RETURN_OK)
+-        return RETURN_ERR;
++    apIndex=(radioIndex==0)?0:1;
++    if(radioIndex==2)
++	    strcpy(interface_name, "wifi16");
++    else if(wifi_GetInterfaceName(radioIndex, interface_name) != RETURN_OK)
++	    return RETURN_ERR;
+     snprintf(cmd, sizeof(cmd), "iwconfig %s freq %d",interface_name,channel);
+     _syscmd(cmd,buf, sizeof(buf));
+ 
+@@ -8689,7 +9052,10 @@ INT wifi_getRadioAutoChannelEnable(INT radioIndex, BOOL *output_bool)
+     char config_file[MAX_BUF_SIZE] = {0};
+ 
+     WIFI_ENTRY_EXIT_DEBUG("Inside %s:%d\n",__func__, __LINE__);
+-    sprintf(config_file,"%s%d.conf",CONFIG_PREFIX,radioIndex);
++    if (radioIndex == 2)
++	    sprintf(config_file,"%s16.conf",CONFIG_PREFIX);
++    else
++	    sprintf(config_file,"%s%d.conf",CONFIG_PREFIX,radioIndex);
+     wifi_hostapdRead(config_file,"channel",output,sizeof(output));
+ 
+     *output_bool = (strncmp(output, "0", 1)==0) ?  TRUE : FALSE;
+@@ -8720,7 +9086,10 @@ INT wifi_getRadioSupportedDataTransmitRates(INT wlanIndex,CHAR *output)
+ 
+     if (NULL == output)
+         return RETURN_ERR;
+-    sprintf(config_file,"%s%d.conf",CONFIG_PREFIX,wlanIndex);
++    if(wlanIndex==2)
++	    sprintf(config_file,"%s16.conf",CONFIG_PREFIX);
++    else
++	    sprintf(config_file,"%s%d.conf",CONFIG_PREFIX,wlanIndex);
+     wifi_hostapdRead(config_file,"hw_mode",output,64);
+ 
+     if(strcmp(output,"b")==0)
+@@ -8745,7 +9114,10 @@ INT wifi_getRadioOperationalDataTransmitRates(INT wlanIndex,CHAR *output)
+     if (NULL == output)
+         return RETURN_ERR;
+ 
+-    sprintf(config_file,"%s%d.conf",CONFIG_PREFIX,wlanIndex);
++    if(wlanIndex==2)
++	    sprintf(config_file,"%s16.conf",CONFIG_PREFIX);
++    else
++	    sprintf(config_file,"%s%d.conf",CONFIG_PREFIX,wlanIndex);
+     wifi_hostapdRead(config_file,"supported_rates",output,64);
+ 
+     if (strlen(output) == 0) {
+@@ -8843,7 +9215,10 @@ INT wifi_setRadioOperationalDataTransmitRates(INT wlanIndex,CHAR *output)
+ 
+     wifi_dbg_printf("\n%s:",__func__);
+     wifi_dbg_printf("params.value=%s\n",params.value);
+-    sprintf(config_file,"%s%d.conf",CONFIG_PREFIX,wlanIndex);
++    if(wlanIndex==2)
++	    sprintf(config_file,"%s16.conf",CONFIG_PREFIX);
++    else
++	    sprintf(config_file,"%s%d.conf",CONFIG_PREFIX,wlanIndex);
+     wifi_hostapdWrite(config_file,&params,1);
+     WIFI_ENTRY_EXIT_DEBUG("Exiting %s:%d\n",__func__, __LINE__);
+ 
+@@ -9316,15 +9691,20 @@ INT wifi_pushRadioChannel2(INT radioIndex, UINT channel, UINT channel_width_MHz,
+     int center_freq1 = 0;
+     struct wifi_hal_freq_params params = {0};
+ 
+-    snprintf(config_file, sizeof(config_file), "%s%d.conf", CONFIG_PREFIX, radioIndex);
+-
+-    if (wifi_GetInterfaceName(radioIndex, interface_name) != RETURN_OK)
+-        return RETURN_ERR;
++    if(radioIndex == 2){
++	    snprintf(config_file, sizeof(config_file), "%s16.conf", CONFIG_PREFIX);
++	    strcpy(interface_name, "wifi16");
++	    band = band_6;
++    }
++    else{
++	    snprintf(config_file, sizeof(config_file), "%s%d.conf", CONFIG_PREFIX, radioIndex);
++	    if (wifi_GetInterfaceName(radioIndex, interface_name) != RETURN_OK)
++		    return RETURN_ERR;
++	    band = wifi_index_to_band(radioIndex);
++    }
+ 
+     WIFI_ENTRY_EXIT_DEBUG("Inside %s:%d\n",__func__, __LINE__);
+ 
+-    band = wifi_index_to_band(radioIndex);
+-
+     width = channel_width_MHz > 20 ? channel_width_MHz : 20;
+ 
+     // Get radio mode HT20|HT40|HT80 etc.
+@@ -9398,11 +9778,13 @@ INT wifi_pushRadioChannel2(INT radioIndex, UINT channel, UINT channel_width_MHz,
+         snprintf(cmd, sizeof(cmd), "hostapd_cli  -i %s chan_switch %d %d %s %s %s",
+             interface_name, csa_beacon_count, freq,
+             sec_chan_offset_str, center_freq1_str, opt_chan_info_str);
+-
+-        ret = _syscmd(cmd, buf, sizeof(buf));
++	ret = _syscmd(cmd, buf, sizeof(buf));
+         fprintf(stdout, "execute: '%s' return %s\n", cmd, buf);
+ 
+-        wifi_reloadAp(radioIndex);
++	if(radioIndex==2)
++		wifi_reloadAp(16);
++	else
++		wifi_reloadAp(radioIndex);
+ 
+         ret = wifi_setRadioChannel(radioIndex, channel);
+         if (ret != RETURN_OK) {
+@@ -9462,7 +9844,11 @@ INT wifi_getNeighboringWiFiStatus(INT radio_index, wifi_neighbor_ap2_t **neighbo
+ 
+     WIFI_ENTRY_EXIT_DEBUG("Inside %s: %d\n", __func__, __LINE__);
+ 
+-    snprintf(file_name, sizeof(file_name), "%s%d.txt", ESSID_FILE, radio_index);
++    if(radio_index==2)
++	    snprintf(file_name, sizeof(file_name), "%s16.txt", ESSID_FILE);
++    else
++	    snprintf(file_name, sizeof(file_name), "%s%d.txt", ESSID_FILE, radio_index);
++
+     f = fopen(file_name, "r");
+     if (f != NULL) {
+         fgets(buf, sizeof(file_name), f);
+@@ -9474,8 +9860,10 @@ INT wifi_getNeighboringWiFiStatus(INT radio_index, wifi_neighbor_ap2_t **neighbo
+         fclose(f);
+     }
+ 
+-    if (wifi_GetInterfaceName(radio_index, interface_name) != RETURN_OK)
+-        return RETURN_ERR;
++    if(radio_index==2)
++	    strcpy(interface_name, "wifi16");
++    else if(wifi_GetInterfaceName(radio_index, interface_name) != RETURN_OK)
++	    return RETURN_ERR;
+ 
+     phyId = radio_index_to_phy(radio_index);
+ 
+@@ -10219,8 +10607,10 @@ INT wifi_getApAssociatedDeviceTidStatsResult(INT radioIndex,  mac_address_t *cli
+     char  if_name[10];
+     char interface_name[16] = {0};
+ 
+-    if (wifi_GetInterfaceName(radioIndex, interface_name) != RETURN_OK)
+-        return RETURN_ERR;
++    if(radioIndex==2)
++	    strcpy(interface_name, "wifi16");
++    else if(wifi_GetInterfaceName(radioIndex, interface_name) != RETURN_OK)
++	    return RETURN_ERR;
+ 
+     snprintf(if_name, sizeof(if_name), "%s", interface_name);
+ 
+@@ -10268,8 +10658,10 @@ INT wifi_getApAssociatedDeviceTidStatsResult(INT radioIndex,  mac_address_t *cli
+     int lines,tid_index=0;
+     char mac_addr[20] = {'\0'};
+ 
+-    if (wifi_GetInterfaceName(radioIndex, if_name) != RETURN_OK)
+-        return RETURN_ERR;
++    if(radioIndex==2)
++	    strcpy(if_name, "wifi16");
++    else if(wifi_GetInterfaceName(radioIndex, if_name) != RETURN_OK)
++	    return RETURN_ERR;
+ 
+     wifi_associated_dev_tid_entry_t *stats_entry;
+ 
+@@ -10520,8 +10912,10 @@ INT wifi_getApAssociatedDeviceRxStatsResult(INT radioIndex, mac_address_t *clien
+ #ifdef HAL_NETLINK_IMPL
+     Netlink nl;
+     char if_name[32];
+-    if (wifi_GetInterfaceName(radioIndex, if_name) != RETURN_OK)
+-        return RETURN_ERR;
++    if(radioIndex==2)
++	    strcpy(if_name, "wifi16");
++    else if(wifi_GetInterfaceName(radioIndex, if_name) != RETURN_OK)
++	    return RETURN_ERR;
+ 
+     *output_array_size = sizeof(wifi_associated_dev_rate_info_rx_stats_t);
+ 
+@@ -10664,8 +11058,10 @@ INT wifi_getApAssociatedDeviceTxStatsResult(INT radioIndex, mac_address_t *clien
+     Netlink nl;
+     char if_name[10];
+     char interface_name[16] = {0};
+-    if (wifi_GetInterfaceName(radioIndex, interface_name) != RETURN_OK)
+-        return RETURN_ERR;
++    if(radioIndex==2)
++	    strcpy(interface_name, "wifi16");
++    else if(wifi_GetInterfaceName(radioIndex, interface_name) != RETURN_OK)
++	    return RETURN_ERR;
+ 
+     *output_array_size = sizeof(wifi_associated_dev_rate_info_tx_stats_t);
+ 
+@@ -10873,14 +11269,20 @@ static int get_survey_dump_buf(INT radioIndex, int channel, const char *buf, siz
+     char interface_name[16] = {0};
+     wifi_band band = band_invalid;
+ 
+-    band = wifi_index_to_band(radioIndex);
++    if(radioIndex==2){
++	    band=band_6;
++	    strcpy(interface_name, "wifi16");
++    }
++    else{
++	    band = wifi_index_to_band(radioIndex);
++	    wifi_GetInterfaceName(radioIndex, interface_name);
++    }
+     freqMHz = ieee80211_channel_to_frequency(channel, band);
+     if (freqMHz == -1) {
+         wifi_dbg_printf("%s: failed to get channel frequency for channel: %d\n", __func__, channel);
+         return -1;
+     }
+ 
+-    wifi_GetInterfaceName(radioIndex, interface_name);
+     if (sprintf(cmd,"iw dev %s survey dump | grep -A5 %d | tr -d '\\t'", interface_name, freqMHz) < 0) {
+         wifi_dbg_printf("%s: failed to build iw dev command for radioIndex=%d freq=%d\n", __FUNCTION__,
+                          radioIndex, freqMHz);
+@@ -10945,8 +11347,10 @@ INT wifi_getRadioChannelStats(INT radioIndex,wifi_channelStats_t *input_output_c
+ 
+     local[0].array_size = array_size;
+ 
+-    if (wifi_GetInterfaceName(radioIndex, if_name) != RETURN_OK)
+-        return RETURN_ERR;
++    if(radioIndex==2)
++	    strcpy(if_name, "wifi16")
++    else if(wifi_GetInterfaceName(radioIndex, if_name) != RETURN_OK)
++	    return RETURN_ERR;
+ 
+     nl.id = initSock80211(&nl);
+ 
+@@ -11432,7 +11836,10 @@ INT wifi_getRadioChannels(INT radioIndex, wifi_channelMap_t *outputMap, INT outp
+     BOOL dfs_enable = false;
+     wifi_band band = band_invalid;
+ 
+-    band = wifi_index_to_band(radioIndex);
++    if(radioIndex == 2)
++	    band = band_6;
++    else
++	    band = wifi_index_to_band(radioIndex);
+     switch (band) {
+         case band_2_4:
+             band_remap = 1;
+@@ -11547,7 +11954,10 @@ INT wifi_getRadioPercentageTransmitPower(INT apIndex, ULONG *txpwr_pcntg)
+ 
+     // The API name as getRadioXXX, I think the input index should be radioIndex,
+     // but current we not change the name, but use it as radioIndex
+-    radioIndex = apIndex;
++    if(apIndex<16)
++	    radioIndex=(apIndex%2==0)?0:1;
++    else if(apIndex>=16 && apIndex<=23)
++	    radioIndex=2;
+     phyIndex = radio_index_to_phy(radioIndex);
+ 
+     // Get the maximum tx power of the device
+@@ -11613,7 +12023,11 @@ INT wifi_setZeroDFSState(UINT radioIndex, BOOL enable, BOOL precac)
+ 
+     params.name = "enable_background_radar";
+     params.value = enable?"1":"0";
+-    sprintf(config_file, "%s%d.conf", CONFIG_PREFIX, radioIndex);
++    if(radioIndex==2)
++	    sprintf(config_file, "%s16.conf", CONFIG_PREFIX);
++    else
++	    sprintf(config_file, "%s%d.conf", CONFIG_PREFIX, radioIndex);
++
+     wifi_hostapdWrite(config_file, &params, 1);
+     wifi_hostapdProcessUpdate(radioIndex, &params, 1);
+ 
+@@ -11632,7 +12046,10 @@ INT wifi_getZeroDFSState(UINT radioIndex, BOOL *enable, BOOL *precac)
+     if (NULL == enable || NULL == precac)
+         return RETURN_ERR;
+ 
+-    sprintf(config_file, "%s%d.conf", CONFIG_PREFIX, radioIndex);
++    if(radioIndex==2)
++	    sprintf(config_file, "%s16.conf", CONFIG_PREFIX);
++    else
++	    sprintf(config_file, "%s%d.conf", CONFIG_PREFIX, radioIndex);
+     wifi_hostapdRead(config_file, "enable_background_radar", buf, sizeof(buf));
+     if (strncmp(buf, "1", 1) == 0) {
+         *enable = true;
+@@ -11699,10 +12116,17 @@ INT wifi_setDownlinkMuType(INT radio_index, wifi_dl_mu_type_t mu_type)
+     params.name = hemu_vendor_cmd;
+     sprintf(buf, "%u", set_mu_type);
+     params.value = buf;
+-    sprintf(config_file, "%s%d.conf", CONFIG_PREFIX, radio_index);
++    if(radio_index==2)
++	    sprintf(config_file, "%s16.conf", CONFIG_PREFIX);
++    else
++	    sprintf(config_file, "%s%d.conf", CONFIG_PREFIX, radio_index);
++
+     wifi_hostapdWrite(config_file, &params, 1);
+     wifi_hostapdProcessUpdate(radio_index, &params, 1);
+-    wifi_reloadAp(radio_index);
++    if(radio_index==2)
++	    wifi_reloadAp(16);
++    else
++	    wifi_reloadAp(radio_index);
+ 
+     WIFI_ENTRY_EXIT_DEBUG("Exiting %s:%d\n",__func__, __LINE__);
+     return RETURN_OK;
+@@ -11729,7 +12153,10 @@ INT wifi_getDownlinkMuType(INT radio_index, wifi_dl_mu_type_t *mu_type)
+     else
+         snprintf(hemu_vendor_cmd, sizeof(hemu_vendor_cmd), "hemu_onoff");
+ 
+-    sprintf(config_file, "%s%d.conf", CONFIG_PREFIX, radio_index);
++    if(radio_index==2)
++	    sprintf(config_file, "%s16.conf", CONFIG_PREFIX);
++    else
++	    sprintf(config_file, "%s%d.conf", CONFIG_PREFIX, radio_index);
+     wifi_hostapdRead(config_file, hemu_vendor_cmd, buf, sizeof(buf));
+     get_mu_type = strtol(buf, NULL, 10);
+ 
+@@ -11777,10 +12204,16 @@ INT wifi_setUplinkMuType(INT radio_index, wifi_ul_mu_type_t mu_type)
+     params.name = hemu_vendor_cmd;
+     sprintf(buf, "%u", set_mu_type);
+     params.value = buf;
+-    sprintf(config_file, "%s%d.conf", CONFIG_PREFIX, radio_index);
++    if(radio_index==2)
++	    sprintf(config_file, "%s16.conf", CONFIG_PREFIX);
++    else
++	    sprintf(config_file, "%s%d.conf", CONFIG_PREFIX, radio_index);
+     wifi_hostapdWrite(config_file, &params, 1);
+     wifi_hostapdProcessUpdate(radio_index, &params, 1);
+-    wifi_reloadAp(radio_index);
++    if(radio_index==2)
++	    wifi_reloadAp(16);
++    else
++	    wifi_reloadAp(radio_index);
+ 
+     WIFI_ENTRY_EXIT_DEBUG("Exiting %s:%d\n",__func__, __LINE__);
+     return RETURN_OK;
+@@ -11807,7 +12240,10 @@ INT wifi_getUplinkMuType(INT radio_index, wifi_ul_mu_type_t *mu_type)
+     if (mu_type == NULL)
+     return RETURN_ERR;
+ 
+-    sprintf(config_file, "%s%d.conf", CONFIG_PREFIX, radio_index);
++    if(radio_index==2)
++	    sprintf(config_file, "%s16.conf", CONFIG_PREFIX);
++    else
++	    sprintf(config_file, "%s%d.conf", CONFIG_PREFIX, radio_index);
+     wifi_hostapdRead(config_file, hemu_vendor_cmd, buf, sizeof(buf));
+ 
+     get_mu_type = strtol(buf, NULL, 10);
+@@ -11838,8 +12274,14 @@ INT wifi_setGuardInterval(INT radio_index, wifi_guard_interval_t guard_interval)
+         return RETURN_ERR;
+     }
+ 
+-    snprintf(config_file, sizeof(config_file), "%s%d.conf", CONFIG_PREFIX, radio_index);
+-    band = wifi_index_to_band(radio_index);
++    if(radio_index==2){
++	    snprintf(config_file, sizeof(config_file), "%s16.conf", CONFIG_PREFIX);
++	    band = band_6;
++    }
++    else{
++	    snprintf(config_file, sizeof(config_file), "%s%d.conf", CONFIG_PREFIX, radio_index);
++	    band = wifi_index_to_band(radio_index);
++    }
+ 
+     // Hostapd are not supported HE mode GI 1600, 3200 ns.
+     if (guard_interval == wifi_guard_interval_800) {    // remove all capab about short GI
+@@ -11859,7 +12301,10 @@ INT wifi_setGuardInterval(INT radio_index, wifi_guard_interval_t guard_interval)
+             }
+         }
+     }
+-    wifi_reloadAp(radio_index);
++    if(radio_index==2)
++	    wifi_reloadAp(16);
++    else
++	    wifi_reloadAp(radio_index);
+ 
+     if (guard_interval == wifi_guard_interval_400)
+         strcpy(GI, "0.4");
+@@ -11872,7 +12317,10 @@ INT wifi_setGuardInterval(INT radio_index, wifi_guard_interval_t guard_interval)
+     else if (guard_interval == wifi_guard_interval_auto)
+         strcpy(GI, "auto");
+     // Record GI for get GI function
+-    snprintf(buf, sizeof(buf), "%s%d.txt", GUARD_INTERVAL_FILE, radio_index);
++    if(radio_index==2)
++	    snprintf(buf, sizeof(buf), "%s16.txt", GUARD_INTERVAL_FILE);
++    else
++	    snprintf(buf, sizeof(buf), "%s%d.txt", GUARD_INTERVAL_FILE, radio_index);
+     f = fopen(buf, "w");
+     if (f == NULL)
+         return RETURN_ERR;
+@@ -11892,7 +12340,10 @@ INT wifi_getGuardInterval(INT radio_index, wifi_guard_interval_t *guard_interval
+     if (guard_interval == NULL)
+         return RETURN_ERR;
+ 
+-    snprintf(cmd, sizeof(cmd), "cat %s%d.txt 2> /dev/null", GUARD_INTERVAL_FILE, radio_index);
++    if(radio_index==2)
++	    snprintf(cmd, sizeof(cmd), "cat %s16.txt 2> /dev/null", GUARD_INTERVAL_FILE);
++    else
++	    snprintf(cmd, sizeof(cmd), "cat %s%d.txt 2> /dev/null", GUARD_INTERVAL_FILE, radio_index);
+     _syscmd(cmd, buf, sizeof(buf));
+ 
+     if (strncmp(buf, "0.4", 3) == 0)
+@@ -11945,10 +12396,16 @@ INT wifi_setBSSColor(INT radio_index, UCHAR color)
+     params.name = "he_bss_color";
+     snprintf(bss_color, sizeof(bss_color), "%hhu", color);
+     params.value = bss_color;
+-    snprintf(config_file, sizeof(config_file), "%s%d.conf", CONFIG_PREFIX, radio_index);
++    if(radio_index==2)
++	    snprintf(config_file, sizeof(config_file), "%s16.conf", CONFIG_PREFIX);
++    else
++	    snprintf(config_file, sizeof(config_file), "%s%d.conf", CONFIG_PREFIX, radio_index);
+     wifi_hostapdWrite(config_file, &params, 1);
+     wifi_hostapdProcessUpdate(radio_index, &params, 1);
+-    wifi_reloadAp(radio_index);
++    if(radio_index==2)
++	    wifi_reloadAp(16);
++    else
++	    wifi_reloadAp(radio_index);
+ 
+     free(color_list);
+     WIFI_ENTRY_EXIT_DEBUG("Exiting %s:%d\n",__func__, __LINE__);
+@@ -11964,8 +12421,10 @@ INT wifi_getBSSColor(INT radio_index, UCHAR *color)
+     if (NULL == color)
+         return RETURN_ERR;
+ 
+-    if (wifi_GetInterfaceName(radio_index, interface_name) != RETURN_OK)
+-        return RETURN_ERR;
++    if(radio_index==2)
++	    strcpy(interface_name, "wifi16");
++    else if(wifi_GetInterfaceName(radio_index, interface_name) != RETURN_OK)
++	    return RETURN_ERR;
+ 
+     snprintf(cmd, sizeof(cmd), "hostapd_cli -i %s get_bss_color | cut -d '=' -f2", interface_name);
+     _syscmd(cmd, buf, sizeof(buf));
+@@ -11984,8 +12443,10 @@ INT wifi_getAvailableBSSColor(INT radio_index, INT maxNumberColors, UCHAR* color
+     if (NULL == colorList || NULL == numColorReturned)
+         return RETURN_ERR;
+ 
+-    if (wifi_GetInterfaceName(radio_index, interface_name) != RETURN_OK)
+-        return RETURN_ERR;
++    if(radio_index==2)
++	    strcpy(interface_name, "wifi16");
++    else if(wifi_GetInterfaceName(radio_index, interface_name) != RETURN_OK)
++	    return RETURN_ERR;
+ 
+     snprintf(cmd, sizeof(cmd), "hostapd_cli -i %s get_color_bmp | head -n 1 | cut -d '=' -f2", interface_name);
+     _syscmd(cmd, buf, sizeof(buf));
+@@ -12630,7 +13091,10 @@ INT setEHT320CentrlChannel(UINT radioIndex, int channel, wifi_channelBandwidth_t
+     snprintf(central_channel_str, sizeof(central_channel_str), "%d", center_channel);
+     param.name = "eht_oper_centr_freq_seg0_idx";
+     param.value = central_channel_str;
+-    snprintf(config_file, sizeof(config_file), "%s%d.conf", CONFIG_PREFIX, radioIndex);
++    if(radioIndex==2)
++	    snprintf(config_file, sizeof(config_file), "%s16.conf", CONFIG_PREFIX);
++    else
++	    snprintf(config_file, sizeof(config_file), "%s%d.conf", CONFIG_PREFIX, radioIndex);
+     wifi_hostapdWrite(config_file, &param, 1);
+ 
+     return RETURN_OK;
+@@ -12658,7 +13122,10 @@ INT wifi_setRadioOpclass(INT radioIndex, INT bandwidth)
+     snprintf(op_class_str, sizeof(op_class_str), "%d", op_class);
+     param.name = "op_class";
+     param.value = op_class_str;
+-    snprintf(config_file, sizeof(config_file), "%s%d.conf", CONFIG_PREFIX, radioIndex);
++    if(radioIndex==2)
++	    snprintf(config_file, sizeof(config_file), "%s16.conf", CONFIG_PREFIX);
++    else
++	    snprintf(config_file, sizeof(config_file), "%s%d.conf", CONFIG_PREFIX, radioIndex);
+     wifi_hostapdWrite(config_file, &param, 1);
+     return RETURN_OK;
+ }
+@@ -12668,7 +13135,10 @@ INT wifi_getRadioOpclass(INT radioIndex, UINT *class)
+     char config_file[32] = {0};
+     char buf [16] = {0};
+ 
+-    snprintf(config_file, sizeof(config_file), "%s%d.conf", CONFIG_PREFIX, radioIndex);
++    if(radioIndex==2)
++	    snprintf(config_file, sizeof(config_file), "%s16.conf", CONFIG_PREFIX);
++    else
++	    snprintf(config_file, sizeof(config_file), "%s%d.conf", CONFIG_PREFIX, radioIndex);
+     if (wifi_hostapdRead(config_file, "op_class", buf, sizeof(buf)) != 0)
+         return RETURN_ERR;      // 6g band should set op_class
+     *class = (UINT)strtoul(buf, NULL, 10);
+@@ -12844,10 +13314,12 @@ INT wifi_getRadioOperatingParameters(wifi_radio_index_t index, wifi_radio_operat
+     BOOL enabled = FALSE;
+ 
+     WIFI_ENTRY_EXIT_DEBUG("Inside %s:%d\n",__func__, __LINE__);
+-    printf("Entering %s index = %d\n", __func__, (int)index);
+ 
+     memset(operationParam, 0, sizeof(wifi_radio_operationParam_t));
+-    snprintf(config_file, sizeof(config_file), "%s%d.conf", CONFIG_PREFIX, index);
++    if(index == 2)
++	    snprintf(config_file, sizeof(config_file), "%s16.conf", CONFIG_PREFIX);
++    else
++	    snprintf(config_file, sizeof(config_file), "%s%d.conf", CONFIG_PREFIX, index);
+     if (wifi_getRadioEnable(index, &enabled) != RETURN_OK)
+     {
+         fprintf(stderr, "%s: wifi_getRadioEnable return error.\n", __func__);
+@@ -12901,7 +13373,7 @@ INT wifi_getRadioOperatingParameters(wifi_radio_index_t index, wifi_radio_operat
+     }
+ 
+     if (operationParam->band == WIFI_FREQUENCY_6_BAND) {
+-        if (wifi_getRadioOpclass(index, &operationParam->op_class) != RETURN_OK) {
++        if (wifi_getRadioOpclass(index, &operationParam->operatingClass) != RETURN_OK) {
+             fprintf(stderr, "%s: op_class is not set.\n", __func__);
+             return RETURN_ERR;
+         }
+@@ -13018,7 +13490,10 @@ static int array_index_to_vap_index(UINT radioIndex, int arrayIndex)
+         return RETURN_ERR;
+     }
+ 
+-    return (arrayIndex * max_radio_num) + radioIndex;
++    if(radioIndex==2)
++	    return (arrayIndex+16);
++    else
++	    return (arrayIndex * (max_radio_num-1)) + radioIndex;
+ }
+ 
+ wifi_bitrate_t beaconRate_string_to_enum(char *beaconRate) {
+@@ -13323,10 +13798,15 @@ static int prepareInterface(UINT apIndex, char *new_interface)
+ 
+     if (strncmp(cur_interface, new_interface, sizeof(cur_interface)) != 0) {
+         wifi_getMaxRadioNumber(&max_radio_num);
+-        radioIndex = apIndex % max_radio_num;
++	if(apIndex<16)
++		radioIndex=(apIndex%2==0)?0:1;
++        else if(apIndex>=16 && apIndex<=23)
++                radioIndex=2;
++
+         phyIndex = radio_index_to_phy(radioIndex);
+         // disable and del old interface, then add new interface
+         wifi_setApEnable(apIndex, FALSE);
++	if(radioIndex<2){
+         if (!(apIndex/max_radio_num)) {
+             if (single_wiphy)
+                 snprintf(cmd, sizeof(cmd), "iw %s del && iw phy0 interface add %s type __ap radios %d", cur_interface, new_interface, radioIndex);
+@@ -13334,6 +13814,16 @@ static int prepareInterface(UINT apIndex, char *new_interface)
+                 snprintf(cmd, sizeof(cmd), "iw %s del && iw phy%d interface add %s type __ap", cur_interface, phyIndex, new_interface);
+             _syscmd(cmd, buf, sizeof(buf));
+         }
++	}
++	else if(radioIndex==2){
++	    if (!((apIndex-16)/max_radio_num)) {
++	    if (single_wiphy)
++                snprintf(cmd, sizeof(cmd), "iw %s del && iw phy0 interface add %s type __ap radios %d", cur_interface, new_interface, radioIndex);
++            else
++                snprintf(cmd, sizeof(cmd), "iw %s del && iw phy%d interface add %s type __ap", cur_interface, phyIndex, new_interface);
++            _syscmd(cmd, buf, sizeof(buf));
++        }
++	}
+     }
+     // update the vap status file
+     snprintf(cmd, sizeof(cmd), "sed -i -n -e '/^%s=/!p' -e '$a%s=1' %s", cur_interface, new_interface, VAP_STATUS_FILE);
+@@ -13374,6 +13864,7 @@ INT wifi_createVAP(wifi_radio_index_t index, wifi_vap_info_map_t *map)
+             enable = FALSE;
+ 
+         // multi-ap first up need to copy current radio config
++	if(vap_info->radio_index < 2){
+         if (vap_info->radio_index != vap_info->vap_index && enable == FALSE) {
+             snprintf(cmd, sizeof(cmd), "cp %s%d.conf %s%d.conf", CONFIG_PREFIX, vap_info->radio_index, CONFIG_PREFIX, vap_info->vap_index);
+             _syscmd(cmd, buf, sizeof(buf));
+@@ -13387,7 +13878,14 @@ INT wifi_createVAP(wifi_radio_index_t index, wifi_vap_info_map_t *map)
+                 continue;
+             prepareInterface(vap_info->vap_index, vap_info->vap_name);
+         }
+-
++	}
++	else if(vap_info->radio_index == 2){
++	    int apIndex = -1;
++            wifi_getApIndexFromName(vap_info->vap_name, &apIndex);
++            if (apIndex != -1 && apIndex != vap_info->vap_index)
++                continue;
++            prepareInterface(vap_info->vap_index, vap_info->vap_name);
++	}
+         struct params params[3];
+         params[0].name = "interface";
+         params[0].value = vap_info->vap_name;
+@@ -13494,8 +13992,8 @@ INT wifi_createVAP(wifi_radio_index_t index, wifi_vap_info_map_t *map)
+         wifi_setApEnable(vap_info->vap_index, FALSE);
+         if (vap_info->u.bss_info.enabled == TRUE)
+             wifi_setApEnable(vap_info->vap_index, TRUE);
+-
+-        multiple_set = FALSE;
++        
++	multiple_set = FALSE;
+ 
+         // If config use hostapd_cli to set, we calling these type of functions after enable the ap.
+         if (vap_info->u.bss_info.wps.enable && vap_info->u.bss_info.wps.methods && WIFI_ONBOARDINGMETHODS_PUSHBUTTON) {
+@@ -13560,7 +14058,10 @@ static int getRadioCapabilities(int radioIndex, wifi_radio_capabilities_t *rcap)
+     }
+ 
+     rcap->numSupportedFreqBand = 1;
+-    band = wifi_index_to_band(radioIndex);
++    if(radioIndex==2)
++	    band = band_6;
++    else
++	    band = wifi_index_to_band(radioIndex);
+ 
+     if (band == band_2_4)
+         rcap->band[0] = WIFI_FREQUENCY_2_4_BAND;
+@@ -13569,6 +14070,8 @@ static int getRadioCapabilities(int radioIndex, wifi_radio_capabilities_t *rcap)
+     else if (band == band_6)
+         rcap->band[0] = WIFI_FREQUENCY_6_BAND;
+ 
++    if(radioIndex==2){
++        rcap->band[0] = WIFI_FREQUENCY_6_BAND;}
+     chlistp = &(rcap->channel_list[0]);
+     memset(pchannels, 0, sizeof(pchannels));
+ 
+@@ -13616,7 +14119,10 @@ static int getRadioCapabilities(int radioIndex, wifi_radio_capabilities_t *rcap)
+     rcap->csi.maxDevices = 8;
+     rcap->csi.soudingFrameSupported = TRUE;
+ 
+-    wifi_GetInterfaceName(radioIndex, interface_name);
++    if(radioIndex==2)
++	    strncpy(interface_name, "wifi16", sizeof(interface_name));
++    else
++	    wifi_GetInterfaceName(radioIndex, interface_name);
+     snprintf(rcap->ifaceName, sizeof(interface_name), "%s",interface_name);
+ 
+     /* channelWidth - all supported bandwidths */
+@@ -14244,7 +14750,10 @@ INT wifi_getTWTsessions(INT ap_index, UINT maxNumberSessions, wifi_twt_sessions_
+ 
+     wifi_getMaxRadioNumber(&max_radio_num);
+ 
+-    radio_index = ap_index % max_radio_num;
++    if(ap_index<16)
++	    radio_index=(ap_index%2==0)?0:1;
++    else if(ap_index>=16 && ap_index<=23)
++	    radio_index=2;
+ 
+     phyId = radio_index_to_phy(radio_index);
+     sprintf(cmd, "cat /sys/kernel/debug/ieee80211/phy%d/mt76/twt_stats | wc -l", phyId);

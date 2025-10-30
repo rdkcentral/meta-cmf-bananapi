@@ -112,6 +112,7 @@ fi
 
 if [ "X$KERNEL_TYPE" == "Xkernel6-6" ]; then
     sed -i '/kernel6-6/s/^#//' ${_TOPDIR}/meta-cmf-bananapi/conf/distro/include/rdk-bpi.inc
+    sed -i '/kernel6-6/s/^#//' ${_TOPDIR}/meta-cmf-bananapi/conf/distro/include/rdk-bpi-ap-extender.inc
     echo 'RDEPENDS:${PN}-dev = ""' >> ${_TOPDIR}/meta-filogic/recipes-kernel/linux6-6-libc-headers/linux-libc-headers.inc
 fi
 
@@ -123,15 +124,8 @@ else # SD card image is default
         echo "Both bl2 and fip binaries are present in local workspace."
     else
         echo "**********************************************************************"
-        echo "> CAUTION: YOU ARE TRYING TO BUILD SD CARD IMAGE WITHOUT BL2 AND FIP BINARIES."
-        if [ "X$KERNEL_TYPE" == "Xkernel6-6" ]; then
-             echo "> Please download the binaries from https://artifactory.rdkcentral.com/artifactory/RDKB-Platform/BPI-R4/uboot-2025.01/bpi-r4_sdmmc_bl2.img and https://artifactory.rdkcentral.com/artifactory/RDKB-Platform/BPI-R4/uboot-2025.01/bpi-r4_sdmmc_fip.bin"
-        else
-             echo "> Please download the binaries from https://artifactory.rdkcentral.com/artifactory/RDKB-Platform/BPI-R4/uboot-2024.04/bpi-r4_sdmmc_bl2.img and https://artifactory.rdkcentral.com/artifactory/RDKB-Platform/BPI-R4/uboot-2024.04/bpi-r4_sdmmc_fip.bin"
-	fi
-        echo "> If you don't have access to above resources, please follow instruction in https://wiki.rdkcentral.com/pages/viewpage.action?pageId=354648448#SDMonoliticimagebuildandflashingstepsforBPIR4.-Buildingbl2.imgandfip.binincaseofnothavingaccesstoartifactoryrepository to build bl2 and fip binaries yourselves."
-        echo "> Place those binaries under ${_TOPDIR}/downloads/"
-        echo "> EXITING NOW."
+        echo "> Missing files are preventing the build from starting:"
+        echo "> The BL2 and FIP binaries aren't in the downloads directory. Copy these binaries into the directory and then restart the build. You can find instructions for creating the necessary binaries on the RDK-B Code Releases page: (https://wiki.rdkcentral.com/display/CMF/RDK-B+Code+Releases)"
         echo "**********************************************************************"
         return 1
     fi

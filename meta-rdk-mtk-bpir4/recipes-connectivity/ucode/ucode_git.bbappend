@@ -1,5 +1,2 @@
-DEPENDS_remove = "ubus uci"
-EXTRA_OECMAKE += " \
-    -DUBUS_SUPPORT=OFF \
-    -DUCI_SUPPORT=OFF \
-"
+DEPENDS_remove = "${@bb.utils.contains('DISTRO_FEATURES', 'OneWifi', 'ubus uci', '', d)}"
+EXTRA_OECMAKE += "${@bb.utils.contains('DISTRO_FEATURES', 'OneWifi', '-DUBUS_SUPPORT=OFF -DUCI_SUPPORT=OFF', '', d)}"

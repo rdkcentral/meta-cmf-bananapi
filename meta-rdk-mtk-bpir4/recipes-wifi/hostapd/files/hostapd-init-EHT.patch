@@ -1,0 +1,98 @@
+SOURCE:RDKM
+--- ./hostapd-init-EHT.sh	2025-10-22 11:15:20.021034563 +0100
++++ ./hostapd-init-EHT.sh	2025-10-22 13:30:43.085766313 +0100
+@@ -157,7 +157,11 @@
+             iw wlan$phyidx del > /dev/null
+         elif [ -e /sys/class/net/wifi$phyidx ]; then
+             for((i=0;i<$vap_per_radio;i++)); do
+-                ifidx=$(($phyidx+$i*$radio_num))
++                if [ $phyidx -lt 2 ]; then
++                           ifidx=$(($phyidx+($i*2)))
++                elif [ $phyidx -eq 2 ]; then
++                           ifidx=$(($i+16))
++                fi
+                 ifname="$(cat /nvram/hostapd"$ifidx".conf | grep ^interface= | cut -d '=' -f2 | tr -d '\n')"
+                 if [ -n $ifname ]; then
+                     hostapd_cli -i global raw REMOVE wifi$ifidx > /dev/null
+@@ -173,14 +177,24 @@
+ 			continue
+         fi
+
+-        if [ ! -f /nvram/hostapd"$devidx".conf ]; then
+-            touch /nvram/hostapd"$devidx".conf
++        if [ $devidx -eq 2 ]; then
++            real_idx=16
++        else
++            real_idx=$devidx
++        fi
++
++        if [ ! -f /nvram/hostapd"$real_idx".conf ]; then
++            touch /nvram/hostapd"$real_idx".conf
+         else
+             for((i=0;i<$vap_per_radio;i++)); do
+-                ifidx=$(($phyidx+$i*$radio_num))
++               if [ $phyidx -lt 2 ]; then
++                           ifidx=$(($phyidx+($i*2)))
++                elif [ $phyidx -eq 2 ]; then
++                           ifidx=$(($i+16))
++                fi
+                 ifname="$(cat /nvram/hostapd"$ifidx".conf | grep ^interface= | cut -d '=' -f2 | tr -d '\n')"
+-                vapstat="$(cat /nvram/vap-status | grep wifi"$ifidx"= | cut -d'=' -f2)"
+-                if [ -n $ifname ] && [[ $vapstat -eq "1" ]]; then
++                vapstat="$(cat /nvram/vap-status | grep wifi"$ifidx"= | cut -d'=' -f2 | head -n 1)"
++                if [ -n "$ifname" ] && [ "$vapstat" == "1" ]; then
+                     if [ $i = 0 ]; then
+                         ## first interface in this phy
+                         iw phy phy0 interface add $ifname type __ap radios $radio_idx > /dev/null
+@@ -188,9 +202,7 @@
+                     touch /nvram/hostapd-acl$ifidx
+                     touch /nvram/hostapd$ifidx.psk
+                     touch /nvram/hostapd-deny$ifidx
+-                    if [ $phyidx = $ifidx ]; then
+-                        touch /tmp/phy0-wifi$ifidx
+-                    fi
++                    touch /tmp/phy0-wifi$ifidx
+                     hostapd_cli -i global raw ADD bss_config=phy0.$radio_idx:/nvram/hostapd"$ifidx".conf
+ 		fi
+ 	    done
+@@ -213,28 +213,28 @@
+
+
+         if [ "$band" == "2g" ]; then
+-            cp -f /etc/hostapd-2G.conf /nvram/hostapd"$devidx".conf
++            cp -f /etc/hostapd-2G.conf /nvram/hostapd"$real_idx".conf
+         fi
+
+         if [ "$band" == "5g" ]; then
+             gen_vht_cap
+-            cp -f /etc/hostapd-5G.conf /nvram/hostapd"$devidx".conf
++            cp -f /etc/hostapd-5G.conf /nvram/hostapd"$real_idx".conf
+         fi
+
+         if [ "$band" == "6g" ]; then
+ 	    gen_he_6ghz_reg_pwr_type /etc/hostapd-6G.conf
+-            cp -f /etc/hostapd-6G.conf /nvram/hostapd"$devidx".conf
++            cp -f /etc/hostapd-6G.conf /nvram/hostapd"$real_idx".conf
+         fi
+
+-        sed -i "/^interface=.*/c\interface=wifi$devidx" /nvram/hostapd"$devidx".conf
+-        sed -i "/^bssid=/c\bssid=$MAC" /nvram/hostapd"$devidx".conf
+-        echo "wpa_psk_file=/nvram/hostapd$devidx.psk" >> /nvram/hostapd"$devidx".conf
+-        iw phy phy0 interface add wifi$devidx type __ap radios $radio_idx > /dev/null
+-        touch /nvram/hostapd-acl$devidx
+-        touch /nvram/hostapd$devidx.psk
+-        touch /nvram/hostapd-deny$devidx
+-        touch /tmp/phy0-wifi$devidx
+-        hostapd_cli -i global raw ADD bss_config=phy0.$radio_idx:/nvram/hostapd"$devidx".conf && echo -e "wifi"$devidx"=1" >> /nvram/vap-status
++        sed -i "/^interface=.*/c\interface=wifi$real_idx" /nvram/hostapd"$real_idx".conf
++        sed -i "/^bssid=/c\bssid=$MAC" /nvram/hostapd"$real_idx".conf
++        echo "wpa_psk_file=/nvram/hostapd$real_idx.psk" >> /nvram/hostapd"$real_idx".conf
++        iw phy phy0 interface add wifi$real_idx type __ap radios $radio_idx > /dev/null
++        touch /nvram/hostapd-acl$real_idx
++        touch /nvram/hostapd$real_idx.psk
++        touch /nvram/hostapd-deny$real_idx
++        touch /tmp/phy0-wifi$real_idx
++        hostapd_cli -i global raw ADD bss_config=phy0.$radio_idx:/nvram/hostapd"$real_idx".conf && echo -e "wifi"$real_idx"=1" >> /nvram/vap-status
+         devidx=$(($devidx + 1))
+         phyidx=$(($phyidx + 1))
+

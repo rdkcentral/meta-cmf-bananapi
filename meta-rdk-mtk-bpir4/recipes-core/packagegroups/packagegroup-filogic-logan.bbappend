@@ -1,4 +1,4 @@
-RDEPENDS_packagegroup-filogic-logan_remove += " iwinfo \
+RDEPENDS_packagegroup-filogic-logan_remove_onewifi += " iwinfo \
                                              uci \
 					ubus \
 "
