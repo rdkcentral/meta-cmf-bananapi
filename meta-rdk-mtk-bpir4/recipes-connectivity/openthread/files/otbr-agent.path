@@ -1,0 +1,9 @@
+[Unit]
+Description=Triggers otbr-agent.service when cpcd is started successfully.
+Documentation= man:systemd.path
+
+[Path]
+DirectoryNotEmpty=/dev/shm/cpcd/cpcd_0/
+
+[Install]
+WantedBy=multi-user.target

@@ -65,4 +65,6 @@ DISTRO_FEATURES_append = " resource_optimization"
 
 DISTRO_FEATURES_append = " CONFIG_IEEE80211BE"
 
+DISTRO_FEATURES_append = " matter"
+
 #DISTRO_FEATURES_append = " generic_mlo"

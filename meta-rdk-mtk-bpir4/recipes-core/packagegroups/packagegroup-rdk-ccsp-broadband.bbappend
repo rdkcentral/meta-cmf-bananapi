@@ -5,8 +5,11 @@ RDEPENDS_packagegroup-rdk-ccsp-broadband_append = " iperf3"
 RDEPENDS_packagegroup-rdk-ccsp-broadband_append = " parodus2ccsp"
 
 RDEPENDS_packagegroup-rdk-ccsp-broadband_append = " \
-           ${@bb.utils.contains('DISTRO_FEATURES', 'OneWifi', 'rdk-wifi-hal', '' ,d)} \
-           ${@bb.utils.contains('DISTRO_FEATURES', 'CPUPROCANALYZER_BROADBAND', 'cpuprocanalyzer', ' ', d)} \
+	${@bb.utils.contains('DISTRO_FEATURES', 'OneWifi', 'rdk-wifi-hal', '' ,d)} \
+	${@bb.utils.contains('DISTRO_FEATURES', 'CPUPROCANALYZER_BROADBAND', 'cpuprocanalyzer', ' ', d)} \
+	linux-firmware-bcm-bt \
+	linux-firmware-rtl-bt \ 
+	linux-firmware-brcm \
            "
 GWPROVAPP = "${@bb.utils.contains('DISTRO_FEATURES','rdkb_wan_manager','ccsp-gwprovapp', '' ,d)}"
 

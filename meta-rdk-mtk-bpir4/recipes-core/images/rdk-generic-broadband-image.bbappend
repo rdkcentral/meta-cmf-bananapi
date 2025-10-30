@@ -1,5 +1,5 @@
 #WebPA Feature
-IMAGE_INSTALL_append = " parodus parodus2ccsp rdktelcovoicemanager asterisk hal-voice-asterisk"
+IMAGE_INSTALL_append = " parodus parodus2ccsp rdktelcovoicemanager asterisk hal-voice-asterisk cpcd otbr-agent bluez5-bluetoothd bt-host-cpc-hci-bridge barton"
 
 #TR069 Feature
 IMAGE_INSTALL_append = " ccsp-tr069-pa"
