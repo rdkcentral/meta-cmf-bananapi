@@ -1,0 +1,14 @@
+Index: platform/rdkb_hal/src/platform/platform_hal.c
+===================================================================
+--- platform.orig/rdkb_hal/src/platform/platform_hal.c
++++ platform/rdkb_hal/src/platform/platform_hal.c
+@@ -426,6 +426,9 @@ INT platform_hal_GetTotalMemorySize(ULON
+     char buf[64] = {0};
+     char cmd[64] = {0};
+     FILE *fp = NULL;
++    if (pulSize == NULL)
++        return RETURN_ERR;
++
+
+     sprintf(cmd, "awk '/MemTotal/ {print $2}' /proc/meminfo > /tmp/total_Mem");
+     system(cmd);

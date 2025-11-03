@@ -9,7 +9,7 @@ IMAGE_INSTALL_append = " bpi-macaddress"
 
 IMAGE_INSTALL_append = " rdk-speedtest-cli"
 #Enable required linux utils for Fwupgrade
-IMAGE_INSTALL_append = " gptfdisk e2fsprogs-mke2fs"
+IMAGE_INSTALL_append = " gptfdisk e2fsprogs-mke2fs util-linux util-linux-losetup coreutils"
 
 ROOTFS_POSTPROCESS_COMMAND_append = "add_busybox_fixes; "
 
