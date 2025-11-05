@@ -60,25 +60,6 @@ sed -i '203 s/^/#/' ${_TOPDIR}/meta-cmf-filogic/recipes-ccsp/util/utopia.bbappen
 touch ${_TOPDIR}/meta-cmf-filogic/recipes-ccsp/util/utopia_changes_applied
 fi
 
-if [ "X$KERNEL_TYPE" != "Xkernel6-6" ]; then
-    if [ ! -e ${_TOPDIR}/meta-cmf-filogic/recipes-ccsp/hal/rdkwifihal_changes_applied ]; then
-         sed -i '9 s/^/#/' ${_TOPDIR}/meta-cmf-filogic/recipes-ccsp/hal/rdk-wifi-hal.bbappend
-         sed -i '10 s/^/#/' ${_TOPDIR}/meta-cmf-filogic/recipes-ccsp/hal/rdk-wifi-hal.bbappend
-         sed -i '11 s/^/#/' ${_TOPDIR}/meta-cmf-filogic/recipes-ccsp/hal/rdk-wifi-hal.bbappend
-         sed -i '12 s/^/#/' ${_TOPDIR}/meta-cmf-filogic/recipes-ccsp/hal/rdk-wifi-hal.bbappend
-         sed -i '13 s/^/#/' ${_TOPDIR}/meta-cmf-filogic/recipes-ccsp/hal/rdk-wifi-hal.bbappend
-         sed -i '14 s/^/#/' ${_TOPDIR}/meta-cmf-filogic/recipes-ccsp/hal/rdk-wifi-hal.bbappend
-         sed -i '15 s/^/#/' ${_TOPDIR}/meta-cmf-filogic/recipes-ccsp/hal/rdk-wifi-hal.bbappend
-         sed -i '16 s/^/#/' ${_TOPDIR}/meta-cmf-filogic/recipes-ccsp/hal/rdk-wifi-hal.bbappend
-         sed -i '17 s/^/#/' ${_TOPDIR}/meta-cmf-filogic/recipes-ccsp/hal/rdk-wifi-hal.bbappend
-         touch ${_TOPDIR}/meta-cmf-filogic/recipes-ccsp/hal/rdkwifihal_changes_applied
-    fi
-    if [ ! -e ${_TOPDIR}/meta-cmf-filogic/recipes-ccsp/ccsp/onewifi_changes_applied ]; then
-         sed -i 's/^SRC_URI +=/SRC_URI_append =/' ${_TOPDIR}/meta-cmf-filogic/recipes-ccsp/ccsp/ccsp-one-wifi.bbappend
-         touch ${_TOPDIR}/meta-cmf-filogic/recipes-ccsp/ccsp/onewifi_changes_applied
-    fi
-fi
-
 # commenting removing dbus.service from meta-cmf-filogic
 if [ ! -e ${_TOPDIR}/meta-cmf-filogic/recipes-core/dbus/dbus_change ]; then
 sed -i '19 s/^/#/' ${_TOPDIR}/meta-cmf-filogic/recipes-core/dbus/dbus_%.bbappend
