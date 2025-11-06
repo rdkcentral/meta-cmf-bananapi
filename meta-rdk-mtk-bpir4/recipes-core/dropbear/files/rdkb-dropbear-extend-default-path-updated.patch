@@ -1,0 +1,12 @@
+Upstream-Status: Pending
+--- dropbear-2022.83-origin/default_options.h	2025-11-05 06:55:14.092958375 +0000
++++ dropbear-2022.83/default_options.h	2025-11-05 06:56:19.545554281 +0000
+@@ -351,7 +351,7 @@
+ #define DEFAULT_IDLE_TIMEOUT 0
+ 
+ /* The default path. This will often get replaced by the shell */
+-#define DEFAULT_PATH "/usr/bin:/bin"
++#define DEFAULT_PATH "/usr/sbin:/usr/bin:/sbin:/bin"
+ #define DEFAULT_ROOT_PATH "/usr/sbin:/usr/bin:/sbin:/bin"
+ 
+ #endif /* DROPBEAR_DEFAULT_OPTIONS_H_ */

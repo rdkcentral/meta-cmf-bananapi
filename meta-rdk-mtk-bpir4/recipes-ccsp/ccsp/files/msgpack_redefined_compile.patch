@@ -1,0 +1,31 @@
+diff --git a/source/dml/tr_181/ml/cosa_apis_util.c b/source/dml/tr_181/ml/cosa_apis_util.c
+old mode 100755
+new mode 100644
+diff --git a/source/dml/tr_181/ml/cosa_wifi_dml.c b/source/dml/tr_181/ml/cosa_wifi_dml.c
+old mode 100755
+new mode 100644
+diff --git a/source/dml/tr_181/ml/cosa_wifi_internal.c b/source/dml/tr_181/ml/cosa_wifi_internal.c
+old mode 100755
+new mode 100644
+diff --git a/source/dml/tr_181/sbapi/cosa_wifi_apis.h b/source/dml/tr_181/sbapi/cosa_wifi_apis.h
+old mode 100755
+new mode 100644
+diff --git a/source/utils/jsonconv.c b/source/utils/jsonconv.c
+old mode 100755
+new mode 100644
+index b71ea162..4b243fa1
+--- a/source/utils/jsonconv.c
++++ b/source/utils/jsonconv.c
+@@ -109,12 +109,6 @@ static char *format_string(const char *input)
+     return output;
+ }
+ 
+-int msgpack_pack_str_with_body(msgpack_packer* pk, const void* b, size_t l)
+- {
+-     int ret = msgpack_pack_str(pk, l);
+-     if (ret != 0) { return ret; }
+-     return msgpack_pack_str_body(pk, b, l);
+- }
+ 
+ /*
+  * Pack cJSON object.
