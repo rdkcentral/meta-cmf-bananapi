@@ -67,6 +67,7 @@ SRC_URI += " \
     file://2.11/supplicant_new.patch \
     file://2.11/bpi.patch \
     file://2.11/mlo_fix.patch \
+    file://2.11/fixed_disassoc_after_assoc_retry.patch \
     "
 
 CFLAGS_append = " -D_PLATFORM_BANANAPI_R4_  -DCONFIG_SME -DCONFIG_GAS -DCONFIG_AP "

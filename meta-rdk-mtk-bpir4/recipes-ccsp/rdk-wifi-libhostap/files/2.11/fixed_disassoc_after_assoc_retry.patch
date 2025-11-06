@@ -1,0 +1,32 @@
+##########################################
+Date: Nov 6, 2025 1:00 PM
+From: 
+Subject: Fixed disassoc after multiple assoc requests
+Source: Comcast
+Upstream-Status:
+Signed-off-by: Bogdan Bogush <bogdan_bogush@comcast.com>
+##########################################
+diff --git a/source/hostap-2.11/src/ap/ieee802_11.c b/source/hostap-2.11/src/ap/ieee802_11.c
+index e3cd9e47c..2d9fbfe35 100644
+--- a/source/hostap-2.11/src/ap/ieee802_11.c
++++ b/source/hostap-2.11/src/ap/ieee802_11.c
+@@ -4923,6 +4923,19 @@ static int add_associated_sta(struct hostapd_data *hapd,
+ 		   wpa_auth_sta_ft_tk_already_set(sta->wpa_sm),
+ 		   wpa_auth_sta_fils_tk_already_set(sta->wpa_sm));
+ 
++	/* If association request retry handled after reply has already
++	 * been sent then added_unassoc is set to 0. This causes the STA to be
++	 * removed and disassociated.
++	 */
++#ifdef RDK_ONEWIFI
++	if (!mld_link_sta && !sta->added_unassoc &&
++	    !(sta->flags & WLAN_STA_AUTHORIZED)) {
++		wpa_printf(MSG_DEBUG, "%s:%d Ignore duplicated assoc request from "
++			MACSTR, __func__, __LINE__, MAC2STR(sta->addr));
++		return 0;
++	}
++#endif /* RDK_ONEWIFI */
++
+ 	if (!mld_link_sta && !sta->added_unassoc &&
+ 	    (!(sta->flags & WLAN_STA_AUTHORIZED) ||
+ 	     (reassoc && sta->ft_over_ds && sta->auth_alg == WLAN_AUTH_FT) ||
