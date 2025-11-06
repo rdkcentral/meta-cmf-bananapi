@@ -24,6 +24,8 @@ SRC_URI += " \
     file://onewifi_pre_start.sh \
     file://wifi_defaults.txt \
 "
+SRC_URI:append:scarthgap = " file://msgpack_redefined_compile.patch"
+
 do_install:append(){
     install -d ${D}/nvram 
     install -m 777 ${WORKDIR}/checkwifi.sh ${D}/usr/ccsp/wifi/
@@ -45,4 +47,4 @@ FILES:${PN} += " \
     /usr/bin/wifi_events_consumer \
     /nvram/wifi_defaults.txt \
 "
-
+INSANE_SKIP:${PN} += "file-rdeps"
