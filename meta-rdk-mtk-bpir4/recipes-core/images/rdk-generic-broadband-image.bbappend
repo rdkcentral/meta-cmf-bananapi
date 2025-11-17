@@ -21,17 +21,36 @@ add_busybox_fixes() {
 			cd -
                 fi
 }
+python __anonymous () {
+    if "sd" in d.getVar('MACHINEOVERRIDES', True):
+        d.setVar('do_filogic_gen_image', 'do_filogic_gen_image_sdcard')
+}
 
-do_filogic_gen_image(){
+do_filogic_gen_image_sdcard(){
+       SQUASHFS_FILE_PATH="${SQUASHFS_FILE_PATH}"  # ensure exported
+        if [ -z "$SQUASHFS_FILE_PATH" ]; then
+        # fallback: check both possibilities
+                if [ -f "${IMGDEPLOYDIR}/${PN}-${MACHINE}.bin.squashfs-xz" ]; then
+                         SQUASHFS_FILE_PATH="${IMGDEPLOYDIR}/${PN}-${MACHINE}.bin.squashfs-xz"
+                elif [ -f "${IMGDEPLOYDIR}/${PN}-${MACHINE}.squashfs-xz" ]; then
+                         SQUASHFS_FILE_PATH="${IMGDEPLOYDIR}/${PN}-${MACHINE}.squashfs-xz"
+                else
+                         echo "ERROR: no squashfs file found"
+                         exit 1
+                fi
+        fi
         if ${@bb.utils.contains('DISTRO_FEATURES','kernel_in_ubi','true','false',d)}; then
         # create sysupgrade image align to openwrt
+                # Use dynamically detected squashfs path
+                SQUASHFS_FILE="${IMGDEPLOYDIR}/$(basename ${SQUASHFS_FILE_PATH})"
                 rm -rf ${IMGDEPLOYDIR}/sysupgrade-${PN}-${MACHINE}
                 rm -rf ${IMGDEPLOYDIR}/${PN}-${MACHINE}-sysupgrade.bin
 
                 mkdir ${IMGDEPLOYDIR}/sysupgrade-${PN}-${MACHINE}
 
                 cp ${DEPLOY_DIR_IMAGE}/fitImage ${IMGDEPLOYDIR}/sysupgrade-${PN}-${MACHINE}/kernel
-                cp ${IMGDEPLOYDIR}/${PN}-${MACHINE}.squashfs-xz ${IMGDEPLOYDIR}/sysupgrade-${PN}-${MACHINE}/root
+                #cp ${IMGDEPLOYDIR}/${PN}-${MACHINE}.squashfs-xz ${IMGDEPLOYDIR}/sysupgrade-${PN}-${MACHINE}/root
+                cp ${SQUASHFS_FILE} ${IMGDEPLOYDIR}/sysupgrade-${PN}-${MACHINE}/root
                 if ${@bb.utils.contains('DISTRO_FEATURES','kernel6-6','true','false',d)}; then
                 fit-rootfs-hash-tool ${IMGDEPLOYDIR}/sysupgrade-${PN}-${MACHINE}/kernel ${IMGDEPLOYDIR}/sysupgrade-${PN}-${MACHINE}/root
                 fi
@@ -46,7 +65,8 @@ do_filogic_gen_image(){
                 mkdir ${IMGDEPLOYDIR}/sysupgrade-${PN}-${MACHINE}-sb
 
                 cp ${DEPLOY_DIR_IMAGE}/fitImage-sb ${IMGDEPLOYDIR}/sysupgrade-${PN}-${MACHINE}-sb/kernel
-                cp ${IMGDEPLOYDIR}/${PN}-${MACHINE}.squashfs-xz ${IMGDEPLOYDIR}/sysupgrade-${PN}-${MACHINE}-sb/root
+                #cp ${IMGDEPLOYDIR}/${PN}-${MACHINE}.squashfs-xz ${IMGDEPLOYDIR}/sysupgrade-${PN}-${MACHINE}-sb/root
+                cp ${SQUASHFS_FILE} ${IMGDEPLOYDIR}/sysupgrade-${PN}-${MACHINE}-sb/root
                 if ${@bb.utils.contains('DISTRO_FEATURES','kernel6-6','true','false',d)}; then
                 fit-rootfs-hash-tool ${IMGDEPLOYDIR}/sysupgrade-${PN}-${MACHINE}-sb/kernel ${IMGDEPLOYDIR}/sysupgrade-${PN}-${MACHINE}-sb/root
                 fi
@@ -57,5 +77,6 @@ do_filogic_gen_image(){
         fi
     fi
 }
+
 IMAGE_INSTALL:remove = "${@bb.utils.contains('DISTRO_FEATURES', 'ppp-enabled', '', 'pptp-linux rp-pppoe xl2tpd', d)}"
 IMAGE_INSTALL:append = "${@bb.utils.contains('DISTRO_FEATURES', 'EasyMesh',' unified-wifi-mesh unified-wifi-mesh-cli','',d)}"
