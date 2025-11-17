@@ -1,0 +1,13 @@
+diff --git git/source/hostap-2.11/src/ap/hostapd.c git/source/hostap-2.11/src/ap/hostapd.c
+index a05de030d..9ae1032c5 100644
+--- git/source/hostap-2.11/src/ap/hostapd.c
++++ git/source/hostap-2.11/src/ap/hostapd.c
+@@ -73,7 +73,7 @@ static void hostapd_switch_color_timeout_handler(void *eloop_data,
+ 						 void *user_ctx);
+ #endif /* CONFIG_IEEE80211AX */
+ 
+-
++struct hapd_global global;
+ int hostapd_for_each_interface(struct hapd_interfaces *interfaces,
+ 			       int (*cb)(struct hostapd_iface *iface,
+ 					 void *ctx), void *ctx)

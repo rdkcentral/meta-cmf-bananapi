@@ -21,12 +21,8 @@ add_busybox_fixes() {
 			cd -
                 fi
 }
-python __anonymous () {
-    if "sd" in d.getVar('MACHINEOVERRIDES', True):
-        d.setVar('do_filogic_gen_image', 'do_filogic_gen_image_sdcard')
-}
 
-do_filogic_gen_image_sdcard(){
+do_filogic_gen_image(){
        SQUASHFS_FILE_PATH="${SQUASHFS_FILE_PATH}"  # ensure exported
         if [ -z "$SQUASHFS_FILE_PATH" ]; then
         # fallback: check both possibilities
