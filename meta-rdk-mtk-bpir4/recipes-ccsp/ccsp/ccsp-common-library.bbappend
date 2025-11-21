@@ -6,7 +6,7 @@ SRC_URI:append = " \
                 "
 CFLAGS_aarch64:append = " -Werror=format-truncation=1 "
 
-do_install:append_class-target() {
+do_install:append:class-target() {
    sed -i 's#${PARODUS_START_LOG_FILE}#/rdklogs/logs/dcmrfc.log#g' ${D}${systemd_unitdir}/system/rfc.service
    sed -i 's/rfc.service /RFCbase.sh /g' ${D}${systemd_unitdir}/system/rfc.service
 
@@ -63,7 +63,7 @@ TARGET_CFLAGS += " \
     -Wno-error=format-truncation \
 "
 
-SYSTEMD_SERVICE:${PN}:remove_onewifi = " ccspwifiagent.service"
+SYSTEMD_SERVICE:${PN}:remove:onewifi = " ccspwifiagent.service"
 SYSTEMD_SERVICE:${PN} += "${@bb.utils.contains('DISTRO_FEATURES', 'OneWifi', 'onewifi.service', '', d)}"
 SYSTEMD_SERVICE:${PN} += "${@bb.utils.contains('DISTRO_FEATURES', 'webconfig_bin', 'webconfig.service', '', d)}"
 SYSTEMD_SERVICE:${PN} += "notifyComp.service"
@@ -73,7 +73,7 @@ SYSTEMD_SERVICE:${PN} += "wan-initialized.target"
 SYSTEMD_SERVICE:${PN} += "wan-initialized.path"
 SYSTEMD_SERVICE:${PN}:remove = " utopia.service"
 
-FILES:${PN}:remove_onewifi = "${systemd_unitdir}/system/ccspwifiagent.service"
+FILES:${PN}:remove:onewifi = "${systemd_unitdir}/system/ccspwifiagent.service"
 FILES:${PN}:remove = "${systemd_unitdir}/system/utopia.service"
 FILES:${PN} += "${@bb.utils.contains('DISTRO_FEATURES', 'OneWifi', '${systemd_unitdir}/system/onewifi.service', '', d)}"
 FILES:${PN} += "\
