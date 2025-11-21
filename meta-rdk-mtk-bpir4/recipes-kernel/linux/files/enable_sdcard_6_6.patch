@@ -2,7 +2,17 @@ diff --git a/arch/arm64/boot/dts/mediatek/mt7988a-bananapi-bpi-r4.dtsi b/arch/ar
 index c4455fbc..dd3bd8b1 100644
 --- a/arch/arm64/boot/dts/mediatek/mt7988a-bananapi-bpi-r4.dtsi
 +++ b/arch/arm64/boot/dts/mediatek/mt7988a-bananapi-bpi-r4.dtsi
-@@ -75,6 +75,15 @@
+@@ -28,8 +28,7 @@
+ 
+ 	chosen {
+ 		stdout-path = &uart0;
+-		bootargs = "console=ttyS0,115200n1 loglevel=8 pci=pcie_bus_perf ubi.block=0,fit root=/dev/fit0 rootwait";
+-		rootdisk-spim-nand = <&ubi_rootfs>;
++		bootargs = "earlycon console=ttyS0,115200 root=/dev/mmcblk0p4 rootfstype=ext4 rw rootwait  debug=7";
+ 	};
+ 
+ 	memory {
+@@ -75,6 +74,15 @@
  			default-state = "off";
  		};
  	};
@@ -18,7 +28,7 @@ index c4455fbc..dd3bd8b1 100644
  };
  
  &eth {
-@@ -102,7 +111,7 @@
+@@ -102,7 +110,7 @@
  };
  
  &gsw_port0 {
@@ -27,7 +37,7 @@ index c4455fbc..dd3bd8b1 100644
  };
  
  &gsw_phy0_led0 {
-@@ -304,6 +313,20 @@
+@@ -304,6 +312,20 @@
  			function = "pwm";
  		};
  	};
@@ -48,7 +58,18 @@ index c4455fbc..dd3bd8b1 100644
  };
  
  &pwm {
-@@ -402,3 +425,18 @@
+@@ -379,6 +401,10 @@
+ 	};
+ };
+ 
++&spi_nand {
++    status = "disabled";
++};
++
+ &uart0 {
+ 	status = "okay";
+ };
+@@ -402,3 +428,18 @@
  &xphy {
  	status = "okay";
  };
