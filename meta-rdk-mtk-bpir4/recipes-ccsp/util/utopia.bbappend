@@ -6,11 +6,11 @@ SRC_URI += "file://service_bridge_bpi.sh"
 
 do_install:append() {
 
-install -d ${D}${sysconfdir}/
-install -d ${D}${sysconfdir}/utopia/
-install -d ${D}${sysconfdir}/utopia/service.d
+#install -d ${D}${sysconfdir}/
+#install -d ${D}${sysconfdir}/utopia/
+#install -d ${D}${sysconfdir}/utopia/service.d
 install -d -m 0777 ${D}/minidumps
-install -m 755 ${S}/source/scripts/init/system/utopia_init.sh ${D}${sysconfdir}/utopia/
+#install -m 755 ${S}/source/scripts/init/system/utopia_init.sh ${D}${sysconfdir}/utopia/
 DISTRO_WAN_ENABLED="${@bb.utils.contains('DISTRO_FEATURES','rdkb_wan_manager','true','false',d)}"
 if [ $DISTRO_WAN_ENABLED = 'true' ]; then
 
