@@ -3,9 +3,9 @@ HOMEPAGE = "http://github.com/rdkcentral/unified-wifi-mesh"
 LICENSE = "Apache-2.0"
 LIC_FILES_CHKSUM = "file://LICENSE;md5=e0b1ae637439c7d6f4487fb90163c79a"
 
-SRC_URI = "git://github.com/rdkcentral/unified-wifi-mesh.git;branch=main;protocol=https;name=Unified-wifi-mesh_header"
+SRC_URI = "git://github.com/rdkcentral/unified-wifi-mesh.git;branch=develop;protocol=https;name=Unified-wifi-mesh_header"
 PV = "git${SRCPV}"
-SRCREV_Unified-wifi-mesh_header = "60cd678d9f05507408b54905e68b3c28fc6a99f2"
+SRCREV_Unified-wifi-mesh_header = "4acb90b1205b03ab24ee31148de98339c5ba8689"
 SRCREV_FORMAT = "Unified-wifi-mesh_header"
 S = "${WORKDIR}/git"
 
