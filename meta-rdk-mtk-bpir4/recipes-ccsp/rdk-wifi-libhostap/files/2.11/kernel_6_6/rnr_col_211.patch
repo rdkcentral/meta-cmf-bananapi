@@ -1,0 +1,86 @@
+##########################################
+Date: Apr 16, 2024 1:00 PM
+From:
+Subject: Implemented RNR driver callback
+Source: Comcast
+Upstream-Status: Pending
+Signed-off-by: Bogdan Bogush <bogdan.bogush@comcast.com>
+##########################################
+
+diff -ruN git.orig/source/hostap-2.11/src/ap/ap_drv_ops.c git/source/hostap-2.11/src/ap/ap_drv_ops.c
+--- git.orig/source/hostap-2.11/src/ap/ap_drv_ops.c	2025-10-13 05:09:48.735386161 +0000
++++ git/source/hostap-2.11/src/ap/ap_drv_ops.c	2025-10-13 05:12:01.410671140 +0000
+@@ -1419,6 +1419,23 @@
+ 	return hapd->driver->dpp_listen(hapd->drv_priv, enable);
+ }
+ 
++size_t hostapd_drv_eid_rnr_colocation_len(struct hostapd_data *hapd,
++                                       size_t *current_len)
++{
++        if (!hapd->driver || !hapd->driver->get_rnr_colocation_len || !hapd->drv_priv)
++                return 0;
++
++        return hapd->driver->get_rnr_colocation_len(hapd->drv_priv, current_len);
++}
++
++u8* hostapd_drv_eid_rnr_colocation(struct hostapd_data *hapd, u8 *eid,
++                                      size_t *current_len)
++{
++        if (!hapd->driver || !hapd->driver->get_rnr_colocation_ie || !hapd->drv_priv)
++                return eid;
++
++        return hapd->driver->get_rnr_colocation_ie(hapd->drv_priv, eid, current_len);
++}
+ 
+ #ifdef CONFIG_PASN
+ int hostapd_drv_set_secure_ranging_ctx(struct hostapd_data *hapd,
+diff -ruN git.orig/source/hostap-2.11/src/ap/ap_drv_ops.h git/source/hostap-2.11/src/ap/ap_drv_ops.h
+--- git.orig/source/hostap-2.11/src/ap/ap_drv_ops.h	2025-10-13 05:09:48.735386161 +0000
++++ git/source/hostap-2.11/src/ap/ap_drv_ops.h	2025-10-13 05:13:23.978226136 +0000
+@@ -159,6 +159,10 @@
+ int hostapd_drv_update_dh_ie(struct hostapd_data *hapd, const u8 *peer,
+ 			     u16 reason_code, const u8 *ie, size_t ielen);
+ int hostapd_drv_dpp_listen(struct hostapd_data *hapd, bool enable);
++size_t hostapd_drv_eid_rnr_colocation_len(struct hostapd_data *hapd,
++                                       size_t *current_len);
++u8* hostapd_drv_eid_rnr_colocation(struct hostapd_data *hapd, u8 *eid,
++                                   size_t *current_len);
+ int hostapd_drv_set_secure_ranging_ctx(struct hostapd_data *hapd,
+ 				       const u8 *own_addr, const u8 *addr,
+ 				       u32 cipher, u8 key_len, const u8 *key,
+diff -ruN git.orig/source/hostap-2.11/src/ap/ieee802_11.c git/source/hostap-2.11/src/ap/ieee802_11.c
+--- git.orig/source/hostap-2.11/src/ap/ieee802_11.c	2025-10-13 05:09:48.739386139 +0000
++++ git/source/hostap-2.11/src/ap/ieee802_11.c	2025-10-13 05:17:48.868800928 +0000
+@@ -8715,6 +8715,8 @@
+ 			total_len += hostapd_eid_nr_db_len(hapd, &current_len);
+ 		/* fallthrough */
+ 	case WLAN_FC_STYPE_PROBE_RESP:
++		total_len += hostapd_drv_eid_rnr_colocation_len(hapd,
++                                                        &current_len);
+ 		if (mode == COLOCATED_LOWER_BAND)
+ 			total_len +=
+ 				hostapd_eid_rnr_colocation_len(hapd,
+@@ -9053,6 +9055,8 @@
+ 			eid = hostapd_eid_nr_db(hapd, eid, &current_len);
+ 		/* fallthrough */
+ 	case WLAN_FC_STYPE_PROBE_RESP:
++		eid = hostapd_drv_eid_rnr_colocation(hapd, eid, &current_len);
++
+ 		if (mode == COLOCATED_LOWER_BAND)
+ 			eid = hostapd_eid_rnr_colocation(hapd, eid,
+ 							 &current_len);
+diff -ruN git.orig/source/hostap-2.11/src/drivers/driver.h git/source/hostap-2.11/src/drivers/driver.h
+--- git.orig/source/hostap-2.11/src/drivers/driver.h	2025-10-13 05:09:48.779385923 +0000
++++ git/source/hostap-2.11/src/drivers/driver.h	2025-10-13 05:18:48.696479155 +0000
+@@ -5433,6 +5433,11 @@
+ 	 */
+ 	int (*dpp_listen)(void *priv, bool enable);
+ 
++	size_t (*get_rnr_colocation_len)(void *priv,
++                                       size_t *current_len);
++        u8* (*get_rnr_colocation_ie)(void *priv, u8 *eid,
++                                   size_t *current_len);
++
+ 	/**
+ 	 * set_secure_ranging_ctx - Add or delete secure ranging parameters of
+ 	 * the specified peer to the driver.

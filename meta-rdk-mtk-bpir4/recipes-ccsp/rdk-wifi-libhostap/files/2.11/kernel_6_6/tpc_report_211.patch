@@ -1,0 +1,59 @@
+##########################################
+Date: Apr 16, 2024 1:00 PM
+From:
+Subject: Add TPC report IE
+Source: Comcast
+Upstream-Status: Pending
+Signed-off-by: Bogdan Bogush <bogdan.bogush@comcast.com>
+##########################################
+
+diff -ruN git.orig/source/hostap-2.11/src/ap/beacon.c git/source/hostap-2.11/src/ap/beacon.c
+--- git.orig/source/hostap-2.11/src/ap/beacon.c	2025-10-13 05:24:06.086772268 +0000
++++ git/source/hostap-2.11/src/ap/beacon.c	2025-10-13 05:28:20.477404178 +0000
+@@ -192,6 +192,22 @@
+ 	return pos;
+ }
+ 
++#ifdef CONFIG_TPC_REPORT
++static u8 * hostapd_eid_tpc(struct hostapd_data *hapd, u8 *eid)
++{
++        /* Element ID */
++        *eid++ = WLAN_EID_TPC_REPORT;
++        /* Length */
++        *eid++ = 2;
++
++        /* Transmit Power - updated by driver */
++        *eid++ = 0;
++        /* Link Margin - updated by driver */
++        *eid++ = 0;
++
++        return eid;
++}
++#endif /* CONFIG_TPC_REPORT */
+ 
+ static u8 * hostapd_eid_country_add(struct hostapd_data *hapd, u8 *pos,
+ 				    u8 *end, int chan_spacing,
+@@ -888,6 +904,11 @@
+ 	/* Power Constraint element */
+ 	pos = hostapd_eid_pwr_constraint(hapd, pos);
+ 
++#ifdef CONFIG_TPC_REPORT
++       /* TPC Report */
++        pos = hostapd_eid_tpc(hapd, pos);
++#endif /* CONFIG_TPC_REPORT */
++
+ 	/* CSA element */
+ 	csa_pos = hostapd_eid_csa(hapd, pos);
+ 	if (csa_pos != pos)
+@@ -2446,6 +2467,11 @@
+ 	/* Power Constraint element */
+ 	tailpos = hostapd_eid_pwr_constraint(hapd, tailpos);
+ 
++#ifdef CONFIG_TPC_REPORT
++        /* TPC Report */
++        tailpos = hostapd_eid_tpc(hapd, tailpos);
++#endif /* CONFIG_TPC_REPORT */
++
+ 	/* CSA IE */
+ 	csa_pos = hostapd_eid_csa(hapd, tailpos);
+ 	if (csa_pos != tailpos)

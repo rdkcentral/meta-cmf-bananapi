@@ -10,6 +10,12 @@ RDEPENDS_packagegroup-rdk-ccsp-broadband_append = " \
 	linux-firmware-bcm-bt \
 	linux-firmware-rtl-bt \ 
 	linux-firmware-brcm \
+           ${@bb.utils.contains('DISTRO_FEATURES', 'OneWifi', 'rdk-wifi-hal', '' ,d)} \
+           ${@bb.utils.contains('DISTRO_FEATURES', 'CPUPROCANALYZER_BROADBAND', 'cpuprocanalyzer', ' ', d)} \
+           ${@bb.utils.contains('DISTRO_FEATURES', 'cellular_hybrid_support', 'usbmuxd', ' ', d)} \
+           ${@bb.utils.contains('DISTRO_FEATURES', 'cellular_hybrid_support', 'usb-modeswitch', ' ', d)} \
+           ${@bb.utils.contains('DISTRO_FEATURES', 'cellular_hybrid_support', 'usb-modeswitch-data', ' ', d)} \
+           ${@bb.utils.contains('DISTRO_FEATURES', 'cellular_hybrid_support', 'modemmanager', ' ', d)} \
            "
 GWPROVAPP = "${@bb.utils.contains('DISTRO_FEATURES','rdkb_wan_manager','ccsp-gwprovapp', '' ,d)}"
 

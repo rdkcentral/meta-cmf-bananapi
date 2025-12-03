@@ -1375,7 +1375,7 @@
    <Record name="dmsb.wanmanager.if.1.VirtualInterface.1.MarkingCount" type="astr">0</Record>
 
   <Record name="dmsb.wanmanager.if.2.BaseInterface" type="astr">Device.Cellular.Interface.1</Record>
-  <Record name="dmsb.wanmanager.if.2.Selection.Enable" type="astr">FALSE</Record>
+  <Record name="dmsb.wanmanager.if.2.Selection.Enable" type="astr">TRUE</Record>
   <Record name="dmsb.wanmanager.if.2.Selection.ActiveLink" type="astr">FALSE</Record>
   <Record name="dmsb.wanmanager.if.2.Selection.RequiresReboot" type="astr">FALSE</Record>
   <Record name="dmsb.wanmanager.if.2.Selection.Group" type="astr">1</Record>

@@ -1,0 +1,42 @@
+##########################################
+Date: Nov 6, 2025 1:00 PM
+From: 
+Subject: Fixed disassoc after multiple assoc requests
+Source: Comcast
+Upstream-Status:
+Signed-off-by: Bogdan Bogush <bogdan_bogush@comcast.com>
+##########################################
+diff --git a/source/hostap-2.11/src/ap/ieee802_11.c b/source/hostap-2.11/src/ap/ieee802_11.c
+index e3cd9e47c..f53ea2de5 100644
+--- a/source/hostap-2.11/src/ap/ieee802_11.c
++++ b/source/hostap-2.11/src/ap/ieee802_11.c
+@@ -5699,6 +5699,29 @@ static void handle_assoc(struct hostapd_data *hapd,
+ 			       seq_ctrl);
+ 		return;
+ 	}
++
++	/* If association request retry handled after reply has already
++	 * been sent then added_unassoc is set to 0. In this case STA is
++	 * removed from driver in add_associated_sta and later disassociated
++	 * by NL80211_CMD_DEL_STATION event. After disassociation STA stops
++	 * EAPOL handshake and disconnects.
++	 */
++#ifdef RDK_ONEWIFI
++	if (!sta->added_unassoc &&
++	    !(sta->flags & WLAN_STA_AUTHORIZED) &&
++	    sta->last_seq_ctrl != WLAN_INVALID_MGMT_SEQ &&
++	    WLAN_GET_SEQ_SEQ(le_to_host16(sta->last_seq_ctrl)) + 1 ==
++		WLAN_GET_SEQ_SEQ(le_to_host16(seq_ctrl)) &&
++	    sta->last_subtype == (reassoc ? WLAN_FC_STYPE_REASSOC_REQ :
++				  WLAN_FC_STYPE_ASSOC_REQ)) {
++		hostapd_logger(hapd, sta->addr, HOSTAPD_MODULE_IEEE80211,
++			       HOSTAPD_LEVEL_DEBUG,
++			       "Drop repeated association frame seq_ctrl=0x%x",
++			       seq_ctrl);
++		return;
++	}
++#endif /* RDK_ONEWIFI */
++
+ 	sta->last_seq_ctrl = seq_ctrl;
+ 	sta->last_subtype = reassoc ? WLAN_FC_STYPE_REASSOC_REQ :
+ 		WLAN_FC_STYPE_ASSOC_REQ;

@@ -9,14 +9,13 @@ Change-Id: Idaae3038a352e94d1f2810a8d73b7f77c8e47309
  1 file changed, 91 insertions(+)
 
 diff --git a/include/wifi_hal.h b/include/wifi_hal.h
-index 579418e..d284af4 100644
+index 7906f42..e11084f 100644
 --- a/include/wifi_hal.h
 +++ b/include/wifi_hal.h
-@@ -110,4 +110,95 @@
+@@ -117,5 +117,93 @@
  * APIs to be deprecated. Not add new function or structure!
  */
  #include "wifi_hal_deprecated.h"
-+
 +/* DRAFT FOR CLIENT API */
 +
 +
@@ -105,9 +104,6 @@ index 579418e..d284af4 100644
 +INT wifi_getApChannel(INT radioIndex,ULONG *output_ulong);   //RDKB
 +
 +INT wifi_setApChannel(INT radioIndex, ULONG channel);        //RDKB  //AP only
-+
-+
+
  #endif
--- 
-2.28.0
 

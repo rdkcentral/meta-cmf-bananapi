@@ -22,4 +22,5 @@ do_install_append () {
                 sed -i "/getInstanceIDs(\"Device.Hosts.Host.\")/a \$hostIDs=\$hostIDs[count(\$hostIDs)-2];" ${D}/usr/www2/managed_devices_add_computer_allowed.jst
                 sed -i "/getInstanceIDs(\"Device.Hosts.Host.\")/a \$hostIDs=\$hostIDs[count(\$hostIDs)-2];" ${D}/usr/www2/managed_devices_add_computer_blocked.jst
                 sed -i "s/\$clients_RSSI\[strtoupper(\$Host\[\$i.toString()\]\['PhysAddress'\])\]/\$Host\[\$i\]\['X_CISCO_COM_RSSI'\]/g" ${D}/usr/www2/connected_devices_computers.jst
+                sed -i '/<?%if (strpos($partnerId, "sky-") !== false)/ s/sky-/RDKM/' ${D}/usr/www2/wireless_network_configuration_edit.jst
 }

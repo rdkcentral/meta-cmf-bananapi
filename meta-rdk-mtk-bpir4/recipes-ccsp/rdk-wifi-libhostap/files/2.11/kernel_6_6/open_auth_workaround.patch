@@ -1,0 +1,27 @@
+##########################################
+Date: Apr 3, 2025 1:00 PM
+From:
+Subject: Workaround for MacBook Pro M2 to accept Open auth in SAE mode
+Source: Comcast
+License: BSD
+Upstream-Status: Pending
+Signed-off-by: Bogdan Bogush <bogdan_bogush@comcast.com>
+##########################################
+diff -ruN git.orig/source/hostap-2.11/src/ap/ieee802_11.c git/source/hostap-2.11/src/ap/ieee802_11.c
+--- git.orig/source/hostap-2.11/src/ap/ieee802_11.c	2025-10-14 06:19:15.970892075 +0000
++++ git/source/hostap-2.11/src/ap/ieee802_11.c	2025-10-14 06:29:33.723627046 +0000
+@@ -3283,9 +3283,13 @@
+ 		resp = WLAN_STATUS_UNSPECIFIED_FAILURE;
+ 		goto fail;
+ 	}
+-
++/* MacBook Pro M2 sends Open auth to AP in SAE mode */
++#ifdef RDK_ONEWIFI
++        if (!(auth_alg == WLAN_AUTH_OPEN ||
++#else
+ 	if (!(((hapd->conf->auth_algs & WPA_AUTH_ALG_OPEN) &&
+ 	       auth_alg == WLAN_AUTH_OPEN) ||
++#endif /* RDK_ONEWIFI */			
+ #ifdef CONFIG_IEEE80211R_AP
+ 	      (hapd->conf->wpa && wpa_key_mgmt_ft(hapd->conf->wpa_key_mgmt) &&
+ 	       auth_alg == WLAN_AUTH_FT) ||

@@ -11,6 +11,9 @@ IMAGE_INSTALL_append = " rdk-speedtest-cli"
 #Enable required linux utils for Fwupgrade
 IMAGE_INSTALL_append = " gptfdisk e2fsprogs-mke2fs util-linux util-linux-losetup coreutils"
 
+#Router discovery tool
+IMAGE_INSTALL_append = " ndisc6"
+
 ROOTFS_POSTPROCESS_COMMAND_append = "add_busybox_fixes; "
 
 #Emptying the PRSERV_HOST since builds are local

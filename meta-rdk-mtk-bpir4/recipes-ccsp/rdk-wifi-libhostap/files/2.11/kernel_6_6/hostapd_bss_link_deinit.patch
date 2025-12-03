@@ -1,0 +1,19 @@
+##########################################
+From: NarendraVarma_Dandu@comcast.com
+Date: Jan 10, 2025 1:00 AM
+Source: Comcast
+##########################################
+
+
+diff -ruN git.orig/source/hostap-2.11/src/ap/hostapd.c git/source/hostap-2.11/src/ap/hostapd.c
+--- git.orig/source/hostap-2.11/src/ap/hostapd.c	2025-10-13 08:51:23.616110437 +0000
++++ git/source/hostap-2.11/src/ap/hostapd.c	2025-10-13 08:52:48.439655712 +0000
+@@ -750,7 +750,7 @@
+  * If the BSS being removed is the first link, the next link becomes the first
+  * link.
+  */
+-static void hostapd_bss_link_deinit(struct hostapd_data *hapd)
++void hostapd_bss_link_deinit(struct hostapd_data *hapd)
+ {
+ #ifdef CONFIG_IEEE80211BE
+ 	int i;

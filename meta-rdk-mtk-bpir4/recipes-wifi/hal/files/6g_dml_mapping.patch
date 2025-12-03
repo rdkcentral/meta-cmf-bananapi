@@ -1802,15 +1802,6 @@ index faee674..ecf1f17 100644
      if (wifi_getRadioEnable(index, &enabled) != RETURN_OK)
      {
          fprintf(stderr, "%s: wifi_getRadioEnable return error.\n", __func__);
-@@ -12901,7 +13373,7 @@ INT wifi_getRadioOperatingParameters(wifi_radio_index_t index, wifi_radio_operat
-     }
- 
-     if (operationParam->band == WIFI_FREQUENCY_6_BAND) {
--        if (wifi_getRadioOpclass(index, &operationParam->op_class) != RETURN_OK) {
-+        if (wifi_getRadioOpclass(index, &operationParam->operatingClass) != RETURN_OK) {
-             fprintf(stderr, "%s: op_class is not set.\n", __func__);
-             return RETURN_ERR;
-         }
 @@ -13018,7 +13490,10 @@ static int array_index_to_vap_index(UINT radioIndex, int arrayIndex)
          return RETURN_ERR;
      }

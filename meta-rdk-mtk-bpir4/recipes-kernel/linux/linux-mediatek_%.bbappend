@@ -6,6 +6,7 @@ SRC_URI_append = " \
     file://rdkb_cfg/iptables_nf.cfg \
     file://rdkb_cfg/bridge_mode.cfg \
     file://rdkb_cfg/coredump.cfg \
+    file://rdkb_cfg/ip6tables_nf.cfg \
     file://netfilter.cfg  \
     ${@bb.utils.contains('DISTRO_FEATURES','kernel6-6', 'file://rdkb_cfg/kernel_6_6.cfg', '', d)}  \
     ${@bb.utils.contains('DISTRO_FEATURES','dac', 'file://rdkb_cfg/container.cfg', '', d)} \
@@ -13,6 +14,8 @@ SRC_URI_append = " \
     file://rdkb_cfg/wps_key.cfg \
     file://enable_sdcard_6_6.patch;apply=no \
 "
+
+SRC_URI_append_mt7988 = "${@bb.utils.contains('DISTRO_FEATURES', 'cellular_hybrid_support', 'file://rdkb_cfg/rdkb-usb.cfg', '', d)}"
 
 CMDLINE_append = "${@bb.utils.contains('DISTRO_FEATURES','dac', 'cgroup_enable=cpuset cgroup_enable=memory cgroup_memory=1', '', d)}"
 

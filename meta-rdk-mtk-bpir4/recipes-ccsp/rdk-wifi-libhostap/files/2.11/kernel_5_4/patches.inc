@@ -1,0 +1,40 @@
+#patch patches (come from openwrt/lede/target/linux/mediatek)
+SRC_URI:append = " \
+    file://Bpi_rdkwifilibhostap_2_11_changes.patch \
+    file://0001-mtk-hostapd-patch-all-in-one.patch;patchdir=source/hostap-2.11/ \
+    file://comcast_changes_merged_to_source_2_11.patch \
+    file://onewifi_lib_2_12.patch \
+    file://RDKB-53254_Telemetry_2.11.patch \
+    file://wps_term_session.patch \
+    file://cmxb7_dfs.patch \
+    file://cohosted_bss_param_211.patch \
+    file://ht_rifs_211.patch \
+    file://vht_oper_basic_mcs_set_211.patch \
+    file://tx_pwr_envelope_211.patch \
+    file://pwr_constraint_211.patch \
+    file://supported_op_classes_211.patch \
+    file://he_2ghz_40mghz_bw_211.patch \
+    file://rnr_col_211.patch \
+    file://tpc_report_211.patch \
+    file://driver_aid_211.patch \
+    file://sta_assoc_req.patch \
+    file://wps_event_notify_cb.patch \
+    file://nl_attr_rx_phy_rate_info.patch \
+    file://hostapd_bss_link_deinit.patch \
+    file://radius_failover_2_11.patch \
+    file://mbssid_support_2_11.patch \
+    file://export_valid_chan_func_2_11.patch \
+    file://increase_eapol_timeout.patch \
+    file://Dynamic_NAS_IP_Update_2_11.patch \
+    file://patch_issues_with2_12.patch \
+    file://wpa3_compatibility_hostap_2_11.patch \
+    file://wpa3_compatibility_telem_hostap_2_11.patch \
+    file://0002-mtk-disable-sae-commit-status.patch \
+    file://mlo_configuration.patch \
+    file://open_auth_workaround.patch \
+    file://mdu_radius_psk_auth_2_11.patch \
+    file://supplicant_new.patch \
+    file://bpi.patch \
+    file://mlo_fix.patch \
+    file://fixed_disassoc_after_assoc_retry.patch \
+    "
