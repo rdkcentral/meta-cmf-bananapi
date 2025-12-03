@@ -9,6 +9,7 @@ SRC_URI:append = " ${@bb.utils.contains('DISTRO_FEATURES', 'HOSTAPD_2_10', 'file
 SRC_URI:append = " ${@bb.utils.contains('DISTRO_FEATURES', 'HOSTAPD_2_11', 'file://2.11/Bpi_rdkwifilibhostap_2_11_changes.patch', 'file://2.10/Bpi_rdkwifilibhostap_2_10_changes.patch', d)}"
 SRC_URI:append = " ${@bb.utils.contains('DISTRO_FEATURES', 'HOSTAPD_2_11', 'file://2.11/supplicant.patch', '', d)}"
 SRC_URI:append = " ${@bb.utils.contains('DISTRO_FEATURES', 'HOSTAPD_2_11', 'file://2.11/libhostap.mk', '', d)}"
+SRC_URI:append:scarthgap = " file://2.11/onewifi_undefine_global.patch"
 
 CFLAGS:append = " -D_PLATFORM_BANANAPI_R4_ -DCONFIG_SME -DCONFIG_GAS -DCONFIG_AP "
 

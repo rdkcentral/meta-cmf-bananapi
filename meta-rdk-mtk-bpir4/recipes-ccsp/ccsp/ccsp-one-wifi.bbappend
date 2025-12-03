@@ -47,4 +47,4 @@ FILES:${PN} += " \
     /usr/bin/wifi_events_consumer \
     /nvram/wifi_defaults.txt \
 "
-INSANE_SKIP:${PN} += "file-rdeps"
+RDEPENDS:${PN} += "msgpack-c"
