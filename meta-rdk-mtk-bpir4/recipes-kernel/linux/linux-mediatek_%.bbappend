@@ -24,8 +24,10 @@ KERNEL_CONFIG_FRAGMENTS += " \
 do_filogic_patches:append() {
     cd ${S}
     if [ ! -e patch_applied_6_6 ]; then
-         patch -p1 < ${WORKDIR}/enable_sdcard_6_6.patch
-         touch patch_applied_6_6
+        if ${@bb.utils.contains('DISTRO_FEATURES', 'sdmmc', 'true', 'false', d)}; then
+            patch -p1 < ${WORKDIR}/enable_sdcard_6_6.patch
+            touch patch_applied_6_6
+        fi
     fi
 }
 # Ensure DTBs are built even if we're using fitImage
