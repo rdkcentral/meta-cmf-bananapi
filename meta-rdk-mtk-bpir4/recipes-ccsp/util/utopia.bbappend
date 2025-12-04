@@ -89,4 +89,7 @@ $custom_data_model_file_name=/usr/ccsp/tr069pa/custom_mapper.xml"  >> ${D}${sysc
 FILES:${PN} += " \
         /minidumps/ \
 "
-FILES:${PN}-dev += "${libdir}/*.so"
+#FILES:${PN}-dev += "${libdir}/*.so"
+FILES:${PN} += "${libdir}/*.so"
+INSANE_SKIP:${PN} += "dev-so"
+
