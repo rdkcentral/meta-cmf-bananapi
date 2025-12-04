@@ -48,3 +48,7 @@ FILES:${PN} += " \
     /nvram/wifi_defaults.txt \
 "
 RDEPENDS:${PN} += "msgpack-c"
+FILES:${PN} += "${libdir}/*.so"
+FILES:${PN}-dev:remove = "${libdir}/*.so"
+INSANE_SKIP:${PN} += "dev-so"
+
