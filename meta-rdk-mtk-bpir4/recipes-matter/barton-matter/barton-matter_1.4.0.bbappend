@@ -10,9 +10,6 @@ SRC_URI += " \
 
 do_check_matter_configuration_append() {
 
-echo "In BB append file"
-
-
 MATTER_ZAP_FILE := "${WORKDIR}/barton.zap"
 # Adding the zzz_generated tarball to the SRC_URI will unpack it into WORKDIR
 MATTER_ZZZ_GENERATED := "${WORKDIR}/zzz_generated"
