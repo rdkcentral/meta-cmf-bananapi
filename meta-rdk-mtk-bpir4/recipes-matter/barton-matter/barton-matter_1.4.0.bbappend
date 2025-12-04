@@ -8,6 +8,11 @@ SRC_URI += " \
     file://zzz_generated.tar.gz \
 "
 
+do_check_matter_configuration_append() {
+
+echo "In BB append file"
+
+
 MATTER_ZAP_FILE := "${WORKDIR}/barton.zap"
 # Adding the zzz_generated tarball to the SRC_URI will unpack it into WORKDIR
 MATTER_ZZZ_GENERATED := "${WORKDIR}/zzz_generated"
@@ -19,3 +24,4 @@ MATTER_CONF_DIR := "/nvram/icontrol"
 export MATTER_ZAP_FILE
 export MATTER_CONF_DIR
 export MATTER_ZZZ_GENERATED
+}
