@@ -16,9 +16,4 @@ MATTER_ZZZ_GENERATED = "${WORKDIR}/zzz_generated"
 
 # Set persistent storage location for production use
 MATTER_CONF_DIR = "/nvram/icontrol"
-
-# Export for tasks
-export MATTER_ZAP_FILE
-export MATTER_CONF_DIR
-export MATTER_ZZZ_GENERATED
 }
