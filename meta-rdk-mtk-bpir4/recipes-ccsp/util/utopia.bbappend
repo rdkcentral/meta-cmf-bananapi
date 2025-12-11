@@ -48,6 +48,9 @@ sed -i 's/^$CosaNAT::port_trigger_enabled=1/$CosaNAT::port_trigger_enabled=0/' $
 install -m 755 ${WORKDIR}/service_bridge_bpi.sh ${D}${sysconfdir}/utopia/service.d/
 install -m 755 ${WORKDIR}/service_bridge_bpi.sh ${D}${sysconfdir}/utopia/service.d/service_bridge.sh
 
+
+sed -i '/^#TOT_MSG_MAX=\$/s/^#//' ${D}${sysconfdir}/utopia/utopia_init.sh
+
 #Adding self heal defaults
 echo "#SelfHeal
 \$ConnTest_PingInterval=60
@@ -84,6 +87,12 @@ echo "#SelfHeal
 #Custom Data Model
 $custom_data_model_enabled=0
 $custom_data_model_file_name=/usr/ccsp/tr069pa/custom_mapper.xml"  >> ${D}${sysconfdir}/utopia/system_defaults
+
+ #Remote management
+  sed -i 's/^\(\$mgmt_wan_httpsaccess=\)0/\11/' ${D}${sysconfdir}/utopia/system_defaults
+  sed -i 's/^\(\$mgmt_wan_httpaccess=\)1/\10/' ${D}${sysconfdir}/utopia/system_defaults
+  sed -i 's/^\(\$mgmt_wan_httpsport=\)443/\18181/' ${D}${sysconfdir}/utopia/system_defaults
+  sed -i '/mgmt_wan_httpaccess/i \$mgmt_wan_httpaccess_ert=1' ${D}${sysconfdir}/utopia/system_defaults
 }
 
 FILES:${PN} += " \
