@@ -33,4 +33,4 @@ DISTRO_FEATURES_append = " generic_mlo"
 #DISTRO_FEATURES_append = "ppp-enabled"
 
 # Kernel 6.6
-#DISTRO_FEATURES_append = " kernel6-6"
+DISTRO_FEATURES_append = " kernel6-6"

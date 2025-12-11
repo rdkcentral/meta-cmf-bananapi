@@ -1,7 +1,10 @@
 do_install_append(){
 
    install -d ${D}${sbindir}
-   sed -i '/brctl addif brlan0 lan0/d' ${D}${sbindir}/init-bridge.sh
+   DISTRO_EM_EXT_ENABLED="${@bb.utils.contains('DISTRO_FEATURES','em_extender','true','false',d)}"
+   if [ $DISTRO_EM_EXT_ENABLED = 'false' ]; then
+       sed -i '/brctl addif brlan0 lan0/d' ${D}${sbindir}/init-bridge.sh
+   fi
 sed -i '/model/a \
 if [ ! -d /nvram/secure ]; then \
     mkdir -p /nvram/secure \
