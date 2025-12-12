@@ -96,7 +96,8 @@ if [ "X$FEATURE_TYPE" == "XEasyMesh" ] && [ "X$WITHOUT_ALSAP" == "Xyes" ]; then
     sed -i 's/$al_mac/$br_mac/g' ${_TOPDIR}/meta-cmf-broadband/recipes-ccsp/unified-wifi-mesh/files/setup_mysql_db_post.sh
 fi
 
-
+    sed -i 's|SYSTEMD_SERVICE:${PN}:remove_broadband = "dropbear.service"|SYSTEMD_SERVICE:${PN}:remove_broadband = "${@bb.utils.contains('\''DISTRO_FEATURES'\'', '\''em_extender'\'', '\'' '\'','\''dropbear.service'\'', d)}"|' \
+${_TOPDIR}/meta-cmf-filogic/recipes-rdkb/sysint-broadband/sysint-broadband.bbappend
 
 echo 'RDEPENDS:${PN}-dev = ""' >> ${_TOPDIR}/meta-filogic/recipes-kernel/linux6-6-libc-headers/linux-libc-headers.inc
 

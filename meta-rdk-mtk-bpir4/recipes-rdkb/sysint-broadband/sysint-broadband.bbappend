@@ -6,9 +6,6 @@ SRCREV_FORMAT = "1.0.0"
 
 SRC_URI += "file://bpi_custom_device.properties"
 
-# To Enable the dropbear service
-SYSTEMD_SERVICE:${PN}:append = "${@bb.utils.contains('DISTRO_FEATURES', 'em_extender', ' dropbear.service', '', d)}"
-
 do_install_append () {
    install -m 644 ${WORKDIR}/bpi_custom_device.properties ${D}${sysconfdir}/device.properties
    ${@bb.utils.contains('DISTRO_FEATURES', 'OneWifi', 'echo "OneWiFiEnabled=true" >> ${D}${sysconfdir}/device.properties', '', d)}
