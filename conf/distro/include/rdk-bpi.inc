@@ -63,6 +63,7 @@ DISTRO_FEATURES_append = " kernel6-6"
 DISTRO_FEATURES_append = " CONFIG_IEEE80211BE"
 
 DISTRO_FEATURES_append = " matter"
+PREFERRED_VERSION_barton-matter = "1.4.0"
 
 #DISTRO_FEATURES_append = " generic_mlo"
 
