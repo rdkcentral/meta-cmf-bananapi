@@ -8,6 +8,20 @@
                     "RadioName": "wifi2",
                     "InterfaceList": [
                         {
+                            "InterfaceName": "wifi2.2",
+                            "Bridge": "brlan0",
+                            "vlanId": 0,
+                            "vapIndex": 17,
+                            "vapName": "iot_ssid_6g"
+                        },
+                        {
+                            "InterfaceName": "wifi2.1",
+                            "Bridge": "brlan0",
+                            "vlanId": 0,
+                            "vapIndex": 22,
+                            "vapName": "mesh_backhaul_6g"
+                        },
+                        {
                             "InterfaceName": "wifi2",
                             "Bridge": "brlan0",
                             "vlanId": 0,

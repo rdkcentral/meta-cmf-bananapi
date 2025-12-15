@@ -1,0 +1,12 @@
+# short-description: Create Bananapi Pi SD card image
+# long-description: Creates a partitioned SD card image for use with Bananapi R4.
+
+bootloader --ptable gpt --timeout=0
+
+part --source rawcopy --sourceparams="file=atf/bpi-r4_sdmmc_bl2_6-6.img" --part-name bl2 --align 17 --fixed-size 4079K --active --part-type=0FC63DAF-8483-4772-8E79-3D69D8477DE4
+
+part --source rawcopy --sourceparams="file=atf/bpi-r4_sdmmc_fip_6-6.bin" --part-name fip --align 6656 --fixed-size 2M --part-type=0FC63DAF-8483-4772-8E79-3D69D8477DE4
+
+part /boot --source bootimg-partition --ondisk mmcblk0 --fstype=vfat --label boot --active --align 8704 --fixed-size 100M --part-type=0FC63DAF-8483-4772-8E79-3D69D8477DE4
+
+part / --source rootfs --ondisk mmcblk0 --fstype=ext4 --label root --align 111104 --fixed-size 4G

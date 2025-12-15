@@ -1,0 +1,14 @@
+Source: Comcast/RDK
+subject:patch for fixing compilation issues after apply the Dynamic_NAS_IP_Update_2_11.patch
+diff -ruN git.orig/source/hostap-2.11/src/ap/ieee802_1x.c git/source/hostap-2.11/src/ap/ieee802_1x.c
+--- git.orig/source/hostap-2.11/src/ap/ieee802_1x.c	2025-10-13 13:07:11.349570021 +0000
++++ git/source/hostap-2.11/src/ap/ieee802_1x.c	2025-10-13 13:08:24.477177181 +0000
+@@ -610,7 +610,7 @@
+ 
+ 	if (hapd->conf->dynamic_own_ip_addr)
+ 		radius_client_get_local_addr(hapd->radius,
+-					     &hapd->conf->own_ip_addr);
++					     &hapd->radius->conf->own_ip_addr);
+ 
+ 	if (!hostapd_config_get_radius_attr(req_attr,
+ 					    RADIUS_ATTR_NAS_IP_ADDRESS) &&

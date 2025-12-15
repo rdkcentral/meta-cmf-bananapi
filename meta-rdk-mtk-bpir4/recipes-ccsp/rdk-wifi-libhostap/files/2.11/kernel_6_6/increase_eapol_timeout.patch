@@ -1,0 +1,14 @@
+SOURCE:COMCAST
+
+diff -ruN git.orig/source/hostap-2.11/src/ap/wpa_auth.c git/source/hostap-2.11/src/ap/wpa_auth.c
+--- git.orig/source/hostap-2.11/src/ap/wpa_auth.c	2025-10-13 10:47:15.762870982 +0000
++++ git/source/hostap-2.11/src/ap/wpa_auth.c	2025-10-13 10:48:03.398616039 +0000
+@@ -79,7 +79,7 @@
+ 				 struct wpa_group *group);
+ 
+ 
+-static const u32 eapol_key_timeout_first = 100; /* ms */
++static const u32 eapol_key_timeout_first = 1000; /* ms */
+ static const u32 eapol_key_timeout_subseq = 1000; /* ms */
+ static const u32 eapol_key_timeout_first_group = 500; /* ms */
+ static const u32 eapol_key_timeout_no_retrans = 4000; /* ms */

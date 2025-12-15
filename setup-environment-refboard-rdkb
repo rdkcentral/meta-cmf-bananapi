@@ -28,6 +28,12 @@ if [ -e "${_TOPDIR}/meta-cmf-filogic/setup-environment-release" ]; then
 	source meta-cmf-filogic/setup-environment-release
 fi
 
+if [[ -z $(grep 'meta-rdk-broadband-apps' conf/bblayers.conf) ]] && [[ -d  ../meta-rdk-broadband-apps ]]
+then
+    cat >> conf/bblayers.conf <<EOF
+BBLAYERS =+ "\${RDKROOT}/meta-rdk-broadband-apps"
+EOF
+fi
 
 if [[ -z $(grep 'meta-cmf-bananapi' conf/bblayers.conf) ]] && [[ -d  ../meta-cmf-bananapi ]]
 then
@@ -60,25 +66,6 @@ sed -i '203 s/^/#/' ${_TOPDIR}/meta-cmf-filogic/recipes-ccsp/util/utopia.bbappen
 touch ${_TOPDIR}/meta-cmf-filogic/recipes-ccsp/util/utopia_changes_applied
 fi
 
-if [ "X$KERNEL_TYPE" != "Xkernel6-6" ]; then
-    if [ ! -e ${_TOPDIR}/meta-cmf-filogic/recipes-ccsp/hal/rdkwifihal_changes_applied ]; then
-         sed -i '9 s/^/#/' ${_TOPDIR}/meta-cmf-filogic/recipes-ccsp/hal/rdk-wifi-hal.bbappend
-         sed -i '10 s/^/#/' ${_TOPDIR}/meta-cmf-filogic/recipes-ccsp/hal/rdk-wifi-hal.bbappend
-         sed -i '11 s/^/#/' ${_TOPDIR}/meta-cmf-filogic/recipes-ccsp/hal/rdk-wifi-hal.bbappend
-         sed -i '12 s/^/#/' ${_TOPDIR}/meta-cmf-filogic/recipes-ccsp/hal/rdk-wifi-hal.bbappend
-         sed -i '13 s/^/#/' ${_TOPDIR}/meta-cmf-filogic/recipes-ccsp/hal/rdk-wifi-hal.bbappend
-         sed -i '14 s/^/#/' ${_TOPDIR}/meta-cmf-filogic/recipes-ccsp/hal/rdk-wifi-hal.bbappend
-         sed -i '15 s/^/#/' ${_TOPDIR}/meta-cmf-filogic/recipes-ccsp/hal/rdk-wifi-hal.bbappend
-         sed -i '16 s/^/#/' ${_TOPDIR}/meta-cmf-filogic/recipes-ccsp/hal/rdk-wifi-hal.bbappend
-         sed -i '17 s/^/#/' ${_TOPDIR}/meta-cmf-filogic/recipes-ccsp/hal/rdk-wifi-hal.bbappend
-         touch ${_TOPDIR}/meta-cmf-filogic/recipes-ccsp/hal/rdkwifihal_changes_applied
-    fi
-    if [ ! -e ${_TOPDIR}/meta-cmf-filogic/recipes-ccsp/ccsp/onewifi_changes_applied ]; then
-         sed -i 's/^SRC_URI +=/SRC_URI_append =/' ${_TOPDIR}/meta-cmf-filogic/recipes-ccsp/ccsp/ccsp-one-wifi.bbappend
-         touch ${_TOPDIR}/meta-cmf-filogic/recipes-ccsp/ccsp/onewifi_changes_applied
-    fi
-fi
-
 # commenting removing dbus.service from meta-cmf-filogic
 if [ ! -e ${_TOPDIR}/meta-cmf-filogic/recipes-core/dbus/dbus_change ]; then
 sed -i '19 s/^/#/' ${_TOPDIR}/meta-cmf-filogic/recipes-core/dbus/dbus_%.bbappend
@@ -90,6 +77,11 @@ sed -i '/python/d' ${_TOPDIR}/meta-cmf-filogic/recipes-core/images/image-exclude
 touch ${_TOPDIR}/meta-cmf-filogic/recipes-core/images/python_binary_removed
 fi
 
+if [ ! -e ${_TOPDIR}/meta-filogic/recipes-wifi/hal/mt76_hal_change ];then
+echo "DEPENDS += \"rdk-wifi-halif\"" >> ${_TOPDIR}/meta-filogic/recipes-wifi/hal/hal-wifi-mt76.bb
+echo "DEPENDS += \"rdk-wifi-halif\"" >> ${_TOPDIR}/meta-cmf-broadband/recipes-ccsp/hal/hal-wifi-cfg80211_git.bb
+touch ${_TOPDIR}/meta-filogic/recipes-wifi/hal/mt76_hal_change
+fi
 
 if [ "X$FEATURE_TYPE" == "XEasyMesh" ]; then
     sed -i '/EasyMesh/s/^#//' ${_TOPDIR}/meta-cmf-bananapi/conf/distro/include/rdk-bpi.inc
@@ -104,29 +96,22 @@ if [ "X$FEATURE_TYPE" == "XEasyMesh" ] && [ "X$WITHOUT_ALSAP" == "Xyes" ]; then
     sed -i 's/$al_mac/$br_mac/g' ${_TOPDIR}/meta-cmf-broadband/recipes-ccsp/unified-wifi-mesh/files/setup_mysql_db_post.sh
 fi
 
+    sed -i 's|SYSTEMD_SERVICE:${PN}:remove_broadband = "dropbear.service"|SYSTEMD_SERVICE:${PN}:remove_broadband = "${@bb.utils.contains('\''DISTRO_FEATURES'\'', '\''em_extender'\'', '\'' '\'','\''dropbear.service'\'', d)}"|' \
+${_TOPDIR}/meta-cmf-filogic/recipes-rdkb/sysint-broadband/sysint-broadband.bbappend
 
-if [ "X$KERNEL_TYPE" == "Xkernel6-6" ]; then
-    sed -i '/kernel6-6/s/^#//' ${_TOPDIR}/meta-cmf-bananapi/conf/distro/include/rdk-bpi.inc
-fi
+echo 'RDEPENDS:${PN}-dev = ""' >> ${_TOPDIR}/meta-filogic/recipes-kernel/linux6-6-libc-headers/linux-libc-headers.inc
 
 if [ "X$BPI_IMG_TYPE" == "Xnand" ]; then
     sed -i '/sdmmc/s/^/#/' ${_TOPDIR}/meta-cmf-bananapi/conf/distro/include/rdk-bpi.inc
 else # SD card image is default
     mkdir -p ${_TOPDIR}/downloads
-    if [ -f ${_TOPDIR}/downloads/bpi-r4_sdmmc_bl2.img ] && [ -f ${_TOPDIR}/downloads/bpi-r4_sdmmc_fip.bin ]; then
-        echo "Both bl2 and fip binaries are present in local workspace."
+    if [ -f ${_TOPDIR}/downloads/bpi-r4_sdmmc_bl2_6-6.img ] && [ -f ${_TOPDIR}/downloads/bpi-r4_sdmmc_fip_6-6.bin ] && [ -f ${_TOPDIR}/downloads/bpi-r4_sdmmc_bl2_B_6-6.img ] && [ -f ${_TOPDIR}/downloads/bpi-r4_sdmmc_fip_B_6-6.bin ]; then
+	    echo "Both bl2 and fip binaries are present in local workspace for 6.6 kernel."
     else
-        echo "**********************************************************************"
-        echo "> CAUTION: YOU ARE TRYING TO BUILD SD CARD IMAGE WITHOUT BL2 AND FIP BINARIES."
-        if [ "X$KERNEL_TYPE" == "Xkernel6-6" ]; then
-             echo "> Please download the binaries from https://artifactory.rdkcentral.com/artifactory/RDKB-Platform/BPI-R4/uboot-2025.01/bpi-r4_sdmmc_bl2.img and https://artifactory.rdkcentral.com/artifactory/RDKB-Platform/BPI-R4/uboot-2025.01/bpi-r4_sdmmc_fip.bin"
-        else
-             echo "> Please download the binaries from https://artifactory.rdkcentral.com/artifactory/RDKB-Platform/BPI-R4/uboot-2024.04/bpi-r4_sdmmc_bl2.img and https://artifactory.rdkcentral.com/artifactory/RDKB-Platform/BPI-R4/uboot-2024.04/bpi-r4_sdmmc_fip.bin"
-	fi
-        echo "> If you don't have access to above resources, please follow instruction in https://wiki.rdkcentral.com/pages/viewpage.action?pageId=354648448#SDMonoliticimagebuildandflashingstepsforBPIR4.-Buildingbl2.imgandfip.binincaseofnothavingaccesstoartifactoryrepository to build bl2 and fip binaries yourselves."
-        echo "> Place those binaries under ${_TOPDIR}/downloads/"
-        echo "> EXITING NOW."
-        echo "**********************************************************************"
-        return 1
-    fi
+	    echo "**********************************************************************"
+	    echo "> Missing files are preventing the build from starting:"
+	    echo "> The BL2 and FIP binaries for kernel-6.6 aren't in the downloads directory. Copy these binaries into the directory and then restart the build. You can find instructions for creating the necessary binaries on the RDK-B Code Releases page: (https://wiki.rdkcentral.com/display/CMF/RDK-B+Code+Releases)"
+	    echo "**********************************************************************"
+	    return 1
+     fi
 fi

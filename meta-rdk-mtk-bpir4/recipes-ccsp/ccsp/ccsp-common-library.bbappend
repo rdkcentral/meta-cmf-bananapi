@@ -75,12 +75,14 @@ do_install_append_class-target() {
    sed -i '$a [Install]\nWantedBy=multi-user.target' ${D}${systemd_unitdir}/system/onewifi.service
    fi
    sed -i '/IsErouterRunningStatus/,/fi/ s/^/#/' ${D}/usr/ccsp/ccspPAMCPCheck.sh
+   sed -i '/ExecStart=/i ExecStartPre=/usr/bin/start_cron' ${D}/lib/systemd/system/RdkFwUpgradeManager.service
 }
 
 
 SYSTEMD_SERVICE_${PN}_remove_onewifi = " ccspwifiagent.service"
 SYSTEMD_SERVICE_${PN} += "${@bb.utils.contains('DISTRO_FEATURES', 'OneWifi', 'onewifi.service ', '', d)}"
 SYSTEMD_SERVICE_${PN} += "${@bb.utils.contains('DISTRO_FEATURES', 'webconfig_bin', 'webconfig.service', '', d)}"
+SYSTEMD_SERVICE_${PN} += "${@bb.utils.contains('DISTRO_FEATURES', 'rdkb_wan_manager', 'RdkTelcoVoiceManager.service', '', d)}"
 SYSTEMD_SERVICE_${PN} += " CcspTelemetry.service"
 SYSTEMD_SERVICE_${PN} += " notifyComp.service"
 SYSTEMD_SERVICE_${PN} += "gwprovapp.service"

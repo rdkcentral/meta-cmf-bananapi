@@ -30,13 +30,14 @@ DISTRO_FEATURES_append = " CPUPROCANALYZER_BROADBAND"
 # RDKB-51565,RDKB-50795: [HAL] Cellular Hal Implementation
 DISTRO_FEATURES_append = " rdkb_cellular_manager_mm"
 
-#Dac Feature support for BPIR4 device.
-DISTRO_FEATURES_append = " dac"
-
 DISTRO_FEATURES_append = " partner_default_ext"
 
 #Enable SDcard image as default
 DISTRO_FEATURES_append = " sdmmc"
+
+DISTRO_FEATURE_append = " rdkb_voice_manager_dmltr104_v2"
+
+DISTRO_FEATURE_append = " telco_voice_feature_enable_persist"
 
 #PPP Feature
 #DISTRO_FEATURES_append = "ppp-enabled"
@@ -57,8 +58,11 @@ DISTRO_FEATURES_append = " wps_support"
 DISTRO_FEATURES_append = " resource_optimization"
 
 #Enable kernel_6_6 support
-#DISTRO_FEATURES_append = " kernel6-6"
+DISTRO_FEATURES_append = " kernel6-6"
 
 DISTRO_FEATURES_append = " CONFIG_IEEE80211BE"
 
 #DISTRO_FEATURES_append = " generic_mlo"
+
+#Enable the below DISTRO to enable Hybrid Hal(rndis/modem) for cellular devices
+#DISTRO_FEATURES_append_broadband = " cellular_hybrid_support"

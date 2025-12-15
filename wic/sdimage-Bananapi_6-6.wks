@@ -1,0 +1,44 @@
+# short-description: Custom Bananapi R4 SD card image
+# long-description: Creates a partitioned SD card image with dual-bank layout and additional RDK-B partitions.
+#
+bootloader --ptable gpt --timeout=0
+
+# 1. BL2 (aligned at 17 sectors, 4079KB)
+part --source rawcopy --sourceparams="file=atf/bpi-r4_sdmmc_bl2_6-6.img" --part-name bl2 --align 17 --fixed-size 4079K --active --part-type=0FC63DAF-8483-4772-8E79-3D69D8477DE4
+
+
+# 2. FIP (aligned at 6656 sectors, 2048KB)
+part --source rawcopy --sourceparams="file=atf/bpi-r4_sdmmc_fip_6-6.bin" --part-name fip --align 6656 --fixed-size 2M --part-type=0FC63DAF-8483-4772-8E79-3D69D8477DE4
+
+# 3. Boot A
+part /boot --source bootimg-partition --ondisk mmcblk0 --fstype=vfat --label boot_a --active --align 8704 --fixed-size 16M --part-type=0FC63DAF-8483-4772-8E79-3D69D8477DE4
+
+# 4. rootfs A
+part / --source rootfs --ondisk mmcblk0 --fstype=ext4 --label rootfs_a --fixed-size 1024M
+
+# 5. BL2 B (copy of BL2)
+part --source rawcopy --sourceparams="file=atf/bpi-r4_sdmmc_bl2_B_6-6.img" --part-name bl2_b --fixed-size 4079K --part-type=0FC63DAF-8483-4772-8E79-3D69D8477DE4
+
+# 6. FIP B (copy of FIP)
+part --source rawcopy --sourceparams="file=atf/bpi-r4_sdmmc_fip_B_6-6.bin" --part-name fip_b --fixed-size 2M --part-type=0FC63DAF-8483-4772-8E79-3D69D8477DE4
+
+# 7. Boot B
+part --source bootimg-partition --ondisk mmcblk0 --fstype=vfat --label boot_b --active --fixed-size 16M --part-type=0FC63DAF-8483-4772-8E79-3D69D8477DE4
+
+# 8. rootfs B
+part / --source rootfs --ondisk mmcblk0 --fstype=ext4 --label rootfs_b --fixed-size 1024M
+
+# 9. NVRAM (2MB)
+part --source=empty --fstype=ext4 --label=nvram --fixed-size=2M
+
+# 10. Crash_a Debug (8MB)
+part --source=empty --fstype=ext4 --label=crash_a --fixed-size=8M
+
+# 11. Crash_b Debug (8MB)
+part --source=empty --fstype=ext4 --label=crash_b --fixed-size=8M
+
+# 12. Reserved (16MB)
+part --source=empty --fstype=ext4 --label=reserved --fixed-size=16M
+
+# 13. DAC 
+part --source=empty --fstype=ext4 --label=dac --fixed-size=32M

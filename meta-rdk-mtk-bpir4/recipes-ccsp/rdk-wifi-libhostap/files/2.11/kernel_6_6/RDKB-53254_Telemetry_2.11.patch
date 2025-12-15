@@ -1,0 +1,69 @@
+Date: 10-Jan-2024
+From: Pavithra_Sundaravadivel@Comcast.com
+Source: COMCAST
+
+diff -ruN git.orig/source/hostap-2.11/src/ap/ap_drv_ops.c git/source/hostap-2.11/src/ap/ap_drv_ops.c
+--- git.orig/source/hostap-2.11/src/ap/ap_drv_ops.c	2025-10-10 16:24:31.770412909 +0000
++++ git/source/hostap-2.11/src/ap/ap_drv_ops.c	2025-10-10 16:32:08.099985651 +0000
+@@ -980,6 +980,14 @@
+ 					reason, link_id);
+ }
+ 
++int hostapd_drv_radius_eap_failure(struct hostapd_data *hapd,
++                           int failure_reason)
++{
++       if (!hapd->driver || !hapd->driver->radius_eap_failure || !hapd->drv_priv)
++               return 0;
++       return hapd->driver->radius_eap_failure(hapd->drv_priv, failure_reason);
++}
++
+ int hostapd_drv_sta_notify_deauth(struct hostapd_data *hapd,
+                           const u8 *addr, int reason)
+ {
+diff -ruN git.orig/source/hostap-2.11/src/ap/ap_drv_ops.h git/source/hostap-2.11/src/ap/ap_drv_ops.h
+--- git.orig/source/hostap-2.11/src/ap/ap_drv_ops.h	2025-10-10 16:24:31.770412909 +0000
++++ git/source/hostap-2.11/src/ap/ap_drv_ops.h	2025-10-10 16:32:52.347750279 +0000
+@@ -115,6 +115,7 @@
+ 			  int no_encrypt);
+ int hostapd_drv_sta_deauth(struct hostapd_data *hapd,
+ 			   const u8 *addr, int reason);
++int hostapd_drv_radius_eap_failure(struct hostapd_data *hapd, int failure_reason);
+ int hostapd_drv_sta_notify_deauth(struct hostapd_data *hapd,
+                            const u8 *addr, int reason);
+ int hostapd_drv_sta_disassoc(struct hostapd_data *hapd,
+diff -ruN git.orig/source/hostap-2.11/src/ap/ieee802_1x.c git/source/hostap-2.11/src/ap/ieee802_1x.c
+--- git.orig/source/hostap-2.11/src/ap/ieee802_1x.c	2025-10-10 16:24:31.774412889 +0000
++++ git/source/hostap-2.11/src/ap/ieee802_1x.c	2025-10-10 16:34:37.247192242 +0000
+@@ -1677,6 +1677,7 @@
+ 		break;
+ 	case EAP_CODE_FAILURE:
+ 		os_strlcpy(buf, "EAP Failure", sizeof(buf));
++		hostapd_drv_radius_eap_failure(hapd, DRV_EAP_FAILURE);
+ 		break;
+ 	default:
+ 		os_strlcpy(buf, "unknown EAP code", sizeof(buf));
+diff -ruN git.orig/source/hostap-2.11/src/ap/ieee802_1x.h git/source/hostap-2.11/src/ap/ieee802_1x.h
+--- git.orig/source/hostap-2.11/src/ap/ieee802_1x.h	2025-10-10 16:24:31.758412974 +0000
++++ git/source/hostap-2.11/src/ap/ieee802_1x.h	2025-10-10 16:35:14.702992985 +0000
+@@ -9,6 +9,9 @@
+ #ifndef IEEE802_1X_H
+ #define IEEE802_1X_H
+ 
++#define DRV_RADIUS_ACCESS_REJECT 1
++#define DRV_EAP_FAILURE 2
++
+ struct hostapd_data;
+ struct sta_info;
+ struct eapol_state_machine;
+diff -ruN git.orig/source/hostap-2.11/src/drivers/driver.h git/source/hostap-2.11/src/drivers/driver.h
+--- git.orig/source/hostap-2.11/src/drivers/driver.h	2025-10-10 16:24:31.834412569 +0000
++++ git/source/hostap-2.11/src/drivers/driver.h	2025-10-10 16:37:50.430164495 +0000
+@@ -5617,7 +5617,7 @@
+ 			      const u8 *match, size_t match_len,
+ 			      bool multicast);
+ #endif /* CONFIG_TESTING_OPTIONS */
+-
++        int (*radius_eap_failure)(void *priv, int failure_reason);
+ 	/**
+ 	 * get_multi_hw_info - Get multiple underlying hardware information
+ 	 *		       (hardware IDx and supported frequency range)

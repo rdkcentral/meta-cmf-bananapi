@@ -1,0 +1,195 @@
+#################################################
+#From: bce6ad856011bb057bc29d1c66bb4e2378b32a57
+#Subject: Add RSN Override for WPA3 Compatibility
+#Source: COMCAST
+#Signed-off-by:Amalesh_Nandh@comcast.com
+#################################################
+diff -ruN git.orig/source/hostap-2.11/src/ap/ap_drv_ops.c git/source/hostap-2.11/src/ap/ap_drv_ops.c
+--- git.orig/source/hostap-2.11/src/ap/ap_drv_ops.c	2025-10-14 05:21:32.273257097 +0000
++++ git/source/hostap-2.11/src/ap/ap_drv_ops.c	2025-10-14 05:23:37.868592209 +0000
+@@ -1448,6 +1448,52 @@
+         return hapd->driver->get_rnr_colocation_len(hapd->drv_priv, current_len);
+ }
+ 
++int hostapd_drv_get_sta_auth_type(struct hostapd_data *hapd,
++                                        const u8 *addr, const u8 *ies, size_t ies_len, int frame_type)
++{
++        struct ieee802_11_elems elems;
++        const u8 *wpa_ie; int res;
++        size_t wpa_ie_len;
++        struct wpa_ie_data data;
++
++        if(!hapd->driver || !hapd->driver->get_sta_auth_type)
++                return -1;
++
++        if (ieee802_11_parse_elems(ies, ies_len, &elems, 1) == ParseFailed) {
++                wpa_printf(MSG_ERROR, "%s Failed to parse elements\n", __func__);
++                return -1;
++        }
++
++        if ((hapd->conf->wpa & WPA_PROTO_RSN) && elems.rsn_ie) {
++                wpa_ie = elems.rsn_ie;
++                wpa_ie_len = elems.rsn_ie_len;
++        } else if ((hapd->conf->wpa & WPA_PROTO_WPA) &&
++                   elems.wpa_ie) {
++                wpa_ie = elems.wpa_ie;
++                wpa_ie_len = elems.wpa_ie_len;
++        } else {
++                wpa_ie = NULL;
++                wpa_ie_len = 0;
++        }
++
++        if(wpa_ie == NULL) {
++                wpa_printf(MSG_ERROR, "wpa ie is NULL in %s\n", __func__);
++                return -1;
++        }
++        
++	if (hapd->conf->wpa && wpa_ie) {
++                wpa_ie -= 2;wpa_ie_len += 2;
++        }
++
++        res = wpa_parse_wpa_ie_rsn(wpa_ie, wpa_ie_len, &data);
++        if(res) {
++                wpa_printf(MSG_ERROR, "RSN_IE %s Failed to parse wpa IE \n", __func__);
++                return -1;
++        }
++
++        return hapd->driver->get_sta_auth_type(hapd->drv_priv, addr, data.key_mgmt, frame_type);
++}
++
+ u8* hostapd_drv_eid_rnr_colocation(struct hostapd_data *hapd, u8 *eid,
+                                       size_t *current_len)
+ {
+diff -ruN git.orig/source/hostap-2.11/src/ap/ap_drv_ops.h git/source/hostap-2.11/src/ap/ap_drv_ops.h
+--- git.orig/source/hostap-2.11/src/ap/ap_drv_ops.h	2025-10-14 05:21:32.273257097 +0000
++++ git/source/hostap-2.11/src/ap/ap_drv_ops.h	2025-10-14 05:24:40.660258609 +0000
+@@ -166,6 +166,7 @@
+ int hostapd_drv_dpp_listen(struct hostapd_data *hapd, bool enable);
+ size_t hostapd_drv_eid_rnr_colocation_len(struct hostapd_data *hapd,
+                                        size_t *current_len);
++int hostapd_drv_get_sta_auth_type(struct hostapd_data *hapd,const u8 *addr, const u8 *ies, size_t ies_len, int frame_type);
+ u8* hostapd_drv_eid_rnr_colocation(struct hostapd_data *hapd, u8 *eid,
+                                    size_t *current_len);
+ struct hostapd_data* hostapd_drv_mbssid_get_tx_bss(struct hostapd_data *hapd);
+diff -ruN git.orig/source/hostap-2.11/src/ap/ieee802_11.c git/source/hostap-2.11/src/ap/ieee802_11.c
+--- git.orig/source/hostap-2.11/src/ap/ieee802_11.c	2025-10-14 05:21:32.277257076 +0000
++++ git/source/hostap-2.11/src/ap/ieee802_11.c	2025-10-14 05:27:11.979454545 +0000
+@@ -6462,7 +6462,7 @@
+ 	if (resp >= 0) {
+ 		if (sta)
+ 			sta->sending_assoc = 1;
+-
++                hostapd_drv_get_sta_auth_type(hapd, mgmt->sa, pos, left, reassoc ? STA_FRAME_REASSOC:STA_FRAME_ASSOC);
+ 		reply_res = send_assoc_resp(hapd,
+ 					    sta, sta ? sta->addr : mgmt->sa,
+ 					    resp, reassoc, pos, left, rssi,
+diff -ruN git.orig/source/hostap-2.11/src/ap/wpa_auth.c git/source/hostap-2.11/src/ap/wpa_auth.c
+--- git.orig/source/hostap-2.11/src/ap/wpa_auth.c	2025-10-14 05:21:32.273257097 +0000
++++ git/source/hostap-2.11/src/ap/wpa_auth.c	2025-10-14 05:29:58.386570281 +0000
+@@ -307,6 +307,13 @@
+ 				     key, key_len, key_flag);
+ }
+ 
++static void wpa_auth_get_sta_auth_type(struct wpa_authenticator *wpa_auth, const u8 *addr,
++                                        const u8 *data, size_t data_len, int frame_type)
++{
++        if(!wpa_auth->cb->get_sta_auth_type)
++                return;
++        wpa_auth->cb->get_sta_auth_type(wpa_auth->cb_ctx, addr, data, data_len, frame_type);
++}
+ 
+ #ifdef CONFIG_PASN
+ static inline int wpa_auth_set_ltf_keyseed(struct wpa_authenticator *wpa_auth,
+@@ -3961,6 +3968,7 @@
+ 		eapol_key_ie = kde.wpa_ie;
+ 		eapol_key_ie_len = kde.wpa_ie_len;
+ 	}
++	wpa_auth_get_sta_auth_type(wpa_auth, sm->addr, eapol_key_ie, eapol_key_ie_len, STA_FRAME_EAPOL_M2);
+ 	ft = sm->wpa == WPA_VERSION_WPA2 && wpa_key_mgmt_ft(sm->wpa_key_mgmt);
+ 	if (!sm->wpa_ie ||
+ 	    wpa_compare_rsn_ie(ft, sm->wpa_ie, sm->wpa_ie_len,
+diff -ruN git.orig/source/hostap-2.11/src/ap/wpa_auth_glue.c git/source/hostap-2.11/src/ap/wpa_auth_glue.c
+--- git.orig/source/hostap-2.11/src/ap/wpa_auth_glue.c	2025-10-14 05:21:32.277257076 +0000
++++ git/source/hostap-2.11/src/ap/wpa_auth_glue.c	2025-10-14 05:37:52.584050643 +0000
+@@ -1730,6 +1730,17 @@
+ }
+ #endif /* CONFIG_NO_RADIUS */
+ 
++static void hostapd_wpa_auth_get_sta_auth_type(void *ctx, const u8 *addr,
++                         const u8 *ies, size_t ies_len, int frame_type)
++{
++        struct hostapd_data *hapd = ctx;
++
++        if(!hapd){
++                wpa_printf(MSG_ERROR, "%s hapd is NULL", __func__);
++                return;
++        }
++        hostapd_drv_get_sta_auth_type(hapd, addr, ies, ies_len, frame_type);
++}
+ 
+ #ifdef CONFIG_PASN
+ static int hostapd_set_ltf_keyseed(void *ctx, const u8 *peer_addr,
+@@ -1891,7 +1902,8 @@
+ #endif /* CONFIG_NO_RADIUS */
+ #if defined(CONFIG_DRIVER_BRCM) && defined(CONFIG_DRIVER_BRCM_CEVENT)
+                 .get_ifname = hostapd_wpa_auth_get_ifname,
+-#endif /* CONFIG_DRIVER_BRCM && CONFIG_DRIVER_BRCM_CEVENT */		
++#endif /* CONFIG_DRIVER_BRCM && CONFIG_DRIVER_BRCM_CEVENT */	
++	        .get_sta_auth_type = hostapd_wpa_auth_get_sta_auth_type,	
+ #ifdef CONFIG_PASN
+ 		.set_ltf_keyseed = hostapd_set_ltf_keyseed,
+ #endif /* CONFIG_PASN */
+diff -ruN git.orig/source/hostap-2.11/src/ap/wpa_auth.h git/source/hostap-2.11/src/ap/wpa_auth.h
+--- git.orig/source/hostap-2.11/src/ap/wpa_auth.h	2025-10-14 05:21:32.277257076 +0000
++++ git/source/hostap-2.11/src/ap/wpa_auth.h	2025-10-14 05:31:21.406129126 +0000
+@@ -439,7 +439,8 @@
+ #endif /* CONFIG_MESH */
+ #if defined(CONFIG_DRIVER_BRCM) && defined(CONFIG_DRIVER_BRCM_CEVENT)
+         char* (*get_ifname)(void *ctx);
+-#endif /* CONFIG_DRIVER_BRCM && CONFIG_DRIVER_BRCM_CEVENT */	
++#endif /* CONFIG_DRIVER_BRCM && CONFIG_DRIVER_BRCM_CEVENT */
++void (*get_sta_auth_type)(void *ctx, const u8 *addr,const u8 *ies, size_t ies_len, int frame_type);
+ #ifdef CONFIG_PASN
+ 	int (*set_ltf_keyseed)(void *ctx, const u8 *addr, const u8 *ltf_keyseed,
+ 			       size_t ltf_keyseed_len);
+diff -ruN git.orig/source/hostap-2.11/src/drivers/driver.h git/source/hostap-2.11/src/drivers/driver.h
+--- git.orig/source/hostap-2.11/src/drivers/driver.h	2025-10-14 05:21:32.313256885 +0000
++++ git/source/hostap-2.11/src/drivers/driver.h	2025-10-14 05:46:15.453383411 +0000
+@@ -5659,6 +5659,18 @@
+         int (*radius_eap_failure)(void *priv, int failure_reason);
+ 	int (*radius_fallback_failover)(void *priv, int radius_switch_reason);
+ 	/**
++        * get_sta_auth_type - Notify about Auth Type STA sent in Assoc/Reassoc Req
++        * @priv: Private driver interface data
++        * @addr: Sends the STA Address
++        * @key_mgmt: STA Auth Type in Association Request
++        * @frame_type: Sends Frame Type of the Station
++        *
++        * Returns: 0 on success, -1 on failure
++        * Update about Auth Type in Association/Reassociation Request to driver
++        */
++       int (*get_sta_auth_type)(void *priv,
++                                       const u8 *addr, int key_mgmt, int frame_type);
++	/**
+ 	 * get_multi_hw_info - Get multiple underlying hardware information
+ 	 *		       (hardware IDx and supported frequency range)
+ 	 * @priv: Private driver interface data
+@@ -6637,6 +6649,18 @@
+ };
+ 
+ /**
++ * enum sta_frame_type
++ * @STA_FRAME_ASSOC: Received STA Frame Type is Association
++ * @STA_FRAME_REASSOC: Received STA Frame Type is Reassociation
++ * @STA_FRAME_EAPOL_M2: Received STA Frame Type is EAPOL M2
++ */
++ enum sta_frame_type {
++        STA_FRAME_ASSOC = 0,
++        STA_FRAME_REASSOC,
++        STA_FRAME_EAPOL_M2,
++};
++
++/**
+  * union wpa_event_data - Additional data for wpa_supplicant_event() calls
+  */
+ union wpa_event_data {

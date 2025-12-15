@@ -47,9 +47,9 @@ Index: ethsw/rdkb_hal/src/ethsw/ccsp_hal_ethsw.c
      memset(&ifr, 0, sizeof(ifr));
 -    snprintf(ifr.ifr_name, sizeof(ifr.ifr_name), "%s", "eth1");
 +    if (PortId == 1)
-+	snprintf(ifr.ifr_name, sizeof(ifr.ifr_name), "erouter0");
++	       snprintf(ifr.ifr_name, sizeof(ifr.ifr_name), "%s", "erouter0");
 +    else
-+        snprintf(ifr.ifr_name, sizeof(ifr.ifr_name),"lan",(PortId-1));
++        snprintf(ifr.ifr_name, sizeof(ifr.ifr_name),"lan%d",(PortId-1));
  
      if (ioctl(sockfd, SIOCGIFFLAGS, &ifr) < 0)
      {
