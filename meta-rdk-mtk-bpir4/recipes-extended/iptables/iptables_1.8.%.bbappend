@@ -1,6 +1,5 @@
-RRECOMMENDS_${PN}:append += "kernel-module-xt-nat \
+RRECOMMENDS:${PN}:append = "kernel-module-xt-nat \
                              kernel-module-ipt-trigger"
-
 
 FILESEXTRAPATHS:prepend:="${THISDIR}/files:"
 
