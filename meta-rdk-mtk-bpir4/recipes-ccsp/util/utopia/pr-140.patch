@@ -1,0 +1,30 @@
+From 00588b130bb6a1a53f6c286232fef421bda07000 Mon Sep 17 00:00:00 2001
+From: "keerthana.p" <keerthana_pandurangan@comcast.com>
+Date: Tue, 2 Dec 2025 17:13:12 +0000
+Subject: [PATCH] RDKBACCL-1248 : rdkb-cli connection was not established from
+
+bpi device via 8888 port
+Reason for change: To allow 8888 port for bpi target to access the
+rdkb-cli GUI from remote pc to bpi ctrl target
+Test procedure: Able to make successful connection
+Risks: None
+
+Signed-off-by: keerthana.p <keerthana_pandurangan@comcast.com>
+---
+ source/firewall/firewall.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/source/firewall/firewall.c b/source/firewall/firewall.c
+index d66db8f..3fd56c4 100644
+--- a/source/firewall/firewall.c
++++ b/source/firewall/firewall.c
+@@ -13241,7 +13241,8 @@ int do_block_ports(FILE *filter_fp)
+    fprintf(filter_fp, "-A INPUT ! -i brlan0 -p tcp -m tcp --dport 49152:49153 -j DROP\n");
+    /* For EasyMesh Controller Communication */
+ #if defined(_PLATFORM_BANANAPI_R4_)
+-   fprintf(filter_fp, "-I INPUT -i %s -p tcp --dport 49153 -j ACCEPT\n",get_current_wan_ifname());
++   fprintf(filter_fp, "-I INPUT -i %s -p tcp --dport 49153 -j ACCEPT\n", get_current_wan_ifname());
++   fprintf(filter_fp, "-I INPUT -i %s -p tcp --dport 8888 -j ACCEPT\n", get_current_wan_ifname());
+ #endif
+    fprintf(filter_fp, "-A INPUT ! -i brlan0 -p udp -m udp --dport 1900 -j DROP\n");
+    fprintf(filter_fp, "-I INPUT ! -i brlan0 -p tcp -m tcp --dport 21515 -j DROP\n");

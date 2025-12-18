@@ -3,6 +3,7 @@ include meta-rdk-mtk-bpir4/recipes-ccsp/ccsp/ccsp_common_bananapi.inc
 FILESEXTRAPATHS_prepend := "${THISDIR}/${PN}:"
 
 SRC_URI += "file://service_bridge_bpi.sh"
+SRC_URI += "file://pr-140.patch"
 
 do_install_append() {
 
