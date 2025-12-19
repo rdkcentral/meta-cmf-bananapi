@@ -22,4 +22,14 @@ do_install_append () {
    # Changing CLOUDURL and DCM_LOG_SERVER_URL values with migrated server
    sed -i -e 's|^CLOUDURL=.*$|CLOUDURL="https://xconf.rdkcentral.com/xconf/swu/stb?eStbMac="|' ${D}${sysconfdir}/include.properties
    sed -i -e 's|^DCM_LOG_SERVER_URL=.*$|DCM_LOG_SERVER_URL=https://xconf.rdkcentral.com/loguploader/getSettings|' ${D}${sysconfdir}/dcm.properties
+   rm -f ${D}${systemd_unitdir}/system/swupdate.service
+   rm  ${D}${base_libdir}/rdk/bank_image_switch.sh
+   rm  ${D}${base_libdir}/rdk/imageFlasher.sh
+   rm  ${D}${base_libdir}/rdk/rpi_image_Flasher.sh
+   rm  ${D}${base_libdir}/rdk/swupdate_utility.sh
+   rm -f ${D}${base_libdir}/rdk/deviceInitiatedFWDnld.sh
+   rm -f ${D}${base_libdir}/rdk/rpi_sw_install.sh
+   rm -f ${D}${base_libdir}/rdk/rpi_sw_install1.sh
 }
+
+SYSTEMD_SERVICE:${PN}:remove = "swupdate.service"
