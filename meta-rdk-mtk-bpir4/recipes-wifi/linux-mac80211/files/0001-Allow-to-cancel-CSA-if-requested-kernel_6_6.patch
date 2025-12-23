@@ -1,0 +1,41 @@
+From ea370587a77a92a322fddf76a8ff1a6a15287b1b Mon Sep 17 00:00:00 2001
+From: Brayan Milczarek <brayan_milczarek@comcast.com>
+Date: Thu, 18 Dec 2025 14:30:14 +0000
+Subject: [PATCH] Allow to cancel CSA if requested
+
+---
+ net/mac80211/cfg.c | 18 +++++++++++++-----
+ 1 file changed, 13 insertions(+), 5 deletions(-)
+
+diff --git a/net/mac80211/cfg.c b/net/mac80211/cfg.c
+index 9f5d016..9c67c71 100644
+--- a/net/mac80211/cfg.c
++++ b/net/mac80211/cfg.c
+@@ -4350,11 +4350,19 @@ __ieee80211_channel_switch(struct wiphy *wiphy, struct net_device *dev,
+ 	/* don't allow another channel switch if one is already active
+ 	 * except the case of post-CSA radar detection.
+ 	 */
+-	if (link_conf->csa_active) {
+-		if (!sdata->wdev.links[link_id].cac_started)
+-			return -EBUSY;
+-		ieee80211_dfs_cac_cancel(local, chanctx);
+-	}
++	//if (link_conf->csa_active) {
++	//	if (!sdata->wdev.links[link_id].cac_started)
++	//		return -EBUSY;
++	//	ieee80211_dfs_cac_cancel(local, chanctx);
++	//}
++	
++        /*RDKB: Allow to cancel previous CSA if another request comes*/
++        if (link_conf->csa_active) {
++               if (sdata->wdev.links[link_id].cac_started)
++                       ieee80211_dfs_cac_cancel(local, chanctx);
++               link_conf->csa_active = false;
++               ieee80211_vif_unblock_queues_csa(sdata);
++        }
+ 
+ 	ch_switch.timestamp = 0;
+ 	ch_switch.device_timestamp = 0;
+-- 
+2.44.4
+
