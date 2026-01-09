@@ -9,6 +9,7 @@ DEPENDS_append = " mesh-agent "
 DEPENDS_remove = " opensync "
 DEPENDS += " ${@bb.utils.contains('DISTRO_FEATURES', 'EasyMesh', ' rdk-wifi-libhostap ', '', d)}"
 
+DEPENDS += " rdk-wifi-hal"
 CFLAGS_append = " -DWIFI_HAL_VERSION_3 -Wno-unused-function "
 LDFLAGS_append = " -ldl"
 CFLAGS_append_aarch64 = " -Wno-error "
