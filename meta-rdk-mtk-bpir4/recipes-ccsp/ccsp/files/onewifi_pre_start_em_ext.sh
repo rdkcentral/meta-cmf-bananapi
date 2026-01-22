@@ -72,9 +72,6 @@ ip link set dev "mld0" address "$new_mac"
 #To update al_mac addr in EasymesgCfg.json
 al_mac_addr=`cat /nvram/EasymeshCfg.json | grep AL_MAC_ADDR  | cut -d '"' -f4`
 al_mac=`iw dev wifi1.3 info | grep addr | cut -d ' ' -f2`
-                 
-if [ "$al_mac_addr" = "00:00:00:00:00:00" ]; then
-        sed -i "s/$al_mac_addr/$al_mac/g" /nvram/EasymeshCfg.json
-fi
+sed -i "s/$al_mac_addr/$al_mac/g" /nvram/EasymeshCfg.json
 
 exit 0

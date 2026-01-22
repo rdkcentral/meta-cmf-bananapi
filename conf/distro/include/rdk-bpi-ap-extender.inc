@@ -34,3 +34,6 @@ DISTRO_FEATURES_append = " generic_mlo"
 
 # Kernel 6.6
 DISTRO_FEATURES_append = " kernel6-6"
+
+#Disable rdm-agent for reference platform
+#DISTRO_FEATURES_append = "RDM"

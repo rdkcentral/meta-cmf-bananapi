@@ -45,6 +45,10 @@ sed -i "s/\$\$cmdiag_ifname=lan0$/\$\$cmdiag_ifname=net0/g" ${D}${sysconfdir}/ut
 sed -i 's/^$CosaNAT::port_trigger_enabled=1/$CosaNAT::port_trigger_enabled=0/' ${D}${sysconfdir}/utopia/system_defaults
 
 #Script for enabling bridge mode in BPIR4.
+#Renaming 6G interface name for WifiAgent
+if [ "${@bb.utils.contains('DISTRO_FEATURES', 'OneWifi', 'true', 'false', d)}" == "false" ]; then
+    sed -i "s/wifi2/wifi16/g" ${WORKDIR}/service_bridge_bpi.sh
+fi
 install -m 755 ${WORKDIR}/service_bridge_bpi.sh ${D}${sysconfdir}/utopia/service.d/
 install -m 755 ${WORKDIR}/service_bridge_bpi.sh ${D}${sysconfdir}/utopia/service.d/service_bridge.sh
 

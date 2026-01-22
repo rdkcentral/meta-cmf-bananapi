@@ -1,6 +1,7 @@
 SOURCE:RDKM
---- ./hostapd-init-EHT.sh	2025-10-22 11:15:20.021034563 +0100
-+++ ./hostapd-init-EHT.sh	2025-10-22 13:30:43.085766313 +0100
+
+--- hostapd-init-EHT.sh	2025-12-27 07:20:06.780944276 +0000
++++ hostapd-init-EHT.sh	2025-12-29 10:12:03.185702259 +0000
 @@ -157,7 +157,11 @@
              iw wlan$phyidx del > /dev/null
          elif [ -e /sys/class/net/wifi$phyidx ]; then
@@ -14,16 +15,23 @@ SOURCE:RDKM
                  ifname="$(cat /nvram/hostapd"$ifidx".conf | grep ^interface= | cut -d '=' -f2 | tr -d '\n')"
                  if [ -n $ifname ]; then
                      hostapd_cli -i global raw REMOVE wifi$ifidx > /dev/null
-@@ -173,14 +177,24 @@
+@@ -173,14 +177,31 @@
  			continue
          fi
-
+ 
 -        if [ ! -f /nvram/hostapd"$devidx".conf ]; then
 -            touch /nvram/hostapd"$devidx".conf
 +        if [ $devidx -eq 2 ]; then
 +            real_idx=16
 +        else
 +            real_idx=$devidx
++        fi
++
++        # Read LanMode
++        LanMode="$(sysevent get bridge_mode)"
++        ExpectedVapStat=1
++        if [ "$LanMode" = "2" ]; then
++                ExpectedVapStat="0"
 +        fi
 +
 +        if [ ! -f /nvram/hostapd"$real_idx".conf ]; then
@@ -40,11 +48,11 @@ SOURCE:RDKM
 -                vapstat="$(cat /nvram/vap-status | grep wifi"$ifidx"= | cut -d'=' -f2)"
 -                if [ -n $ifname ] && [[ $vapstat -eq "1" ]]; then
 +                vapstat="$(cat /nvram/vap-status | grep wifi"$ifidx"= | cut -d'=' -f2 | head -n 1)"
-+                if [ -n "$ifname" ] && [ "$vapstat" == "1" ]; then
++                if [ -n "$ifname" ] && [ "$vapstat" = "$ExpectedVapStat" ]; then
                      if [ $i = 0 ]; then
                          ## first interface in this phy
                          iw phy phy0 interface add $ifname type __ap radios $radio_idx > /dev/null
-@@ -188,9 +202,7 @@
+@@ -188,9 +209,7 @@
                      touch /nvram/hostapd-acl$ifidx
                      touch /nvram/hostapd$ifidx.psk
                      touch /nvram/hostapd-deny$ifidx
@@ -55,26 +63,26 @@ SOURCE:RDKM
                      hostapd_cli -i global raw ADD bss_config=phy0.$radio_idx:/nvram/hostapd"$ifidx".conf
  		fi
  	    done
-@@ -213,28 +213,28 @@
-
-
+@@ -201,31 +220,34 @@
+ 
+ 
          if [ "$band" == "2g" ]; then
 -            cp -f /etc/hostapd-2G.conf /nvram/hostapd"$devidx".conf
 +            cp -f /etc/hostapd-2G.conf /nvram/hostapd"$real_idx".conf
          fi
-
+ 
          if [ "$band" == "5g" ]; then
              gen_vht_cap
 -            cp -f /etc/hostapd-5G.conf /nvram/hostapd"$devidx".conf
 +            cp -f /etc/hostapd-5G.conf /nvram/hostapd"$real_idx".conf
          fi
-
+ 
          if [ "$band" == "6g" ]; then
  	    gen_he_6ghz_reg_pwr_type /etc/hostapd-6G.conf
 -            cp -f /etc/hostapd-6G.conf /nvram/hostapd"$devidx".conf
 +            cp -f /etc/hostapd-6G.conf /nvram/hostapd"$real_idx".conf
          fi
-
+ 
 -        sed -i "/^interface=.*/c\interface=wifi$devidx" /nvram/hostapd"$devidx".conf
 -        sed -i "/^bssid=/c\bssid=$MAC" /nvram/hostapd"$devidx".conf
 -        echo "wpa_psk_file=/nvram/hostapd$devidx.psk" >> /nvram/hostapd"$devidx".conf
@@ -93,6 +101,13 @@ SOURCE:RDKM
 +        touch /nvram/hostapd-deny$real_idx
 +        touch /tmp/phy0-wifi$real_idx
 +        hostapd_cli -i global raw ADD bss_config=phy0.$radio_idx:/nvram/hostapd"$real_idx".conf && echo -e "wifi"$real_idx"=1" >> /nvram/vap-status
++        if [ "$LanMode" = "2" ]; then
++            hostapd_cli -i global raw ADD bss_config=phy0.$radio_idx:/nvram/hostapd"$real_idx".conf && echo -e "wifi"$real_idx"=0" >> /nvram/vap-status
++        fi
          devidx=$(($devidx + 1))
          phyidx=$(($phyidx + 1))
-
+-		
++
+ 	done
+ }
+ #Creating files for tracking AssociatedDevices

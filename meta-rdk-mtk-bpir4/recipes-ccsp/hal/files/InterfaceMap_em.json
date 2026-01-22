@@ -23,6 +23,7 @@
                         },
                         {
                             "InterfaceName": "wifi2",
+                            "MldName": "mld0",
                             "Bridge": "brlan0",
                             "vlanId": 0,
                             "vapIndex": 16,
@@ -86,6 +87,7 @@
                         },
                         {
                             "InterfaceName": "wifi0",
+                            "MldName": "mld0",
                             "Bridge": "brlan0",
                             "vlanId": 0,
                             "vapIndex": 0,

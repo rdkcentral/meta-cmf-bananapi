@@ -62,10 +62,15 @@ DISTRO_FEATURES_append = " kernel6-6"
 
 DISTRO_FEATURES_append = " CONFIG_IEEE80211BE"
 
+
 DISTRO_FEATURES_append = " matter"
 PREFERRED_VERSION_barton-matter = "1.4.2"
 
 #DISTRO_FEATURES_append = " generic_mlo"
+DISTRO_FEATURES_append = " generic_mlo"
 
 #Enable the below DISTRO to enable Hybrid Hal(rndis/modem) for cellular devices
 #DISTRO_FEATURES_append_broadband = " cellular_hybrid_support"
+
+#Disable rdm-agent for reference platform
+#DISTRO_FEATURES_append = "RDM"

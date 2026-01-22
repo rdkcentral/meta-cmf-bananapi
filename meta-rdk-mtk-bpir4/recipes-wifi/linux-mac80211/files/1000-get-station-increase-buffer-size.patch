@@ -1,0 +1,23 @@
+##########################################
+Date: Jan 12, 2026 1:00 PM
+From: 
+Subject: Increase get station buffer size. Default 4K page size cannot accommodate STA info
+  with multiple links.
+Source: Comcast
+License: GPL-2.0
+Upstream-Status: Pending
+Signed-off-by: Bogdan Bogush <bogdan.bogush@comcast.com>
+##########################################
+diff --git a/net/wireless/nl80211.c b/net/wireless/nl80211.c
+index 1dbe31d..40f6809 100644
+--- a/net/wireless/nl80211.c
++++ b/net/wireless/nl80211.c
+@@ -7680,7 +7680,7 @@ static int nl80211_get_station(struct sk_buff *skb, struct genl_info *info)
+ 		return err;
+ 	}
+ 
+-	msg = nlmsg_new(NLMSG_DEFAULT_SIZE, GFP_KERNEL);
++	msg = nlmsg_new(SKB_WITH_OVERHEAD(8192UL) - NLMSG_HDRLEN, GFP_KERNEL);
+ 	if (!msg) {
+ 		cfg80211_sinfo_release_content(&sinfo);
+ 		return -ENOMEM;
