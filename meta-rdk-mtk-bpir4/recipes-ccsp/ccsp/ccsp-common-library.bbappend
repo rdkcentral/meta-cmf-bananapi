@@ -1,12 +1,12 @@
 include ccsp_common_bananapi.inc
 
-FILESEXTRAPATHS_prepend := "${THISDIR}/${PN}:${THISDIR}/files:"
-SRC_URI_append = " \
+FILESEXTRAPATHS:prepend := "${THISDIR}/${PN}:${THISDIR}/files:"
+SRC_URI:append = " \
                    file://gwprovapp.conf \
                 "
-CFLAGS_aarch64_append = " -Werror=format-truncation=1 "
+CFLAGS_aarch64:append = " -Werror=format-truncation=1 "
 
-do_install_append_class-target() {
+do_install:append_class-target() {
    install -D -m 0644 ${S}/systemd_units/parodus.service ${D}${systemd_unitdir}/system/parodus.service
    install -D -m 0644 ${S}/systemd_units/webpa.service ${D}${systemd_unitdir}/system/webpa.service
    sed -i 's/parodusCmd.cmd &/parodusCmd.cmd/' ${D}${systemd_unitdir}/system/parodus.service
@@ -79,7 +79,7 @@ do_install_append_class-target() {
 }
 
 
-SYSTEMD_SERVICE_${PN}_remove_onewifi = " ccspwifiagent.service"
+SYSTEMD_SERVICE_${PN}:remove_onewifi = " ccspwifiagent.service"
 SYSTEMD_SERVICE_${PN} += "${@bb.utils.contains('DISTRO_FEATURES', 'OneWifi', 'onewifi.service ', '', d)}"
 SYSTEMD_SERVICE_${PN} += "${@bb.utils.contains('DISTRO_FEATURES', 'webconfig_bin', 'webconfig.service', '', d)}"
 SYSTEMD_SERVICE_${PN} += "${@bb.utils.contains('DISTRO_FEATURES', 'rdkb_wan_manager', 'RdkTelcoVoiceManager.service', '', d)}"
@@ -90,14 +90,14 @@ SYSTEMD_SERVICE_${PN} += "wan-initialized.target"
 SYSTEMD_SERVICE_${PN} += "wan-initialized.path"
 SYSTEMD_SERVICE_${PN} += "parodus.service"
 SYSTEMD_SERVICE_${PN} += "webpa.service"
-SYSTEMD_SERVICE_${PN}_remove = " utopia.service"
+SYSTEMD_SERVICE_${PN}:remove = " utopia.service"
 SYSTEMD_SERVICE_${PN} += " CcspAdvSecuritySsp.service"
 SYSTEMD_SERVICE_${PN} += "CcspXdnsSsp.service"
 
-FILES_${PN}_remove_onewifi = "${systemd_unitdir}/system/ccspwifiagent.service"
-FILES_${PN}_remove = "${systemd_unitdir}/system/utopia.service" 
-FILES_${PN}_append = "${@bb.utils.contains('DISTRO_FEATURES', 'OneWifi', ' ${systemd_unitdir}/system/onewifi.service ', '', d)}"
-FILES_${PN}_append = " \
+FILES_${PN}:remove_onewifi = "${systemd_unitdir}/system/ccspwifiagent.service"
+FILES_${PN}:remove = "${systemd_unitdir}/system/utopia.service" 
+FILES_${PN}:append = "${@bb.utils.contains('DISTRO_FEATURES', 'OneWifi', ' ${systemd_unitdir}/system/onewifi.service ', '', d)}"
+FILES_${PN}:append = " \
    ${systemd_unitdir}/system/wan-initialized.target \
    ${systemd_unitdir}/system/wan-initialized.path \
    ${systemd_unitdir}/system/CcspTelemetry.service \

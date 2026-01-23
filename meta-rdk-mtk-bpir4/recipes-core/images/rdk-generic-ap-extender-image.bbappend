@@ -4,7 +4,7 @@ LIC_FILES_CHKSUM = "file://${COMMON_LICENSE_DIR}/MIT;md5=0835ade698e0bcf8506ecda
 
 #SDCARD supported Pre build bootloader
 do_build[depends] += "${@bb.utils.contains('DISTRO_FEATURES','sdmmc','atf_bootloader_prebuild:do_deploy','',d)}"
-ROOTFS_POSTPROCESS_COMMAND_append = "add_busybox_fixes; "
+ROOTFS_POSTPROCESS_COMMAND:append = "add_busybox_fixes; "
 
 #Emptying the PRSERV_HOST since builds are local
 PRSERV_HOST = ""
@@ -19,13 +19,13 @@ add_busybox_fixes() {
                         cd -
                 fi
 }
-IMAGE_INSTALL_remove = "${@bb.utils.contains('DISTRO_FEATURES', 'ppp-enabled', '', 'pptp-linux rp-pppoe xl2tpd', d)}"
+IMAGE_INSTALL:remove = "${@bb.utils.contains('DISTRO_FEATURES', 'ppp-enabled', '', 'pptp-linux rp-pppoe xl2tpd', d)}"
 
-IMAGE_FEATURES_remove = "read-only-rootfs"
-IMAGE_FSTYPES_remove= "tar.gz"
+IMAGE_FEATURES:remove = "read-only-rootfs"
+IMAGE_FSTYPES:remove= "tar.gz"
 SYSTEMD_TOOLS = "systemd-analyze systemd-bootchart"
 # systemd-bootchart doesn't currently build with musl libc
-SYSTEMD_TOOLS_remove_libc-musl = "systemd-bootchart"
+SYSTEMD_TOOLS:remove_libc-musl = "systemd-bootchart"
 
 DEPENDS += "cryptsetup-native fit-rootfs-hash-tool-native"
 
@@ -75,19 +75,19 @@ IMAGE_INSTALL += " \
     "
 #IMAGE_INSTALL += " opensync openvswitch mesh-agent e2fsprogs "
 
-IMAGE_INSTALL_append_mt7988 += " marvell-eth-firmware mediatek-eth-firmware "
+IMAGE_INSTALL:append:mt7988 = " marvell-eth-firmware mediatek-eth-firmware "
 
 BB_HASH_IGNORE_MISMATCH = "1"
 IMAGE_NAME[vardepsexclude] = "DATETIME"
 #ESDK-CHANGES
-do_populate_sdk_ext_prepend() {
+do_populate_sdk_ext:prepend() {
     builddir = d.getVar('TOPDIR')
     if os.path.exists(builddir + '/conf/templateconf.cfg'):
         with open(builddir + '/conf/templateconf.cfg', 'w') as f:
             f.write('meta/conf\n')
 }
 
-sdk_ext_postinst_append() {
+sdk_ext_postinst:append() {
    echo "ln -s $target_sdk_dir/layers/openembedded-core/meta-rdk $target_sdk_dir/layers/openembedded-core/../meta-rdk \n" >> $env_setup_script
 }
 
@@ -100,7 +100,7 @@ require ${TOPDIR}/../meta-cmf-filogic/recipes-core/images/image-exclude-files.in
 remove_unused_file() {
    for i in ${REMOVED_FILE_LIST} ; do rm -rf ${IMAGE_ROOTFS}/$i ; done
 }
-ROOTFS_POSTPROCESS_COMMAND_append = "remove_unused_file; "
+ROOTFS_POSTPROCESS_COMMAND:append = "remove_unused_file; "
 
 do_filogic_gen_image(){
 	if ${@bb.utils.contains('DISTRO_FEATURES','kernel_in_ubi','true','false',d)}; then

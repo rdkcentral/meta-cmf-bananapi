@@ -1,4 +1,4 @@
-RDEPENDS_packagegroup-filogic-mt76_remove_onewifi = " \
+RDEPENDS:packagegroup-filogic-mt76:remove_onewifi = " \
                     hostapd \
                     usteer \
                     wifi-test-tool \
@@ -7,4 +7,4 @@ RDEPENDS_packagegroup-filogic-mt76_remove_onewifi = " \
                     uci \
                     ubus \
 "
-RDEPENDS_packagegroup-filogic-mt76_remove_broadband = " mt76-test"
+RDEPENDS:packagegroup-filogic-mt76:remove_broadband = " mt76-test"

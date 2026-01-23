@@ -1,20 +1,20 @@
 #WebPA Feature
-IMAGE_INSTALL_append = " parodus parodus2ccsp rdktelcovoicemanager asterisk hal-voice-asterisk"
+IMAGE_INSTALL:append = " parodus parodus2ccsp rdktelcovoicemanager asterisk hal-voice-asterisk"
 
 #TR069 Feature
-IMAGE_INSTALL_append = " ccsp-tr069-pa"
-IMAGE_INSTALL_append = " bpi-serialnumber"
-IMAGE_INSTALL_append = " bpi-macaddress"
+IMAGE_INSTALL:append = " ccsp-tr069-pa"
+IMAGE_INSTALL:append = " bpi-serialnumber"
+IMAGE_INSTALL:append = " bpi-macaddress"
 
 
-IMAGE_INSTALL_append = " rdk-speedtest-cli"
+IMAGE_INSTALL:append = " rdk-speedtest-cli"
 #Enable required linux utils for Fwupgrade
-IMAGE_INSTALL_append = " gptfdisk e2fsprogs-mke2fs util-linux util-linux-losetup coreutils"
+IMAGE_INSTALL:append = " gptfdisk e2fsprogs-mke2fs util-linux util-linux-losetup coreutils"
 
 #Router discovery tool
-IMAGE_INSTALL_append = " ndisc6"
+IMAGE_INSTALL:append = " ndisc6"
 
-ROOTFS_POSTPROCESS_COMMAND_append = "add_busybox_fixes; "
+ROOTFS_POSTPROCESS_COMMAND:append = "add_busybox_fixes; "
 
 #Emptying the PRSERV_HOST since builds are local
 PRSERV_HOST = ""
@@ -66,7 +66,7 @@ do_filogic_gen_image(){
     fi
 }
 
-IMAGE_INSTALL_remove = "${@bb.utils.contains('DISTRO_FEATURES', 'ppp-enabled', '', 'pptp-linux rp-pppoe xl2tpd', d)}"
-IMAGE_INSTALL_append = "${@bb.utils.contains('DISTRO_FEATURES', 'EasyMesh',' unified-wifi-mesh unified-wifi-mesh-cli socat','',d)}"
-IMAGE_INSTALL_append = "${@bb.utils.contains('DISTRO_FEATURES', 'with_alsap',' ieee1905-em ','',d)}"
-IMAGE_INSTALL_remove_onewifi += " mtkhnat-util"
+IMAGE_INSTALL:remove = "${@bb.utils.contains('DISTRO_FEATURES', 'ppp-enabled', '', 'pptp-linux rp-pppoe xl2tpd', d)}"
+IMAGE_INSTALL:append = "${@bb.utils.contains('DISTRO_FEATURES', 'EasyMesh',' unified-wifi-mesh unified-wifi-mesh-cli socat','',d)}"
+IMAGE_INSTALL:append = "${@bb.utils.contains('DISTRO_FEATURES', 'with_alsap',' ieee1905-em ','',d)}"
+IMAGE_INSTALL:remove:onewifi = " mtkhnat-util"

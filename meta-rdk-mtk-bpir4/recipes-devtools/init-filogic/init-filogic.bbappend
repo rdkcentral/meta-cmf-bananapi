@@ -1,4 +1,4 @@
-do_install_append(){
+do_install:append(){
 
    install -d ${D}${sbindir}
    DISTRO_EM_EXT_ENABLED="${@bb.utils.contains('DISTRO_FEATURES','em_extender','true','false',d)}"
@@ -25,7 +25,7 @@ fi' ${D}${sbindir}/init-bridge.sh
 }
 
 #ESDK support - Avoid conflict file is installed by both systemd and init-filogic in kirkstone
-SYSTEMD_SERVICE:${PN}_remove = "usb-mount@.service"
-do_install_append_broadband () {
+SYSTEMD_SERVICE:${PN}:remove = "usb-mount@.service"
+do_install:append_broadband () {
    rm ${D}${systemd_unitdir}/system/usb-mount@.service
 }
