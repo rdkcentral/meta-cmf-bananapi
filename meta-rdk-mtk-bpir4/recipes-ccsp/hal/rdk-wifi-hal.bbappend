@@ -8,7 +8,7 @@ CFLAGS:append = " -D_PLATFORM_BANANAPI_R4_  -DBANANA_PI_PORT  -DFEATURE_SINGLE_P
 CFLAGS:append = " ${@bb.utils.contains('DISTRO_FEATURES', 'generic_mlo', ' -DCONFIG_GENERIC_MLO -DCONFIG_MLO ', '', d)}"
 CFLAGS:append = "${@bb.utils.contains('DISTRO_FEATURES', 'kernel6-6' , ' -DKERNEL_6_6 ','', d)}"
 
-CFLAGS:append_kirkstone = " -fcommon"
+CFLAGS:append = " ${@bb.utils.contains_any('DISTRO_FEATURES', 'kirkstone scarthgap',' -fcommon ','', d)}"
 CFLAGS:remove = "-DCONFIG_MBO"
 EXTRA_OECONF:append = " ${@bb.utils.contains('DISTRO_FEATURES', 'OneWifi', ' ONE_WIFIBUILD=true ', '', d)}"
 EXTRA_OECONF:append = " ${@bb.utils.contains('DISTRO_FEATURES', 'OneWifi', ' BANANA_PI_PORT=true ', '', d)}"
@@ -30,6 +30,6 @@ do_install:append() {
   fi
 }
 
-FILES_${PN} += " \
+FILES:${PN} += " \
   /nvram/* \
 "

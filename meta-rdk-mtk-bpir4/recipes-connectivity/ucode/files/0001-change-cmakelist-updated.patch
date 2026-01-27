@@ -1,0 +1,20 @@
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index adf7dfb..5bed507 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -41,12 +41,10 @@ find_library(libblobmsg_json NAMES blobmsg_json)
+ find_package(ZLIB)
+ find_library(libmd NAMES libmd.a md)
+ 
+-if(LINUX)
+-  find_library(libnl_tiny NAMES nl-tiny)
++find_library(libnl_tiny NAMES nl-tiny)
+ 
+-  if(libnl_tiny AND libubox)
+-    set(DEFAULT_NL_SUPPORT ON)
+-  endif()
++if(libnl_tiny AND libubox)
++  set(DEFAULT_NL_SUPPORT ON)
+ endif()
+ 
+ if(libuci AND libubox)
