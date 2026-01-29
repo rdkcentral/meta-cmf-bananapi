@@ -95,6 +95,6 @@ sed -i '/mgmt_wan_httpaccess/i \$mgmt_wan_httpaccess_ert=1' ${D}${sysconfdir}/ut
 
 }
 
-FILES_${PN} += " \
+FILES:${PN} += " \
                 /minidumps/ \
 "

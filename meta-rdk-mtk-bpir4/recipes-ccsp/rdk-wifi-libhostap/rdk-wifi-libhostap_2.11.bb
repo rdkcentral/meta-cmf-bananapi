@@ -49,7 +49,7 @@ EXTRA_OECONF += " --disable-static --enable-shared "
 
 S = "${WORKDIR}/git/"
 
-FILES_${PN} = " \
+FILES:${PN} = " \
         ${libdir}/libhostap.so* \
 "
 EXTRA_OEMAKE += "${@bb.utils.contains('DISTRO_FEATURES', 'Wifi-test-suite', 'WIFI_EMULATOR=true', 'WIFI_EMULATOR=false', d)}"

@@ -11,7 +11,7 @@ DEPENDS += " ${@bb.utils.contains('DISTRO_FEATURES', 'EasyMesh', ' rdk-wifi-libh
 
 CFLAGS:append = " -DWIFI_HAL_VERSION_3 -Wno-unused-function "
 LDFLAGS:append = " -ldl"
-CFLAGS:append_aarch64 = " -Wno-error "
+CFLAGS:append:aarch64 = " -Wno-error "
 
 EXTRA_OECONF:append = " ${@bb.utils.contains('DISTRO_FEATURES', 'EasyMesh', ' --enable-em-app ', '', d)}"
 CFLAGS:append = " ${@bb.utils.contains('DISTRO_FEATURES', 'EasyMesh', ' -DEASY_MESH_NODE ', '', d)}"
@@ -35,6 +35,8 @@ SRC_URI += " \
     ${@bb.utils.contains('DISTRO_FEATURES', 'EasyMesh', bb.utils.contains('DISTRO_FEATURES', 'em_extender', 'file://onewifi_pre_start_em_ext.sh ','file://onewifi_pre_start_em_ctrl.sh ', d), 'file://onewifi_pre_start.sh ', d)} \
     file://wifi_defaults.txt \
 "
+SRC_URI:append:scarthgap = " file://msgpack_redefined_compile.patch"
+
 do_install:append(){
     install -d ${D}/nvram 
     install -m 777 ${WORKDIR}/checkwifi.sh ${D}/usr/ccsp/wifi/
@@ -42,9 +44,12 @@ do_install:append(){
     install -m 644 ${WORKDIR}/wifi_defaults.txt ${D}/nvram/
 }
 
-FILES_${PN} += " \
+FILES:${PN} += " \
     ${prefix}/ccsp/wifi/checkwifi.sh \
     ${prefix}/ccsp/wifi/onewifi_pre_start.sh \
     /usr/bin/wifi_events_consumer \
     /nvram/wifi_defaults.txt \
 "
+FILES:${PN} += "${libdir}/*.so"
+FILES:${PN}-dev:remove = "${libdir}/*.so"
+INSANE_SKIP:${PN} += "dev-so"

@@ -26,6 +26,6 @@ fi' ${D}${sbindir}/init-bridge.sh
 
 #ESDK support - Avoid conflict file is installed by both systemd and init-filogic in kirkstone
 SYSTEMD_SERVICE:${PN}:remove = "usb-mount@.service"
-do_install:append_broadband () {
+do_install:append:broadband () {
    rm ${D}${systemd_unitdir}/system/usb-mount@.service
 }

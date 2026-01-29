@@ -66,3 +66,4 @@ DISTRO_FEATURES:append = " CONFIG_IEEE80211BE"
 
 #Enable the below DISTRO to enable Hybrid Hal(rndis/modem) for cellular devices
 #DISTRO_FEATURES:append_broadband = " cellular_hybrid_support"
+DISTRO_FEATURES:append:scarthgap = " rdkoss"

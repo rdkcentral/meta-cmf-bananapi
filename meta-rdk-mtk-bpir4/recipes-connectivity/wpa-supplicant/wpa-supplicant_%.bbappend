@@ -14,13 +14,13 @@ do_configure:append() {
 do_install:append () {
         install -d ${D}${includedir}
         install -d ${D}${libdir}
-        install -d ${D}/lib/rdk/
+        install -d ${D}/${libdir}/rdk/
 
         install -m 0777 ${S}/wpa_supplicant/libwpa_client.so  ${D}${libdir}/
         install -m 0644 ${S}/src/common/wpa_ctrl.h ${D}${includedir}/
 }
 FILES:${PN} += "${libdir}/libwpa_client.so"
 FILES:${PN} += "${includedir}/wpa_ctrl.h"
-FILES:${PN} += "lib/rdk"
+FILES:${PN} += "${libdir}/rdk"
 FILES:${PN} += " /usr/local"
 FILES:${PN}-dbg += " /usr/local/"
