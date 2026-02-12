@@ -5,6 +5,10 @@ FILESEXTRAPATHS_prepend := "${THISDIR}/files:"
 SRC_URI_remove = "${CMF_GIT_ROOT}/rdkb/components/opensource/ccsp/OneWifi;protocol=${CMF_GIT_PROTOCOL};branch=${CMF_GIT_BRANCH};name=OneWifi"
 SRC_URI = "git://github.com/rdkcentral/OneWifi.git;protocol=https;branch=develop;name=OneWifi"
 SRCREV_OneWifi = "74ea1f6ca37612b13cfccba6213fe3fb06beb982"
+
+SRC_URI_remove = " ${@bb.utils.contains('DISTRO_FEATURES', 'sta_manager', '${RDKB_CCSP_ROOT_GIT}/WiFiStaManager/generic;protocol=${RDK_GIT_PROTOCOL};branch=${CCSP_GIT_BRANCH};destsuffix=WiFiStaManager;name=WiFiStaManager', " ", d)}"
+SRCREV_WiFiStaManager_remove = "${AUTOREV}"
+
 DEPENDS_append = " mesh-agent "
 DEPENDS_remove = " opensync "
 DEPENDS += " ${@bb.utils.contains('DISTRO_FEATURES', 'EasyMesh', ' rdk-wifi-libhostap ', '', d)}"
@@ -37,6 +41,14 @@ SRC_URI += " \
     ${@bb.utils.contains('DISTRO_FEATURES', 'EasyMesh', bb.utils.contains('DISTRO_FEATURES', 'em_extender', 'file://onewifi_pre_start_em_ext.sh ','file://onewifi_pre_start_em_ctrl.sh ', d), 'file://onewifi_pre_start.sh ', d)} \
     file://wifi_defaults.txt \
 "
+
+do_configure_prepend() {
+   if ${@bb.utils.contains('DISTRO_FEATURES','sta_manager','true','false',d)}; then
+        mkdir -p ${S}/../WiFiStaManager
+        cp -rf ${S}/source/apps/sta_mgr/* ${S}/../WiFiStaManager/
+   fi
+}
+
 do_install_append(){
     install -d ${D}/nvram 
     install -m 777 ${WORKDIR}/checkwifi.sh ${D}/usr/ccsp/wifi/
