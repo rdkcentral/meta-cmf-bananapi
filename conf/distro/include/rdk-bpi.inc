@@ -21,6 +21,8 @@ DISTRO_FEATURES_append = " disable_nl80211_acl"
 #No Moca Support
 DISTRO_FEATURES_append = " no_moca_support"
 
+DISTRO_FEATURES_append = " no_mta_support"
+
 DISTRO_FEATURES_append = " referencepltfm "
 
 MACHINEOVERRIDES_append =. "${@bb.utils.contains('DISTRO_FEATURES', 'OneWifi', ':onewifi', '' ,d)}"

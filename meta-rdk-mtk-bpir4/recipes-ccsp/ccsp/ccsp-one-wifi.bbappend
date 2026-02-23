@@ -48,3 +48,4 @@ FILES_${PN} += " \
     /usr/bin/wifi_events_consumer \
     /nvram/wifi_defaults.txt \
 "
+DEPENDS_remove = "hal-cm hal-moca hal-mso_mgmt hal-mta"
