@@ -1,0 +1,43 @@
+--- a/net/mac80211/cfg.c        2026-02-23 11:09:05.447445205 +0000
++++ b/net/mac80211/cfg.c        2026-02-23 11:08:31.555433913 +0000
+@@ -5669,6 +5669,12 @@
+ }
+ EXPORT_SYMBOL_GPL(ieee80211_crit_update_notify);
+
++static int ieee80211_set_mac_acl(struct wiphy *wiphy, struct net_device *dev, const struct cfg80211_acl_data *acl)
++{
++
++       return 0;
++}
++
+ const struct cfg80211_ops mac80211_config_ops = {
+        .add_virtual_intf = ieee80211_add_iface,
+        .del_virtual_intf = ieee80211_del_iface,
+@@ -5789,4 +5796,5 @@
+        .assoc_ml_reconf = ieee80211_assoc_ml_reconf,
+        .set_epcs = ieee80211_set_epcs,
+        .skip_cac = ieee80211_skip_cac,
++       .set_mac_acl = ieee80211_set_mac_acl,
+ };
+--- a/net/wireless/core.c       2026-02-23 10:58:10.231226054 +0000
++++ b/net/wireless/core.c       2026-02-23 10:58:44.575237578 +0000
+@@ -820,8 +820,8 @@
+                           ETH_ALEN)))
+                return -EINVAL;
+
+        if (WARN_ON(wiphy->max_acl_mac_addrs &&
+-                   (!(wiphy->flags & WIPHY_FLAG_HAVE_AP_SME) ||
++                   ((wiphy->flags & WIPHY_FLAG_HAVE_AP_SME) ||
+                     !rdev->ops->set_mac_acl)))
+                return -EINVAL;
+
+--- a/net/mac80211/main.c       2026-02-23 10:59:22.647250346 +0000
++++ b/net/mac80211/main.c       2026-02-23 11:01:06.607285176 +0000
+@@ -850,6 +850,7 @@
+
+        wiphy = wiphy_new_nm(&mac80211_config_ops, priv_size, requested_name);
+
++       wiphy->max_acl_mac_addrs = 10;
+        if (!wiphy)
+                return NULL;
+

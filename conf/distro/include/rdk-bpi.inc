@@ -16,7 +16,7 @@ DISTRO_FEATURES_append = " HOSTAPD_2_11"
 DISTRO_FEATURES_append = " OneWifi onewifi_integration"
 
 # MacFilter Feature
-DISTRO_FEATURES_append = " disable_nl80211_acl"
+#DISTRO_FEATURES_append = " disable_nl80211_acl"
 
 #No Moca Support
 DISTRO_FEATURES_append = " no_moca_support"
