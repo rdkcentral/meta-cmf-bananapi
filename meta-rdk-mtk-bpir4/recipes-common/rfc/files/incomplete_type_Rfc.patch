@@ -1,0 +1,12 @@
+diff --git a/rfcMgr/rfc_manager.cpp b/rfcMgr/rfc_manager.cpp
+index 0430f63..f5459b8 100644
+--- a/rfcMgr/rfc_manager.cpp
++++ b/rfcMgr/rfc_manager.cpp
+@@ -25,6 +25,7 @@
+ #include <unistd.h>
+ #include <sys/types.h>
+ #include <sys/wait.h>
++#include <array>
+ 
+ namespace rfc {
+ #if defined(USE_IARMBUS)

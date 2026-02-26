@@ -1,11 +1,11 @@
 include meta-rdk-mtk-bpir4/recipes-ccsp/ccsp/ccsp_common_bananapi.inc
 
-FILESEXTRAPATHS_prepend := "${THISDIR}/${PN}:"
+FILESEXTRAPATHS:prepend := "${THISDIR}/${PN}:"
 
 SRC_URI += "file://service_bridge_bpi.sh"
 SRC_URI += "file://pr-140.patch"
 
-do_install_append() {
+do_install:append() {
 
 install -d ${D}${sysconfdir}/
 install -d ${D}${sysconfdir}/utopia/
@@ -95,6 +95,6 @@ sed -i '/mgmt_wan_httpaccess/i \$mgmt_wan_httpaccess_ert=1' ${D}${sysconfdir}/ut
 
 }
 
-FILES_${PN} += " \
+FILES:${PN} += " \
                 /minidumps/ \
 "

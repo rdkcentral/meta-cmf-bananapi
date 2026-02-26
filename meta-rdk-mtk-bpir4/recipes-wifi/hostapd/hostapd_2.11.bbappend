@@ -1,4 +1,4 @@
-FILESEXTRAPATHS_prepend := "${THISDIR}/files:"
+FILESEXTRAPATHS:prepend := "${THISDIR}/files:"
 
 SRC_URI += " \
     file://hostapd-2G.conf \
@@ -16,7 +16,7 @@ do_bpi_hostapd_patch(){
 }
 addtask bpi_hostapd_patch after do_patch before do_compile
 
-do_install_append() {
+do_install:append() {
     install -m 755 ${WORKDIR}/hostapd-2G.conf ${D}${sysconfdir}/hostapd-2G.conf
     install -m 755 ${WORKDIR}/hostapd-5G.conf ${D}${sysconfdir}/hostapd-5G.conf
     install -m 755 ${WORKDIR}/hostapd-6G.conf ${D}${sysconfdir}/hostapd-6G.conf

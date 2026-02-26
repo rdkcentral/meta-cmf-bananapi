@@ -1,2 +1,2 @@
 #Router discovery tool
-IMAGE_INSTALL_append = " ndisc6"
+IMAGE_INSTALL:append = " ndisc6"

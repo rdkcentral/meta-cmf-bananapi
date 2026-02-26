@@ -223,11 +223,11 @@ diff -ruN git.orig/source/hostap-2.11/src/ap/beacon.c git/source/hostap-2.11/src
  #ifdef CONFIG_IEEE80211AX
  	if (hapd->iconf->ieee80211ax && !hapd->conf->disable_11ax) {
 diff -ruN git.orig/source/hostap-2.11/src/drivers/driver.h git/source/hostap-2.11/src/drivers/driver.h
---- git.orig/source/hostap-2.11/src/drivers/driver.h	2025-10-13 12:15:21.190338075 +0000
-+++ git/source/hostap-2.11/src/drivers/driver.h	2025-10-13 12:12:56.087124794 +0000
-@@ -5659,6 +5659,15 @@
-         int (*radius_eap_failure)(void *priv, int failure_reason);
- 	int (*radius_fallback_failover)(void *priv, int radius_switch_reason);
+--- git.orig/source/hostap-2.11/src/drivers/driver.h	2026-01-19 09:56:51.889619015 +0000
++++ git/source/hostap-2.11/src/drivers/driver.h	2026-01-19 09:49:31.093680476 +0000
+@@ -5687,6 +5687,15 @@
+ 	int (*configure_edcca_threshold)(void *priv, s8 link_id, const int *threshold);
+ 	int (*get_edcca)(void *priv, s8 link_id, const u8 mode, u8 *value);
  
 +	struct hostapd_data *(*get_mbssid_tx_bss)(void *priv);
 +        int (*get_mbssid_bss_index)(void *priv);
@@ -239,5 +239,5 @@ diff -ruN git.orig/source/hostap-2.11/src/drivers/driver.h git/source/hostap-2.1
 +        u8* (*get_mbssid_config)(void *priv, u8 *eid);
 +
  	/**
- 	 * get_multi_hw_info - Get multiple underlying hardware information
- 	 *		       (hardware IDx and supported frequency range)
+ 	 * mu_ctrl - ctrl for UL/DL MURU
+ 	 * @priv: Private driver interface data

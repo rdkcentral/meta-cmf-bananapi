@@ -1,14 +1,13 @@
-Index: platform/rdkb_hal/src/platform/platform_hal.c
-===================================================================
---- platform.orig/rdkb_hal/src/platform/platform_hal.c
-+++ platform/rdkb_hal/src/platform/platform_hal.c
-@@ -426,6 +426,9 @@ INT platform_hal_GetTotalMemorySize(ULON
+diff -Naur platform.orig/rdkb_hal/src/platform/platform_hal.c platform/rdkb_hal/src/platform/platform_hal.c
+--- platform.orig/rdkb_hal/src/platform/platform_hal.c	2026-01-19 07:28:09.712375874 +0000
++++ platform/rdkb_hal/src/platform/platform_hal.c	2026-01-19 07:25:06.114628353 +0000
+@@ -426,6 +426,9 @@
      char buf[64] = {0};
      char cmd[64] = {0};
      FILE *fp = NULL;
 +    if (pulSize == NULL)
 +        return RETURN_ERR;
 +
-
-     sprintf(cmd, "awk '/MemTotal/ {print $2}' /proc/meminfo > /tmp/total_Mem");
+ 
+     sprintf(cmd, "awk '/MemTotal/ {print $2}' /proc/meminfo > /tmp/total_Mem");    
      system(cmd);

@@ -7,8 +7,8 @@ LIC_FILES_CHKSUM = "file://LICENSE;md5=baa21dec03307f641a150889224a157f"
 SRC_URI = "${CMF_GITHUB_ROOT}/utopia;protocol=https;nobranch=1"
 
 SRCREV = "${SRCREV:pn-utopia}"
-PV = "${PV:pn-utopia}"
-PR = "${PR:pn-utopia}"
+PV = "${PV_pn-utopia}"
+PR = "${PR_pn-utopia}"
 
 S = "${WORKDIR}/git"
 

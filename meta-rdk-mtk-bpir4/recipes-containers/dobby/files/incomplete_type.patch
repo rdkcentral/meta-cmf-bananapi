@@ -1,0 +1,12 @@
+diff --git a/daemon/lib/source/DobbyRunC.cpp b/daemon/lib/source/DobbyRunC.cpp
+index 26d8e761..bc8fe5bd 100644
+--- a/daemon/lib/source/DobbyRunC.cpp
++++ b/daemon/lib/source/DobbyRunC.cpp
+@@ -39,6 +39,7 @@
+ #include <sstream>
+ #include <vector>
+ #include <json/json.h>
++#include <array>
+ 
+ 
+ DobbyRunC::DobbyRunC(const std::shared_ptr<IDobbyUtils>& utils,
