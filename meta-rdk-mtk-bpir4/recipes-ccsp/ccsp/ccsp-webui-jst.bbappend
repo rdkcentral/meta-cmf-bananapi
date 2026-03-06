@@ -1,4 +1,5 @@
 include ccsp_common_bananapi.inc
+SRC_URI_append = " file://CcspWebUI.service"
 
 do_install_append () {
                 if ${@bb.utils.contains('DISTRO_FEATURES', 'OneWifi', 'true', 'false', d)}; then
@@ -16,6 +17,8 @@ do_install_append () {
                    install -m 0755 ${S}/../xb6/jst/actionHandler/ajaxSet_wireless_network_configuration_edit.jst ${D}/usr/www2/actionHandler/ajaxSet_wireless_network_configuration_edit.jst
                 fi
                 install -m 0755 ${S}/../xb6/jst/at_a_glance.jst ${D}/usr/www2/at_a_glance.jst
+                install -m 0644 ${WORKDIR}/CcspWebUI.service ${D}${systemd_unitdir}/system/
+                rm -r ${D}${base_libdir}/rdk
                 sed -i "s/count(\$IDs)-1/count(\$IDs)-2/g"  ${D}/usr/www2/actionHandler/ajax_managed_devices.jst
                 sed -i "s/count(\$IDs)-1/count(\$IDs)-2/g"  ${D}/usr/www2/actionHandler/ajax_managed_services.jst
                 sed -i "s/count(\$IDs)-1/count(\$IDs)-2/g"  ${D}/usr/www2/actionHandler/ajax_port_forwarding.jst
@@ -24,3 +27,4 @@ do_install_append () {
                 sed -i "s/\$clients_RSSI\[strtoupper(\$Host\[\$i.toString()\]\['PhysAddress'\])\]/\$Host\[\$i\]\['X_CISCO_COM_RSSI'\]/g" ${D}/usr/www2/connected_devices_computers.jst
                 sed -i '/<?%if (strpos($partnerId, "sky-") !== false)/ s/sky-/RDKM/' ${D}/usr/www2/wireless_network_configuration_edit.jst
 }
+FILES:${PN}:remove = "${base_libdir}/rdk/*"
