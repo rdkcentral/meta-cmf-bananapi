@@ -8,6 +8,7 @@ SRC_URI_append = " \
     file://rdkb_cfg/coredump.cfg \
     file://rdkb_cfg/ip6tables_nf.cfg \
     file://netfilter.cfg  \
+    ${@bb.utils.contains('DISTRO_FEATURES','NFT_Enable', 'file://nftables.cfg', '', d)}  \
     ${@bb.utils.contains('DISTRO_FEATURES','kernel6-6', 'file://rdkb_cfg/kernel_6_6.cfg', '', d)}  \
     file://rdkb_cfg/container.cfg \
     ${@bb.utils.contains('DISTRO_FEATURES','sdmmc','file://rdkb_cfg/sdmmc.cfg','',d)} \
