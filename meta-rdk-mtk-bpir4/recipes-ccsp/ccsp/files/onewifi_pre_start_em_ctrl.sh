@@ -12,6 +12,9 @@ fi
 if [ ! -f /nvram/Reset.json ]; then
    cp /usr/ccsp/EasyMesh/Reset.json /nvram
 fi
+if [ ! -f /nvram/Data_Elements_JSON_Schema_v3.0.json ]; then
+   cp /usr/ccsp/EasyMesh/Data_Elements_JSON_Schema_v3.0.json /nvram
+fi
 if [ ! -d /nvram/static ]; then
    cp -rf /usr/ccsp/EasyMesh/static /nvram
 fi

@@ -8,6 +8,7 @@ if [ ! -f /nvram/InterfaceMap.json ]; then
 fi
 if [ ! -f /nvram/EasymeshCfg.json ]; then
    cp /usr/ccsp/EasyMesh/EasymeshCfg.json /nvram
+   cp /usr/ccsp/EasyMesh/Data_Elements_JSON_Schema_v3.0.json /nvram
 fi
 
 sleep 5
