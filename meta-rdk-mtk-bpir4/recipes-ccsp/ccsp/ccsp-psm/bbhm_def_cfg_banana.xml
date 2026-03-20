@@ -36,10 +36,6 @@
 -->
 
 <Provision>
-  <Record name="com.cisco.spvtg.ccsp.tr069pa.PmNotif.Device.ManagementServer.ConnectionRequestURL" type="astr" contentType="ip4Addr">2</Record>
-  <Record name="eRT.com.cisco.spvtg.ccsp.tr069pa.PmNotif.Device.ManagementServer.ConnectionRequestURL" type="astr" contentType="ip4Addr">2</Record>
-  <Record name="eMG.com.cisco.spvtg.ccsp.tr069pa.PmNotif.Device.ManagementServer.ConnectionRequestURL" type="astr" contentType="ip4Addr">2</Record>
-  <Record name="eRT.com.cisco.spvtg.ccsp.tr069pa.Device.ManagementServer.STUNServerPort.Value" type="astr">3478</Record>
   <Record name="eRT.com.cisco.spvtg.ccsp.tr181pa.Device.WiFi.ValidateSSIDName" type="astr">1</Record>
   <Record name="eRT.com.cisco.spvtg.ccsp.tr181pa.Device.WiFi.Radio.1.CTSProtection" type="astr">0</Record>
   <Record name="eRT.com.cisco.spvtg.ccsp.tr181pa.Device.WiFi.Radio.2.CTSProtection" type="astr">0</Record>
@@ -1169,7 +1165,6 @@
   <Record name="dmsb.l2net.9.Port.1.InstanceNum" type="astr">1</Record>
   <Record name="dmsb.l2net.9.Port.1.Upstream" type="astr">FALSE</Record>
 
-  <Record name="dmsb.device.deviceinfo.X_RDKCENTRAL-COM_Syndication.TR69CertLocation" type="astr"></Record>
   <Record name="eRT.com.cisco.spvtg.ccsp.Device.WiFi.Radio.1.ChanUtilSelfHealEnable" type="astr">0</Record>
   <Record name="eRT.com.cisco.spvtg.ccsp.Device.WiFi.Radio.2.ChanUtilSelfHealEnable" type="astr">0</Record>
   <Record name="eRT.com.cisco.spvtg.ccsp.Device.WiFi.Radio.3.ChanUtilSelfHealEnable" type="astr">0</Record>

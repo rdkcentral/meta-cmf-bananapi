@@ -1,5 +1,5 @@
 # USP-PA Feature
-DISTRO_FEATURES_append = " usppa"
+#DISTRO_FEATURES_append = " usppa"
 
 DISTRO_FEATURES_append = " WanManagerUnificationEnable"
 
@@ -37,15 +37,13 @@ DISTRO_FEATURES_append = " partner_default_ext"
 #Enable SDcard image as default
 DISTRO_FEATURES_append = " sdmmc"
 
-DISTRO_FEATURE_append = " rdkb_voice_manager_dmltr104_v2"
-
-DISTRO_FEATURE_append = " telco_voice_feature_enable_persist"
 
 #PPP Feature
 #DISTRO_FEATURES_append = "ppp-enabled"
 
 #disabling lan0_as_wan to allow lan0 interface to come
 DISTRO_FEATURES_remove = " lan0_as_wan"
+DISTRO_FEATURES_remove = " snmppa"
 
 #Need to enable below distro once required changes are merged 
 #DISTRO_FEATURES_append = " EasyMesh"

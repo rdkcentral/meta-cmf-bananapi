@@ -15,7 +15,6 @@ RDEPENDS_packagegroup-rdk-ccsp-broadband_append = " \
 GWPROVAPP = "${@bb.utils.contains('DISTRO_FEATURES','rdkb_wan_manager','ccsp-gwprovapp', '' ,d)}"
 
 RDEPENDS_packagegroup-rdk-ccsp-broadband_append = "${@bb.utils.contains('DISTRO_FEATURES', 'rdkb_cellular_manager_mm', ' rdk-cellularmanager-mm', ' ', d)}"
-RDEPENDS_packagegroup-rdk-ccsp-broadband_append = " rdktelcovoicemanager"
 RDEPENDS_packagegroup-rdk-ccsp-broadband_append = " gw-lan-refresh"
 RDEPENDS_packagegroup-rdk-ccsp-broadband_remove = "ccsp-adv-security"
 
@@ -32,3 +31,4 @@ RDEPENDS_packagegroup-rdk-ccsp-broadband_remove = "ccsp-mta-agent"
 RDEPENDS_packagegroup-rdk-ccsp-broadband_remove = "ccsp-moca"
 #code to be fixed
 RDEPENDS_packagegroup-rdk-ccsp-broadband_remove = "ccsp-xconf"
+RDEPENDS_packagegroup-rdk-ccsp-broadband_remove = "notify-comp"
