@@ -1,6 +1,5 @@
 include ccsp_common_bananapi.inc
 
-SRCREV_ccsp_common_library = "2bb388fda59494cd3cf3a9e2139aa3d7dc537edb"
 FILESEXTRAPATHS_prepend := "${THISDIR}/${PN}:${THISDIR}/files:"
 SRC_URI_append = " \
                    file://gwprovapp.conf \

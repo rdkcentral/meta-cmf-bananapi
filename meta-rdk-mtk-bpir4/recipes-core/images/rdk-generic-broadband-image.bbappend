@@ -7,7 +7,7 @@ IMAGE_INSTALL_append = " bpi-serialnumber"
 IMAGE_INSTALL_append = " bpi-macaddress"
 
 
-IMAGE_INSTALL_append = " rdk-speedtest-cli rdm-agent remotedebugger"
+IMAGE_INSTALL_append = " rdk-speedtest-cli rdm-agent ${@bb.utils.contains('DISTRO_FEATURES', 'rrd', ' remotedebugger', " ", d)}"
 #Enable required linux utils for Fwupgrade
 IMAGE_INSTALL_append = " gptfdisk e2fsprogs-mke2fs util-linux util-linux-losetup coreutils"
 
