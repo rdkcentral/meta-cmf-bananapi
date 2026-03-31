@@ -1,0 +1,36 @@
+From 1fda90407ab3488e1a6cf87bc369342a36838649 Mon Sep 17 00:00:00 2001
+From: SsandhyaR <Sandhyarani_Sirasanagandla@comcast.com>
+Date: Mon, 30 Mar 2026 20:19:07 +0530
+Subject: [PATCH] RDKCOM-5568: RDKBDEV-3412 RDKBACCL-1092 : FW Upgrade is not
+ working via tftp server configurations (#277)
+
+Reason for change: tftp utility is not working due to inpresent helper
+rule
+Test procedure: check the tftp utility and FW upgrade
+Risks: Low
+
+Signed-off-by: ssiras826 <sandhyarani_sirasanagandla@comcast.com>
+---
+ source/firewall/firewall.c | 6 ++++++
+ 1 file changed, 6 insertions(+)
+
+diff --git a/source/firewall/firewall.c b/source/firewall/firewall.c
+index 33aed5b..c612c6e 100644
+--- a/source/firewall/firewall.c
++++ b/source/firewall/firewall.c
+@@ -12017,6 +12017,12 @@ static int prepare_subtables(FILE *raw_fp, FILE *mangle_fp, FILE *nat_fp, FILE *
+        do_lan2wan_helpers(raw_fp);
+    }
+ #endif
++
++#if defined (_PLATFORM_BANANAPI_R4_)
++       isRawTableUsed = 1;
++       fprintf(raw_fp, "-A OUTPUT -p udp --dport 69 -j CT --helper tftp\n");
++#endif
++
+    /*
+     * mangle
+     */
+-- 
+2.34.1
+
