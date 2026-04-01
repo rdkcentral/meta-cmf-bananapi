@@ -1370,7 +1370,9 @@
    <Record name="dmsb.wanmanager.if.1.VirtualInterface.1.IPInterface" type="astr">Device.IP.Interface.1</Record> 
    <Record name="dmsb.wanmanager.if.1.VirtualInterface.1.IP.Mode" type="astr">3</Record> 
    <Record name="dmsb.wanmanager.if.1.VirtualInterface.1.IP.IPv4Source" type="astr">2</Record> 
+   <Record name="dmsb.wanmanager.if.1.VirtualInterface.1.IP.DHCPV4Interface" type="astr">Device.DHCPv4.Client.1</Record>
    <Record name="dmsb.wanmanager.if.1.VirtualInterface.1.IP.IPv6Source" type="astr">2</Record> 
+   <Record name="dmsb.wanmanager.if.1.VirtualInterface.1.IP.DHCPV6Interface" type="astr">Device.DHCPv6.Client.1</Record>
    <Record name="dmsb.wanmanager.if.1.VirtualInterface.1.VlanInUse" type="astr"></Record> 
    <Record name="dmsb.wanmanager.if.1.VirtualInterface.1.Timeout" type="astr">20</Record> 
    <Record name="dmsb.wanmanager.if.1.VirtualInterface.1.VlanCount" type="astr">0</Record> 
@@ -1394,7 +1396,9 @@
   <Record name="dmsb.wanmanager.if.2.VirtualInterface.1.IPInterface" type="astr"></Record>
   <Record name="dmsb.wanmanager.if.2.VirtualInterface.1.IP.Mode" type="astr">3</Record>
   <Record name="dmsb.wanmanager.if.2.VirtualInterface.1.IP.IPv4Source" type="astr">1</Record>
+  <Record name="dmsb.wanmanager.if.2.VirtualInterface.1.IP.DHCPV4Interface" type="astr">Device.DHCPv4.Client.1</Record>
   <Record name="dmsb.wanmanager.if.2.VirtualInterface.1.IP.IPv6Source" type="astr">1</Record>
+  <Record name="dmsb.wanmanager.if.2.VirtualInterface.1.IP.DHCPV6Interface" type="astr">Device.DHCPv6.Client.1</Record>
   <Record name="dmsb.wanmanager.if.2.VirtualInterface.1.VlanInUse" type="astr"></Record>
   <Record name="dmsb.wanmanager.if.2.VirtualInterface.1.Timeout" type="astr">0</Record>
   <Record name="dmsb.wanmanager.if.2.VirtualInterface.1.VlanCount" type="astr">0</Record>
@@ -1404,4 +1408,44 @@
   <!-- Default WPA3 transition start record -->
   <Record name="Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.WPA3_Personal_Transition.Enable" type="astr">1</Record> 
   <Record name="dmsb.device.deviceinfo.X_RDKCENTRAL-COM_WHIX.LogInterval" type="astr">3600</Record>	
+	  <!-- DHCP Manager  -->
+  <Record name="dmsb.dhcpmanager.ClientNoOfEntries" type="astr">1</Record>
+  <Record name="dmsb.dhcpmanager.Client.1.Alias" type="astr" >WANOE</Record>
+  <Record name="dmsb.dhcpmanager.Client.1.ReqOptionNoOfEntries" type="astr">4</Record>
+  <Record name="dmsb.dhcpmanager.Client.1.ReqOption.1.Tag" type="astr">125</Record>
+  <Record name="dmsb.dhcpmanager.Client.1.ReqOption.1.Order" type="astr">1</Record>
+  <Record name="dmsb.dhcpmanager.Client.1.ReqOption.2.Tag" type="astr">42</Record>
+  <Record name="dmsb.dhcpmanager.Client.1.ReqOption.2.Order" type="astr">2</Record>
+  <Record name="dmsb.dhcpmanager.Client.1.ReqOption.3.Tag" type="astr">2</Record>
+  <Record name="dmsb.dhcpmanager.Client.1.ReqOption.3.Order" type="astr">3</Record>
+  <Record name="dmsb.dhcpmanager.Client.1.ReqOption.4.Tag" type="astr">122</Record>
+  <Record name="dmsb.dhcpmanager.Client.1.ReqOption.4.Order" type="astr">4</Record>
+
+  <Record name="dmsb.dhcpmanager.Client.1.SendOptionNoOfEntries" type="astr">3</Record>
+  <Record name="dmsb.dhcpmanager.Client.1.SendOption.1.Tag" type="astr">43</Record>
+  <Record name="dmsb.dhcpmanager.Client.1.SendOption.1.Value" type="astr">020745524f55544552030c45524f555445523a45445641</Record>
+  <Record name="dmsb.dhcpmanager.Client.1.SendOption.2.Tag" type="astr">60</Record>
+  <Record name="dmsb.dhcpmanager.Client.1.SendOption.2.Value" type="astr">65526F75746572312E30</Record>
+  <Record name="dmsb.dhcpmanager.Client.1.SendOption.3.Tag" type="astr">125</Record>
+  <Record name="dmsb.dhcpmanager.Client.1.SendOption.3.Value" type="astr">0000118b0701027B7C7c0107</Record>
+
+
+  <Record name="dmsb.dhcpmanager.dhcpv6.ClientNoOfEntries" type="astr">1</Record>
+
+  <Record name="dmsb.dhcpmanager.dhcpv6.Client.1.Alias" type="astr">WANOE</Record>
+  <Record name="dmsb.dhcpmanager.dhcpv6.Client.1.RequestedOptions" type="astr"> 23 , 24 </Record> <!-- domain, dns-server -->
+  <Record name="dmsb.dhcpmanager.dhcpv6.Client.1.ReqAddr" type="astr">TRUE</Record>
+  <Record name="dmsb.dhcpmanager.dhcpv6.Client.1.ReqPrefix" type="astr">FALSE</Record>
+
+  <Record name="dmsb.dhcpmanager.dhcpv6.Client.1.SentOptNoOfEntries" type="astr">3</Record>
+
+  <Record name="dmsb.dhcpmanager.dhcpv6.Client.1.SentOption.1.Alias" type="astr">class-id</Record>
+  <Record name="dmsb.dhcpmanager.dhcpv6.Client.1.SentOption.1.Tag" type="astr">16</Record>
+  <Record name="dmsb.dhcpmanager.dhcpv6.Client.1.SentOption.1.Value" type="astr">0000118b000a65526f75746572312e30</Record>
+  <Record name="dmsb.dhcpmanager.dhcpv6.Client.1.SentOption.2.Alias" type="astr">vendor-specific-info</Record>
+  <Record name="dmsb.dhcpmanager.dhcpv6.Client.1.SentOption.2.Tag" type="astr">17</Record>
+  <Record name="dmsb.dhcpmanager.dhcpv6.Client.1.SentOption.2.Value" type="astr">0000118b0001000800260027087A087B0002000745524F555445520003000B45524F555445523A4544560027000107</Record>
+  <Record name="dmsb.dhcpmanager.dhcpv6.Client.1.SentOption.3.Alias" type="astr">pd</Record>
+  <Record name="dmsb.dhcpmanager.dhcpv6.Client.1.SentOption.3.Tag" type="astr" >25</Record>
+  <Record name="dmsb.dhcpmanager.dhcpv6.Client.1.SentOption.3.Value" type="astr">{ prefix ::/56 }</Record>	
 </Provision>

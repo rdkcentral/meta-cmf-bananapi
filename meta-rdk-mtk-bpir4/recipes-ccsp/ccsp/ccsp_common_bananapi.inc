@@ -9,9 +9,11 @@ CFLAGS_append += " -DWAN_MANAGER_UNIFICATION_ENABLED"
 CFLAGS_append += " -DFEATURE_SUPPORT_RDKLOG"
 CFLAGS_append += " -DRBUS_BUILD_INTEGRATED"
 
+CFLAGS_append  += " ${@bb.utils.contains('DISTRO_FEATURES', 'rdkb_configurable_wan_interface', '-DFEATURE_RDKB_CONFIGURABLE_WAN_INTERFACE', '', d)}"
 CFLAGS_append  += " ${@bb.utils.contains('DISTRO_FEATURES', 'WanFailOverSupportEnable', ' -DWAN_FAILOVER_SUPPORTED -DRBUS_BUILD_FLAG_ENABLE', '', d)}"
 CFLAGS_append  += " ${@bb.utils.contains('DISTRO_FEATURES', 'WanManagerUnificationEnable', '-DWAN_MANAGER_UNIFICATION_ENABLED', '', d)}"
 CFLAGS_append += "${@bb.utils.contains('DISTRO_FEATURES', 'rdkb_wan_manager', ' -DFEATURE_RDKB_WAN_MANAGER ', '', d)}"
+CFLAGS_append  += " ${@bb.utils.contains('DISTRO_FEATURES', 'dhcp_manager', '-DFEATURE_RDKB_DHCP_MANAGER', '', d)}"
 
 DEPENDS += "breakpad-wrapper"
 LDFLAGS += "-lbreakpadwrapper"
