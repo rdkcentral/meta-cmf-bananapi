@@ -14,6 +14,7 @@ CFLAGS:append  += " ${@bb.utils.contains('DISTRO_FEATURES', 'WanFailOverSupportE
 CFLAGS:append  += " ${@bb.utils.contains('DISTRO_FEATURES', 'WanManagerUnificationEnable', '-DWAN_MANAGER_UNIFICATION_ENABLED', '', d)}"
 CFLAGS:append += "${@bb.utils.contains('DISTRO_FEATURES', 'rdkb_wan_manager', ' -DFEATURE_RDKB_WAN_MANAGER ', '', d)}"
 CFLAGS:append  += " ${@bb.utils.contains('DISTRO_FEATURES', 'dhcp_manager', '-DFEATURE_RDKB_DHCP_MANAGER', '', d)}"
+CFLAGS:append += "${@bb.utils.contains('DISTRO_FEATURES','bridgeUtilsBin',' -D_BRIDGE_UTILS_BIN_ ','',d)}"
 
 DEPENDS += "breakpad-wrapper"
 LDFLAGS += "-lbreakpadwrapper"

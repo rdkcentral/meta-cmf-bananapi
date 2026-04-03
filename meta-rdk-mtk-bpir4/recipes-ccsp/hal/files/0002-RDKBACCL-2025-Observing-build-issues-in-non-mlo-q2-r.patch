@@ -1,0 +1,51 @@
+From ebd520e0820a35fcfbfc29e296548e8275d3b1c3 Mon Sep 17 00:00:00 2001
+From: "keerthana.p" <keerthana_pandurangan@comcast.com>
+Date: Fri, 7 Aug 2026 06:18:46 +0000
+Subject: [PATCH] RDKBACCL-2025 - Observing build issues in non mlo q2 release
+ and latest kirkstone builds
+
+Reason for change : Below errors are seen,
+./git/src/../platform/banana-pi/platform.c: In function 'platform_pre_create_vap':
+../git/src/../platform/banana-pi/platform.c:675:12: error: invalid storage class for function 'get_sta_list_handler'
+  675 | static int get_sta_list_handler(struct nl_msg *msg, void *arg)
+      |            ^~~~~~~~~~~~~~~~~~~~
+../git/src/../platform/banana-pi/platform.c:698:12: error: invalid storage class for function 'get_sta_list'
+  698 | static int get_sta_list(wifi_interface_info_t *interface, sta_list_t *sta_list)
+      |            ^~~~~~~~~~~~
+../git/src/../platform/banana-pi/platform.c:718:13: error: invalid storage class for function 'set_wifi_standard_from_rate'
+  718 | static void set_wifi_standard_from_rate(struct nlattr **rate, char *cli_OperatingStandard)
+      |             ^~~~~~~~~~~~~~~~~~~~~~~~~~~
+../git/src/../platform/banana-pi/platform.c:736:12: error: invalid storage class for function 'get_sta_stats_handler'
+  736 | static int get_sta_stats_handler(struct nl_msg *msg, void *arg)
+      |            ^~~~~~~~~~~~~~~~~~~~~
+../git/src/../platform/banana-pi/platform.c:839:12: error: invalid storage class for function 'get_sta_stats'
+  839 | static int get_sta_stats(wifi_interface_info_t *interface, mac_address_t mac, wifi_associated_dev3_t *dev)
+      |            ^~~~~~~~~~~~~
+../git/src/../platform/banana-pi/platform.c:1037:1: error: expected declaration or statement at end of input
+ 1037 | }
+      | ^
+Test Procedure: Build successful
+Risks: Low
+
+Signed-off-by: keerthana.p <keerthana_pandurangan@comcast.com>
+---
+ platform/banana-pi/platform.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/platform/banana-pi/platform.c b/platform/banana-pi/platform.c
+index 66b4c5c..7295f82 100644
+--- a/platform/banana-pi/platform.c
++++ b/platform/banana-pi/platform.c
+@@ -445,8 +445,8 @@ int platform_pre_create_vap(wifi_radio_index_t index, wifi_vap_info_map_t *map)
+         memcpy(vap->u.bss_info.mld_info.common_info.mld_addr,
+             interface->vap_info.u.bss_info.mld_info.common_info.mld_addr,
+             sizeof(vap->u.bss_info.mld_info.common_info.mld_addr));
+-    }
+ #endif // CONFIG_IEEE80211BE && CONFIG_GENERIC_MLO
++    }
+     return 0;
+ }
+ 
+-- 
+2.44.4
+

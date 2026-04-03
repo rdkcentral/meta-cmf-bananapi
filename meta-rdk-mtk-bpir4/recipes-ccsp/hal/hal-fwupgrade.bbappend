@@ -8,7 +8,7 @@ SRC_URI:append = "git://github.com/rdkcentral/rdkb-hal-bpi;branch=develop;protoc
                 "
 LIC_FILES_CHKSUM = "file://../../LICENSE;md5=3b83ef96387f14655fc854ddc3c6bd57"
 
-SRCREV_fwupgradehal = "2d25cbb860419bd5f9e5ba2511524d8eec3245e4"
+SRCREV_fwupgradehal = "b65af992cd74ddb7335419b7e8bf3ea84b3dd7bd"
 do_install:append () {
          install -d ${D}${bindir}
         install -v -m 0755 ${WORKDIR}/start_cron.sh ${D}${bindir}/start_cron

@@ -1,4 +1,3 @@
-Upstream-Status: Pending
 SOURCE:RDKM
 diff -Naur git.orig/source/hostap-2.11/wpa_supplicant/events.c git/source/hostap-2.11/wpa_supplicant/events.c
 --- git.orig/source/hostap-2.11/wpa_supplicant/events.c	2026-05-22 06:49:59.314637967 +0000
@@ -36,3 +35,40 @@ diff -Naur git.orig/source/hostap-2.11/wpa_supplicant/wpa_supplicant.c git/sourc
  
  #ifdef CONFIG_BGSCAN
  	if (state == WPA_COMPLETED && wpa_s->current_ssid != wpa_s->bgscan_ssid)
+diff -Naur git.origin/source/hostap-2.11/src/ap/hostapd.c git/source/hostap-2.11/src/ap/hostapd.c
+--- git.origin/source/hostap-2.11/src/ap/hostapd.c	2026-06-25 05:40:51.186728722 +0000
++++ git/source/hostap-2.11/src/ap/hostapd.c	2026-06-25 05:42:58.555926269 +0000
+@@ -594,9 +594,15 @@
+ 	hapd->probereq_cb = NULL;
+ 	hapd->num_probereq_cb = 0;
+ 
++	if(!hapd->current_rates)
++	{
+ 	os_free(hapd->current_rates);
++	}
+ 	hapd->current_rates = NULL;
++	if(!hapd->basic_rates)
++        {
+ 	os_free(hapd->basic_rates);
++	}
+ 	hapd->basic_rates = NULL;
+ 
+ #ifdef CONFIG_P2P
+diff -Naur git.origin/source/hostap-2.11/src/ap/hw_features.c git/source/hostap-2.11/src/ap/hw_features.c
+--- git.origin/source/hostap-2.11/src/ap/hw_features.c	2026-06-25 05:40:51.178728648 +0000
++++ git/source/hostap-2.11/src/ap/hw_features.c	2026-06-25 05:41:57.523352434 +0000
+@@ -282,10 +282,14 @@
+ 		return -1;
+ 	}
+ 
++	if (!hapd->basic_rates) {
+ 	os_free(hapd->basic_rates);
++	}
+ 	hapd->basic_rates = int_array_dup(basic_rates);
+ 
++	if (!hapd->current_rates) {
+ 	os_free(hapd->current_rates);
++	}
+ 	hapd->num_rates = 0;
+ 
+ 	hapd->current_rates =

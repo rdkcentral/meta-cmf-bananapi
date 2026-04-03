@@ -38,7 +38,7 @@ python do_unpack:append() {
 do_deploy() {
         mkdir -p ${DEPLOYDIR}/atf/
         if ${@bb.utils.contains_any('DISTRO_FEATURES', 'kernel6-6 kernel6-12', 'true', 'false', d)}; then
-        echo "Deploying kernel 6.6 BL2/FIP binaries..."
+        echo "Deploying kernel 6.x BL2/FIP binaries..."
         install -m 0644 ${UNPACKDIR}/bpi-r4_sdmmc_bl2_6-6.img ${DEPLOYDIR}/atf/
         install -m 0644 ${UNPACKDIR}/bpi-r4_sdmmc_bl2_B_6-6.img ${DEPLOYDIR}/atf/
         install -m 0644 ${UNPACKDIR}/bpi-r4_sdmmc_fip_6-6.bin ${DEPLOYDIR}/atf/

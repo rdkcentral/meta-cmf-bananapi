@@ -48,6 +48,7 @@ do_install:append() {
     fi
 }
 
+
 RRECOMMENDS:${PN} = " \
     ${PN}-bcm-bt \
     ${PN}-brcm \
