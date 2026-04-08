@@ -1275,6 +1275,7 @@
    <Record name="dmsb.wanmanager.RestorationDelay" type="astr">45</Record> 
    <Record name="dmsb.wanmanager.if.1.Name" type="astr">lan0</Record> 
    <Record name="dmsb.wanmanager.if.1.DisplayName" type="astr">WanOE</Record> 
+   <Record name="dmsb.wanmanager.if.1.AliasName" type="astr">WanOE</Record>
    <Record name="dmsb.wanmanager.if.1.Enable" type="astr">TRUE</Record> 
    <Record name="dmsb.wanmanager.if.1.Type" type="astr">2</Record> 
    <Record name="dmsb.wanmanager.if.1.Priority" type="astr">0</Record> 
@@ -1302,6 +1303,7 @@
    <!-- X_RDK_WanManager.CPEInterface.2. -wanmanager -->
   <Record name="dmsb.wanmanager.if.2.Name" type="astr">wwan0</Record>
   <Record name="dmsb.wanmanager.if.2.DisplayName" type="astr">LTE</Record>
+  <Record name="dmsb.wanmanager.if.2.AliasName" type="astr">LTE</Record>
   <Record name="dmsb.wanmanager.if.2.Enable" type="astr">TRUE</Record>
   <Record name="dmsb.wanmanager.if.2.Type" type="astr">3</Record>
   <Record name="dmsb.wanmanager.if.2.Priority" type="astr">1</Record>
