@@ -1,0 +1,30 @@
+SOURCE: RDKM and https://github.com/rdkcentral/provisioning-and-management/pull/142
+
+From d81df946fc1a5eaa377d913df8f34db224a0a3ad Mon Sep 17 00:00:00 2001
+From: ksaipr036 <kosika_saipriya@comcast.com>
+Date: Fri, 28 Nov 2025 11:53:13 +0530
+Subject: [PATCH] RDKBACCL-1063: Bridge mode functionality is not working as
+ expected
+
+Reason for Change: Switching from router to Bridge-Static mode resolved the 2.4GHz rollback issue, aligning the log flow behavior across 2.4GHz, 5GHz, and 6GHz bands
+Test Procedure: Sanity-tested onewifi and wifiagent builds (both passed), and confirmed that 2.4 GHz log flow in wifiagent now matches with 5GHz and 6GHz.
+Risks: Low.
+
+Signed-off-by: ksaipr036 <kosika_saipriya@comcast.com>
+---
+ .../TR-181/board_sbapi/cosa_x_cisco_com_devicecontrol_apis.c    | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/source-arm/TR-181/board_sbapi/cosa_x_cisco_com_devicecontrol_apis.c b/source-arm/TR-181/board_sbapi/cosa_x_cisco_com_devicecontrol_apis.c
+index 2f2bd57d..35619cb1 100644
+--- a/source-arm/TR-181/board_sbapi/cosa_x_cisco_com_devicecontrol_apis.c
++++ b/source-arm/TR-181/board_sbapi/cosa_x_cisco_com_devicecontrol_apis.c
+@@ -4343,7 +4343,7 @@ void* bridge_mode_wifi_notifier_thread(void* arg) {
+ #endif 
+  {"Device.WiFi.Radio.1.Enable", acSetRadioString, ccsp_boolean}, 
+  {"Device.WiFi.Radio.2.Enable", acSetRadioString, ccsp_boolean},
+-#if !defined (_CBR_PRODUCT_REQ_) && !defined (_BWG_PRODUCT_REQ_) // CBR and BWG don't have XHS don't force here
++#if !defined (_CBR_PRODUCT_REQ_) && !defined (_BWG_PRODUCT_REQ_) && !defined (_PLATFORM_BANANAPI_R4_) // CBR and BWG don't have XHS don't force here
+  {"Device.WiFi.SSID.3.Enable", acSetRadioString, ccsp_boolean},
+ #endif
+  {"Device.WiFi.Radio.3.Enable", acSetRadioString, ccsp_boolean}
