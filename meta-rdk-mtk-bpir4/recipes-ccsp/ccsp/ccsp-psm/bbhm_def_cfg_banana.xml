@@ -1334,7 +1334,7 @@
    <Record name="dmsb.ethlink.ifcount" type="astr">1</Record> 
    <Record name="dmsb.ethlink.1.Enable" type="astr">FALSE</Record> 
    <Record name="dmsb.ethlink.1.alias" type="astr">WANOE</Record> 
-   <Record name="dmsb.ethlink.1.name" type="astr">erouter0</Record> 
+   <Record name="dmsb.ethlink.1.name" type="astr">lan0</Record> 
    <Record name="dmsb.ethlink.1.lowerlayers" type="astr"></Record> 
    <Record name="dmsb.ethlink.1.macoffset" type="astr">3</Record> 
    <Record name="dmsb.ethlink.1.baseiface" type="astr">lan0</Record> 
@@ -1362,7 +1362,7 @@
    <Record name="dmsb.wanmanager.if.1.VirtualInterfaceifcount" type="astr">1</Record> 
    <Record name="dmsb.wanmanager.if.1.VirtualInterface.1.Enable" type="astr">TRUE</Record> 
    <Record name="dmsb.wanmanager.if.1.VirtualInterface.1.Alias" type="astr">WANOE</Record> 
-   <Record name="dmsb.wanmanager.if.1.VirtualInterface.1.Name" type="astr">erouter0</Record> 
+   <Record name="dmsb.wanmanager.if.1.VirtualInterface.1.Name" type="astr">lan0</Record> 
    <Record name="dmsb.wanmanager.if.1.VirtualInterface.1.EnableMAPT" type="astr">TRUE</Record> 
    <Record name="dmsb.wanmanager.if.1.VirtualInterface.1.EnableDSLite" type="astr">FALSE</Record> 
    <Record name="dmsb.wanmanager.if.1.VirtualInterface.1.EnableIPoE" type="astr">TRUE</Record> 
