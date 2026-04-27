@@ -2,15 +2,6 @@ include ccsp_common_bananapi.inc
 
 FILESEXTRAPATHS_prepend := "${THISDIR}/${PN}:${THISDIR}/files:"
 
-SRC_URI:remove = "${CMF_GITHUB_ROOT}/common-library;protocol=https;${BRANCH_ccsp_common_library}"
-
-PV_pn-ccsp-common-library = "2.0.0_stable2_20260109"
-SRC_URI:append = "git://github.com/rdkcentral/common-library.git;protocol=https;name=ccsp_common_library;branch=support/2026q1"
-SRCREV_ccsp_common_library = "740a897df8d1b6525b632862814c9ce1cfa4f991"
-
-PV_pn-ccsp-common-library-native = "2.0.0_stable2_20260109"
-SRCREV_pn-ccsp-common-library-native = "740a897df8d1b6525b632862814c9ce1cfa4f991"
-
 SRC_URI_append = " \
                    file://gwprovapp.conf \
                 "
