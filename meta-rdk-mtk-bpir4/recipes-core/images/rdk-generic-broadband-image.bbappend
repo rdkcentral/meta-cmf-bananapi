@@ -14,6 +14,15 @@ IMAGE_INSTALL_append = " gptfdisk e2fsprogs-mke2fs util-linux util-linux-losetup
 #Router discovery tool
 IMAGE_INSTALL_append = " ndisc6"
 
+IMAGE_INSTALL_append = " rust-hello-world"
+
+IMAGE_INSTALL_append = " gcc g++ make cmake binutils packagegroup-core-buildessential libtool automake autoconf pkgconfig gdbm rust cargo xz  go git ca-certificates  openssl openssl-engines"
+
+IMAGE_INSTALL_append = " kernel-dev kernel-devsrc kernel-modules kmod module-init-tools bc flex bison linux-libc-headers-dev"
+
+EXTRA_IMAGE_FEATURES += "tools-sdk"
+EXTRA_IMAGE_FEATURES += "dev-pkgs"
+
 ROOTFS_POSTPROCESS_COMMAND_append = "add_busybox_fixes; "
 
 #Emptying the PRSERV_HOST since builds are local

@@ -14,7 +14,7 @@ part --source rawcopy --sourceparams="file=atf/bpi-r4_sdmmc_fip_6-6.bin" --part-
 part /boot --source bootimg-partition --ondisk mmcblk0 --fstype=vfat --label boot_a --active --align 8704 --fixed-size 16M --part-type=0FC63DAF-8483-4772-8E79-3D69D8477DE4
 
 # 4. rootfs A
-part / --source rootfs --ondisk mmcblk0 --fstype=ext4 --label rootfs_a --fixed-size 1024M
+part / --source rootfs --ondisk mmcblk0 --fstype=ext4 --label rootfs_a --fixed-size 14G
 
 # 5. BL2 B (copy of BL2)
 part --source rawcopy --sourceparams="file=atf/bpi-r4_sdmmc_bl2_B_6-6.img" --part-name bl2_b --fixed-size 4079K --part-type=0FC63DAF-8483-4772-8E79-3D69D8477DE4
@@ -26,7 +26,7 @@ part --source rawcopy --sourceparams="file=atf/bpi-r4_sdmmc_fip_B_6-6.bin" --par
 part --source bootimg-partition --ondisk mmcblk0 --fstype=vfat --label boot_b --active --fixed-size 16M --part-type=0FC63DAF-8483-4772-8E79-3D69D8477DE4
 
 # 8. rootfs B
-part / --source empty --ondisk mmcblk0 --fstype=ext4 --label rootfs_b --fixed-size 1024M
+part / --source empty --ondisk mmcblk0 --fstype=ext4 --label rootfs_b --fixed-size 14G
 
 # 9. NVRAM (16MB)
 part --source=empty --fstype=ext4 --label=nvram --fixed-size=16M

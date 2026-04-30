@@ -76,3 +76,7 @@ DISTRO_FEATURES_append = " rrd"
 #Enable MAP-T
 DISTRO_FEATURES_append = " feature_mapt"
 DISTRO_FEATURES_append = " nat46"
+
+#PREFERRED_VERSION_gmp ?= "4.2.1"
+PREFERRED_VERSION_gmp = ""
+
