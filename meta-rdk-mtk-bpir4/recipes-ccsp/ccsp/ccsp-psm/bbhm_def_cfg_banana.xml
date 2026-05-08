@@ -1411,24 +1411,6 @@
 	  <!-- DHCP Manager  -->
   <Record name="dmsb.dhcpmanager.ClientNoOfEntries" type="astr">1</Record>
   <Record name="dmsb.dhcpmanager.Client.1.Alias" type="astr" >WANOE</Record>
-  <Record name="dmsb.dhcpmanager.Client.1.ReqOptionNoOfEntries" type="astr">4</Record>
-  <Record name="dmsb.dhcpmanager.Client.1.ReqOption.1.Tag" type="astr">125</Record>
-  <Record name="dmsb.dhcpmanager.Client.1.ReqOption.1.Order" type="astr">1</Record>
-  <Record name="dmsb.dhcpmanager.Client.1.ReqOption.2.Tag" type="astr">42</Record>
-  <Record name="dmsb.dhcpmanager.Client.1.ReqOption.2.Order" type="astr">2</Record>
-  <Record name="dmsb.dhcpmanager.Client.1.ReqOption.3.Tag" type="astr">2</Record>
-  <Record name="dmsb.dhcpmanager.Client.1.ReqOption.3.Order" type="astr">3</Record>
-  <Record name="dmsb.dhcpmanager.Client.1.ReqOption.4.Tag" type="astr">122</Record>
-  <Record name="dmsb.dhcpmanager.Client.1.ReqOption.4.Order" type="astr">4</Record>
-
-  <Record name="dmsb.dhcpmanager.Client.1.SendOptionNoOfEntries" type="astr">3</Record>
-  <Record name="dmsb.dhcpmanager.Client.1.SendOption.1.Tag" type="astr">43</Record>
-  <Record name="dmsb.dhcpmanager.Client.1.SendOption.1.Value" type="astr">020745524f55544552030c45524f555445523a45445641</Record>
-  <Record name="dmsb.dhcpmanager.Client.1.SendOption.2.Tag" type="astr">60</Record>
-  <Record name="dmsb.dhcpmanager.Client.1.SendOption.2.Value" type="astr">65526F75746572312E30</Record>
-  <Record name="dmsb.dhcpmanager.Client.1.SendOption.3.Tag" type="astr">125</Record>
-  <Record name="dmsb.dhcpmanager.Client.1.SendOption.3.Value" type="astr">0000118b0701027B7C7c0107</Record>
-
 
   <Record name="dmsb.dhcpmanager.dhcpv6.ClientNoOfEntries" type="astr">1</Record>
 
