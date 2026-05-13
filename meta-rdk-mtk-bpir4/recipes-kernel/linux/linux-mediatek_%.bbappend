@@ -25,7 +25,7 @@ do_filogic_patches:append() {
     cd ${S}
     Enable_sd_6_6="${@bb.utils.contains( 'DISTRO_FEATURES','kernel6-6','true','false',d)}"
     Enable_sd_v6="${@bb.utils.contains( 'DISTRO_FEATURES','kernel6-12','true','false',d)}"
-    if [ ! -e patch_applied ];then
+    if [ ! -e patch_applied_v6 ];then
          if [ $Enable_sd_6_6 = 'true' ]; then
               patch -p1 < ${WORKDIR}/enable_sdcard_6_6.patch
               patch -p1 < ${WORKDIR}/bluetooth_6_6.patch
@@ -33,6 +33,6 @@ do_filogic_patches:append() {
               patch -p1 < ${WORKDIR}/enable_sdcard_v6.patch
              patch -p1 < ${WORKDIR}/bluetooth_v6.patch
          fi
-         touch patch_applied
+         touch patch_applied_v6
     fi
 }
