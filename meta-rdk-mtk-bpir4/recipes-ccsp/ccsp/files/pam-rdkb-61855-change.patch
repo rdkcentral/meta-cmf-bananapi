@@ -1,0 +1,68 @@
+From 8de8690cda882fca29866c32ca18b605a18d0c13 Mon Sep 17 00:00:00 2001
+From: suriya-prem <224775237+suriya-prem@users.noreply.github.com>
+Date: Wed, 19 Nov 2025 09:18:39 +0000
+Subject: [PATCH] RDKB-61855 : Unable to launch the admin GUI page after
+ changing the IPv4 Gateway address
+
+Reason for change: Gateway address is not reflected in the "brlan0" bridge interface.
+Test Procedure: Change the local IP in GUI and check.
+Risks: Low
+Priority: P0
+---
+ .../cosa_x_cisco_com_devicecontrol_dml.c          | 15 ---------------
+ 1 file changed, 15 deletions(-)
+
+diff --git a/source/TR-181/middle_layer_src/cosa_x_cisco_com_devicecontrol_dml.c b/source/TR-181/middle_layer_src/cosa_x_cisco_com_devicecontrol_dml.c
+index da624f82..2c209fc5 100644
+--- a/source/TR-181/middle_layer_src/cosa_x_cisco_com_devicecontrol_dml.c
++++ b/source/TR-181/middle_layer_src/cosa_x_cisco_com_devicecontrol_dml.c
+@@ -2124,9 +2124,6 @@ LanMngm_SetParamUlongValue
+     BOOL                                      bridgeMode;
+     ULONG                                     deviceMode;
+ 
+-    char ip_buff[16]  = {0};
+-    struct in_addr addr;
+-
+     if (CosaDmlDcGetDeviceMode(NULL, &deviceMode) != ANSC_STATUS_SUCCESS)
+             return FALSE;
+     
+@@ -2189,11 +2186,6 @@ LanMngm_SetParamUlongValue
+     }
+     if (strcmp(ParamName, "LanSubnetMask") == 0)
+     {
+-        addr.s_addr = uValuepUlong;
+-        if (inet_ntop(AF_INET, &addr, ip_buff, sizeof(ip_buff)) == NULL) {
+-            CcspTraceWarning(("inet_ntop: Invalid IPv4 address\n"));
+-            return FALSE;
+-        }
+         if (Dhcpv4_Lan_MutexTryLock() != 0)
+         {
+             CcspTraceWarning(("%s not supported if already lan blob update is inprogress\n",ParamName));
+@@ -2201,7 +2193,6 @@ LanMngm_SetParamUlongValue
+         }
+ 
+ 		CcspTraceWarning(("RDKB_LAN_CONFIG_CHANGED: Setting new LanSubnetMask value  ...\n"));
+-        syscfg_set_commit(NULL, DHCPV4_LAN_NETMASK, ip_buff);
+         pLanMngm->LanSubnetMask.Value = uValuepUlong;
+         lan_ip_config_modified=true;
+         Dhcpv4_Lan_MutexUnLock();
+@@ -2209,11 +2200,6 @@ LanMngm_SetParamUlongValue
+     }
+     if (strcmp(ParamName, "LanIPAddress") == 0)
+     {
+-        addr.s_addr = uValuepUlong;
+-        if (inet_ntop(AF_INET, &addr, ip_buff, sizeof(ip_buff)) == NULL) {
+-            CcspTraceWarning(("inet_ntop: Invalid IPv4 address\n"));
+-            return FALSE;
+-        }
+         if (Dhcpv4_Lan_MutexTryLock() != 0)
+         {
+             CcspTraceWarning(("%s not supported if already lan blob update is inprogress\n",ParamName));
+@@ -2221,7 +2207,6 @@ LanMngm_SetParamUlongValue
+         }
+ 
+ 		CcspTraceWarning(("RDKB_LAN_CONFIG_CHANGED: Setting new LanIPAddress value  ...\n"));
+-        syscfg_set_commit(NULL, DHCPV4_LAN_IP, ip_buff);
+         pLanMngm->LanIPAddress.Value = uValuepUlong;
+         lan_ip_config_modified=true;
+         Dhcpv4_Lan_MutexUnLock();
