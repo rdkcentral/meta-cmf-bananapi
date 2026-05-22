@@ -14,6 +14,8 @@ DISTRO_FEATURES_append = " no_moca_support"
 DISTRO_FEATURES_append = " referencepltfm "
 
 MACHINEOVERRIDES_append = "${@bb.utils.contains('DISTRO_FEATURES', 'OneWifi', ':onewifi', '' ,d)}"
+MACHINEOVERRIDES:append =. "${@bb.utils.contains('DISTRO_FEATURES', 'kernel6-6', ':kernel6-6', '' ,d)}"
+MACHINEOVERRIDES:append =. "${@bb.utils.contains('DISTRO_FEATURES', 'kernel6-12', ':kernel6-12', '' ,d)}"
 
 DISTRO_FEATURES_append = " partner_default_ext"
 
@@ -33,6 +35,7 @@ DISTRO_FEATURES_append = " generic_mlo"
 
 # Kernel 6.6
 DISTRO_FEATURES_append = " kernel6-6"
+#DISTRO_FEATURES_append = " kernel6-12"
 
 #Disable rdm-agent for reference platform
 #DISTRO_FEATURES_append = "RDM"

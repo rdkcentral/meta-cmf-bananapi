@@ -297,4 +297,5 @@ SRC_URI:append = " \
     file://xfi_tel_compete_v6_2_11.patch \
     file://host_kernel_v6.patch \
     file://BPI_ssid_broad_v6.patch \
+    file://Bpi_runtime_issues.patch \
 "

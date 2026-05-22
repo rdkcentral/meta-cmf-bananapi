@@ -147,10 +147,10 @@ index 89383bf..6b8dd7b 100644
          interface->wpa_s.current_ssid->pt = sae_derive_pt(interface->wpa_s.conf->sae_groups,
 +            interface->wpa_s.current_ssid->ssid,
 +            interface->wpa_s.current_ssid->ssid_len,
-+            interface->wpa_s.current_ssid->sae_password,
++            (const u8*) interface->wpa_s.current_ssid->sae_password,
 +            os_strlen(interface->wpa_s.current_ssid->sae_password),
-+            interface->wpa_s.current_ssid->sae_password_id,
-+            os_strlen(interface->wpa_s.current_ssid->sae_password_id));
++            (const u8*) interface->wpa_s.current_ssid->sae_password_id,
++            interface->wpa_s.current_ssid->sae_password_id ? os_strlen(interface->wpa_s.current_ssid->sae_password_id) : 0);
 +#else
 +       interface->wpa_s.current_ssid->pt = sae_derive_pt(interface->wpa_s.conf->sae_groups,
              interface->wpa_s.current_ssid->ssid,
