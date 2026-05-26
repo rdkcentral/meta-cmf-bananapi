@@ -31,3 +31,6 @@ FILES_${PN} += " \
     /fss/gw/version.txt \
     /etc/url \
 "
+DEPENDS_remove = "hal-cm hal-moca hal-mso_mgmt hal-mta"
+
+RDEPENDS_${PN}_remove = "hal-cm hal-moca hal-mso_mgmt hal-mta"

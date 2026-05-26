@@ -126,3 +126,4 @@ sed -i '/Before=CcspPandMSsp.service/a Requires=mount-nvram.service' ${D}/lib/sy
 FILES_${PN} += " \
                 /minidumps/ \
 "
+DEPENDS_remove = "hal-cm hal-moca hal-mso_mgmt hal-mta"

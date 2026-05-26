@@ -51,3 +51,4 @@ FILES_${PN} += " \
     /usr/ccsp/wifi/wifi_defaults.txt \
     /usr/lib/libwifi* \
 "
+DEPENDS_remove = "hal-cm hal-moca hal-mso_mgmt hal-mta"

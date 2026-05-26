@@ -36,10 +36,6 @@
 -->
 
 <Provision>
-  <Record name="com.cisco.spvtg.ccsp.tr069pa.PmNotif.Device.ManagementServer.ConnectionRequestURL" type="astr" contentType="ip4Addr">2</Record>
-  <Record name="eRT.com.cisco.spvtg.ccsp.tr069pa.PmNotif.Device.ManagementServer.ConnectionRequestURL" type="astr" contentType="ip4Addr">2</Record>
-  <Record name="eMG.com.cisco.spvtg.ccsp.tr069pa.PmNotif.Device.ManagementServer.ConnectionRequestURL" type="astr" contentType="ip4Addr">2</Record>
-  <Record name="eRT.com.cisco.spvtg.ccsp.tr069pa.Device.ManagementServer.STUNServerPort.Value" type="astr">3478</Record>
   <Record name="eRT.com.cisco.spvtg.ccsp.tr181pa.Device.WiFi.ValidateSSIDName" type="astr">1</Record>
   <Record name="eRT.com.cisco.spvtg.ccsp.tr181pa.Device.WiFi.Radio.1.CTSProtection" type="astr">0</Record>
   <Record name="eRT.com.cisco.spvtg.ccsp.tr181pa.Device.WiFi.Radio.2.CTSProtection" type="astr">0</Record>
@@ -1171,7 +1167,6 @@
   <Record name="dmsb.l2net.9.Port.1.InstanceNum" type="astr">1</Record>
   <Record name="dmsb.l2net.9.Port.1.Upstream" type="astr">FALSE</Record>
 
-  <Record name="dmsb.device.deviceinfo.X_RDKCENTRAL-COM_Syndication.TR69CertLocation" type="astr"></Record>
   <Record name="eRT.com.cisco.spvtg.ccsp.Device.WiFi.Radio.1.ChanUtilSelfHealEnable" type="astr">0</Record>
   <Record name="eRT.com.cisco.spvtg.ccsp.Device.WiFi.Radio.2.ChanUtilSelfHealEnable" type="astr">0</Record>
   <Record name="eRT.com.cisco.spvtg.ccsp.Device.WiFi.Radio.3.ChanUtilSelfHealEnable" type="astr">0</Record>
@@ -1411,23 +1406,6 @@
 	  <!-- DHCP Manager  -->
   <Record name="dmsb.dhcpmanager.ClientNoOfEntries" type="astr">1</Record>
   <Record name="dmsb.dhcpmanager.Client.1.Alias" type="astr" >WANOE</Record>
-  <Record name="dmsb.dhcpmanager.Client.1.ReqOptionNoOfEntries" type="astr">4</Record>
-  <Record name="dmsb.dhcpmanager.Client.1.ReqOption.1.Tag" type="astr">125</Record>
-  <Record name="dmsb.dhcpmanager.Client.1.ReqOption.1.Order" type="astr">1</Record>
-  <Record name="dmsb.dhcpmanager.Client.1.ReqOption.2.Tag" type="astr">42</Record>
-  <Record name="dmsb.dhcpmanager.Client.1.ReqOption.2.Order" type="astr">2</Record>
-  <Record name="dmsb.dhcpmanager.Client.1.ReqOption.3.Tag" type="astr">2</Record>
-  <Record name="dmsb.dhcpmanager.Client.1.ReqOption.3.Order" type="astr">3</Record>
-  <Record name="dmsb.dhcpmanager.Client.1.ReqOption.4.Tag" type="astr">122</Record>
-  <Record name="dmsb.dhcpmanager.Client.1.ReqOption.4.Order" type="astr">4</Record>
-
-  <Record name="dmsb.dhcpmanager.Client.1.SendOptionNoOfEntries" type="astr">3</Record>
-  <Record name="dmsb.dhcpmanager.Client.1.SendOption.1.Tag" type="astr">43</Record>
-  <Record name="dmsb.dhcpmanager.Client.1.SendOption.1.Value" type="astr">020745524f55544552030c45524f555445523a45445641</Record>
-  <Record name="dmsb.dhcpmanager.Client.1.SendOption.2.Tag" type="astr">60</Record>
-  <Record name="dmsb.dhcpmanager.Client.1.SendOption.2.Value" type="astr">65526F75746572312E30</Record>
-  <Record name="dmsb.dhcpmanager.Client.1.SendOption.3.Tag" type="astr">125</Record>
-  <Record name="dmsb.dhcpmanager.Client.1.SendOption.3.Value" type="astr">0000118b0701027B7C7c0107</Record>
 
 
   <Record name="dmsb.dhcpmanager.dhcpv6.ClientNoOfEntries" type="astr">1</Record>

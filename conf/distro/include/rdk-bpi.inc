@@ -76,3 +76,8 @@ DISTRO_FEATURES_append = " rrd"
 #Enable MAP-T
 DISTRO_FEATURES_append = " feature_mapt"
 DISTRO_FEATURES_append = " nat46"
+
+#ckp
+DISTRO_FEATURES_append = " no_mta_support"
+
+DISTRO_FEATURES_remove = " snmppa"
