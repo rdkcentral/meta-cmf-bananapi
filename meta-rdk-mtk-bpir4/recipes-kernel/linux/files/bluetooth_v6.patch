@@ -1,5 +1,5 @@
 diff --git a/net/bluetooth/hci_sync.c b/net/bluetooth/hci_sync.c
-index f79b38603205..f9fa2086e8fb 100644
+index f79b38603205..a3b6b7e6d2ad 100644
 --- a/net/bluetooth/hci_sync.c
 +++ b/net/bluetooth/hci_sync.c
 @@ -2990,12 +2990,13 @@ static int hci_le_set_ext_scan_param_sync(struct hci_dev *hdev, u8 type,
@@ -17,16 +17,14 @@ index f79b38603205..f9fa2086e8fb 100644
  
  done:
  	if (!num_phy)
-@@ -6469,7 +6470,7 @@ static int hci_le_ext_create_conn_sync(struct hci_dev *hdev,
- 		p++;
+@@ -6479,13 +6480,13 @@ static int hci_le_ext_create_conn_sync(struct hci_dev *hdev,
  		plen += sizeof(*p);
  	}
--
-+/*
- 	if (scan_2m(hdev) && (conn->le_adv_phy == HCI_ADV_PHY_2M ||
- 			      conn->le_adv_sec_phy == HCI_ADV_PHY_2M)) {
- 		cp->phys |= LE_SCAN_PHY_2M;
-@@ -6485,7 +6486,7 @@ static int hci_le_ext_create_conn_sync(struct hci_dev *hdev,
+ 
+-	if (scan_coded(hdev) && (conn->le_adv_phy == HCI_ADV_PHY_CODED ||
++/*	if (scan_coded(hdev) && (conn->le_adv_phy == HCI_ADV_PHY_CODED ||
+ 				 conn->le_adv_sec_phy == HCI_ADV_PHY_CODED)) {
+ 		cp->phys |= LE_SCAN_PHY_CODED;
  		set_ext_conn_params(conn, p);
  
  		plen += sizeof(*p);

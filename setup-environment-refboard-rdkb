@@ -23,6 +23,22 @@ _TOPDIR=`pwd`
 
 export RDK_BSP_LAYER=none
 
+if [ "X$MP_version" == "X4.3" ] && [ ! -e ${_TOPDIR}/meta-cmf-filogic/MP4_3_applied ] && [ ! -e ${_TOPDIR}/meta-filogic/MP4_3_applied ];
+then
+    cd ${_TOPDIR}/meta-filogic
+    git checkout 77e17792f60279b6e1deb1f1c6abf5705972bc6f
+    cd -
+    cd ${_TOPDIR}/meta-cmf-filogic
+    git checkout a68043b58a049ee5a93f3509c1f268fea73cc388
+    cd -
+    sed -i '/kernel6-12/s/^#//' ${_TOPDIR}/meta-cmf-bananapi/conf/distro/include/rdk-bpi.inc
+    sed -i '/kernel6-12/s/^#//' ${_TOPDIR}/meta-cmf-bananapi/conf/distro/include/rdk-bpi-ap-extender.inc
+    sed -i '/kernel6-6/s/^/#/' ${_TOPDIR}/meta-cmf-bananapi/conf/distro/include/rdk-bpi.inc
+    sed -i '/kernel6-6/s/^/#/' ${_TOPDIR}/meta-cmf-bananapi/conf/distro/include/rdk-bpi-ap-extender.inc
+    touch ${_TOPDIR}/meta-cmf-filogic/MP4_3_applied
+    touch ${_TOPDIR}/meta-filogic/MP4_3_applied
+fi
+
 #select filogic880-bpi-r4.conf for BPI R4
 if [ -e "${_TOPDIR}/meta-cmf-filogic/setup-environment-release" ]; then
 	source meta-cmf-filogic/setup-environment-release
@@ -84,16 +100,12 @@ touch ${_TOPDIR}/meta-filogic/recipes-wifi/hal/mt76_hal_change
 fi
 
 if [ ! -e ${_TOPDIR}/meta-rdk/recipes-common/rdm-agent/rdm_hal_change ]; then
-    sed -i \
-        -e '/librdmopenssl/d' \
-        -e '/rdm_rsa_signature_verify/d' \
-        -e '/install -d.*\${D}\${includedir}\/rdm$/d' \
-        -e '/install -d.*\${D}\${libdir}$/d' \
-        -e 's/\(rdm\/\*\) \\$/\1"/' \
-        ${_TOPDIR}/meta-rdk/recipes-common/rdm-agent/rdm-agent.bb
-    touch ${_TOPDIR}/meta-rdk/recipes-common/rdm-agent/rdm_hal_change
+sed -i '77 s/^/#/' ${_TOPDIR}/meta-rdk/recipes-common/rdm-agent/rdm-agent.bb
+sed -i '78 s/^/#/' ${_TOPDIR}/meta-rdk/recipes-common/rdm-agent/rdm-agent.bb
+sed -i '79 s/^/#/' ${_TOPDIR}/meta-rdk/recipes-common/rdm-agent/rdm-agent.bb
+sed -i '80 s/^/#/' ${_TOPDIR}/meta-rdk/recipes-common/rdm-agent/rdm-agent.bb
+touch ${_TOPDIR}/meta-rdk/recipes-common/rdm-agent/rdm_hal_change
 fi
-
 
 if [ "X$FEATURE_TYPE" == "XEasyMesh" ]; then
     sed -i '/EasyMesh/s/^#//' ${_TOPDIR}/meta-cmf-bananapi/conf/distro/include/rdk-bpi.inc
@@ -113,12 +125,6 @@ if [ "X$FEATURE_TYPE" == "XEasyMesh" ] && [ "X$WITHOUT_ALSAP" == "Xyes" ]; then
     fi	
 fi
 
-if [ "X$KERNEL_VER" == "Xkernel6-12" ]; then
-    sed -i '/kernel6-12/s/^#//' ${_TOPDIR}/meta-cmf-bananapi/conf/distro/include/rdk-bpi.inc
-    sed -i '/kernel6-12/s/^#//' ${_TOPDIR}/meta-cmf-bananapi/conf/distro/include/rdk-bpi-ap-extender.inc
-    sed -i '/kernel6-6/s/^/#/' ${_TOPDIR}/meta-cmf-bananapi/conf/distro/include/rdk-bpi.inc
-    sed -i '/kernel6-6/s/^/#/' ${_TOPDIR}/meta-cmf-bananapi/conf/distro/include/rdk-bpi-ap-extender.inc
-fi
     sed -i 's|SYSTEMD_SERVICE:${PN}:remove_broadband = "dropbear.service"|SYSTEMD_SERVICE:${PN}:remove_broadband = "${@bb.utils.contains('\''DISTRO_FEATURES'\'', '\''em_extender'\'', '\'' '\'','\''dropbear.service'\'', d)}"|' \
 ${_TOPDIR}/meta-cmf-filogic/recipes-rdkb/sysint-broadband/sysint-broadband.bbappend
 
