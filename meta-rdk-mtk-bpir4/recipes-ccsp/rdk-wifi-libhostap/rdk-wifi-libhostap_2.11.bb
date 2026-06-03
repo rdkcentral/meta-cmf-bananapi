@@ -5,7 +5,7 @@ LICENSE = "BSD-3-Clause"
 PATCH_SRC = "${@bb.utils.contains('DISTRO_FEATURES','kernel6-12','kernel_6_12',bb.utils.contains('DISTRO_FEATURES','kernel6-6','kernel_6_6','kernel_5_4',d), d)}"
 FILESEXTRAPATHS_prepend:="${THISDIR}/files:"
 FILESEXTRAPATHS:prepend := "${THISDIR}/files/2.11/${PATCH_SRC}:"
-FILESEXTRAPATHS:prepend := "${@bb.utils.contains_any('DISTRO_FEATURES', 'kernel6-6 kernel6-12', '${TOPDIR}/../meta-filogic/recipes-wifi/hostapd/files/kernelv6-patches:', '', d)}"
+FILESEXTRAPATHS:prepend := "${@bb.utils.contains('DISTRO_FEATURES', 'kernel6-12', '${TOPDIR}/../meta-filogic/recipes-wifi/hostapd/files/kernel*6-patches:', bb.utils.contains('DISTRO_FEATURES','kernel6-6','${TOPDIR}/../meta-filogic/recipes-wifi/hostapd/files/kernel6-6-patches:', '', d), d)}"
 PROVIDES = "rdk-wifi-libhostap"
 RPROVIDES_${PN} = "rdk-wifi-libhostap"
 DEPENDS += "libnl openssl"
@@ -16,8 +16,8 @@ inherit autotools pkgconfig
 
 SRC_URI = "git://w1.fi/hostap.git;protocol=https;branch=main;destsuffix=${S}/source/hostap-${PV};name=${PV}"
 SRCREV = "96e48a05aa0a82e91e3cab75506297e433e253d0"
-SRCREV_kernel6-6 = "53d12cd44da765ee446b2834aad92e9670319f8c"
-SRCREV_kernel6-12 =  "53d12cd44da765ee446b2834aad92e9670319f8c"
+SRCREV_kernel6-6 = "4b8ac10cb77c3d4dbf7ccefbe697dc0578da374c"
+SRCREV_kernel6-12 = "53d12cd44da765ee446b2834aad92e9670319f8c"
 
 LIC_FILES_CHKSUM = "file://source/hostap-2.11/README;md5=6e4b25e7d74bfc44a32ba37bdf5210a6"
 
