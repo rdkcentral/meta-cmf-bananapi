@@ -100,11 +100,14 @@ touch ${_TOPDIR}/meta-filogic/recipes-wifi/hal/mt76_hal_change
 fi
 
 if [ ! -e ${_TOPDIR}/meta-rdk/recipes-common/rdm-agent/rdm_hal_change ]; then
-sed -i '77 s/^/#/' ${_TOPDIR}/meta-rdk/recipes-common/rdm-agent/rdm-agent.bb
-sed -i '78 s/^/#/' ${_TOPDIR}/meta-rdk/recipes-common/rdm-agent/rdm-agent.bb
-sed -i '79 s/^/#/' ${_TOPDIR}/meta-rdk/recipes-common/rdm-agent/rdm-agent.bb
-sed -i '80 s/^/#/' ${_TOPDIR}/meta-rdk/recipes-common/rdm-agent/rdm-agent.bb
-touch ${_TOPDIR}/meta-rdk/recipes-common/rdm-agent/rdm_hal_change
+    sed -i \
+        -e '/librdmopenssl/d' \
+        -e '/rdm_rsa_signature_verify/d' \
+        -e '/install -d.*\${D}\${includedir}\/rdm$/d' \
+        -e '/install -d.*\${D}\${libdir}$/d' \
+        -e 's/\(rdm\/\*\) \\$/\1"/' \
+        ${_TOPDIR}/meta-rdk/recipes-common/rdm-agent/rdm-agent.bb
+    touch ${_TOPDIR}/meta-rdk/recipes-common/rdm-agent/rdm_hal_change
 fi
 
 if [ "X$FEATURE_TYPE" == "XEasyMesh" ]; then

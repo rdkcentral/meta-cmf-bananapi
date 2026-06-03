@@ -32,7 +32,6 @@ mkdir -p /nvram
 mount /dev/mmcblk0p9 /nvram
 if [ "$?" != "0" ]; then
 echo "Mounting nvram partition failed." >>/tmp/mount-nvram.log
-exit 1
 fi
 mkdir -p /nvram/secure
 # OneWifi DB stored under /opt/secure/wifi
@@ -40,8 +39,16 @@ mkdir -p /opt/secure
 mount --bind /nvram /opt/secure
 # MariaDB stored under /var/lib/mysql
 if [ -f /lib/systemd/system/mysqld.service ] ; then
+mkdir -p /nvram/mysql
 mkdir -p /var/lib/mysql
-mount --bind /nvram /var/lib/mysql
+mount --bind /nvram/mysql /var/lib/mysql
+chown mysql:mysql /var/lib/mysql
+if [ ! -d /var/lib/mysql/mysql ]; then
+echo "First boot: initializing MariaDB system tables..." >>/tmp/mount-nvram.log
+/usr/bin/mysql_install_db --user=mysql --datadir=/var/lib/mysql --rpm
+chown -R mysql:mysql /var/lib/mysql
+else
+echo "Already MariaDB has been initialized " >> /tmp/mount-nvram.log
 fi
-
+fi
 exit 0

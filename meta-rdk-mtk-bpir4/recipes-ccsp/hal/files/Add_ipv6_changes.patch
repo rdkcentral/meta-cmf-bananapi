@@ -5,14 +5,6 @@ Index: platform/rdkb_hal/src/platform/platform_hal.c
 ===================================================================
 --- platform.orig/rdkb_hal/src/platform/platform_hal.c
 +++ platform/rdkb_hal/src/platform/platform_hal.c
-@@ -20,6 +20,7 @@
- #include <stdio.h>
- #include <stdlib.h>
- #include <string.h>
-+#include <unistd.h>
- 
- #include "platform_hal.h" 
- 
 @@ -28,6 +29,22 @@
  /* Note that 0 == RETURN_OK == STATUS_OK    */
  /* Note that -1 == RETURN_ERR == STATUS_NOK */
