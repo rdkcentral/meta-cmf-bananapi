@@ -5,6 +5,7 @@ FILESEXTRAPATHS_prepend := "${THISDIR}/${PN}:"
 SRC_URI += "file://service_bridge_bpi.sh"
 
 CFLAGS_append  = " ${@bb.utils.contains('DISTRO_FEATURES', 'matter', ' -DFEATURE_MATTER_ENABLED', '', d)}"
+CFLAGS_append = "${@bb.utils.contains('DISTRO_FEATURES', 'vlan_manager' , ' -DFEATURE_RDKB_VLAN_MANAGER ','', d)}"
 
 do_install_append() {
 

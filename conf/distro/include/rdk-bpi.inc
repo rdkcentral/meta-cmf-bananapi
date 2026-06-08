@@ -165,3 +165,6 @@ RDKB_OPT_PKGS_DISABLED[vardepvalue] = "${RDKB_OPT_PKGS_DISABLED}"
 DISTRO_FEATURES:append = "${@bb.utils.contains('CORE_RDKB_ENABLED', '1', ' Core-RDKB', '', d)}"
 DISTRO_FEATURES:append = "${@' Optional-RDKB' if d.getVar('RDKB_OPT_ENABLED_LIST').strip() else ''}"
 DISTRO_FEATURES:remove = "${@bb.utils.contains('CORE_RDKB_ENABLED', '1', bb.utils.contains('RDKB_OPTIONAL_ENABLED', '1', ' ${RDKB_OPT_FEATURES_DISABLED}', ' ${RDKB_OPT_FEATURES_DISABLED}', d), '', d)}"
+
+#VLAN Manager integration
+#DISTRO_FEATURES_append = " vlan_manager"

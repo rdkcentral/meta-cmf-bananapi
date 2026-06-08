@@ -1,0 +1,17 @@
+Source: Manigandan Gopalakrishnan<Manigandan_Gopalakrishnan@comcast.com>
+Subject: Changes needed for vlan-manager integration
+
+diff -Naur platform.orig/rdkb_hal/src/platform/platform_hal.c platform/rdkb_hal/src/platform/platform_hal.c
+--- platform.orig/rdkb_hal/src/platform/platform_hal.c	2026-11-23 05:12:33.186657985 +0000
++++ platform/rdkb_hal/src/platform/platform_hal.c	2026-11-23 05:14:29.563220315 +0000
+@@ -191,6 +191,10 @@
+             }
+             fclose(fp);
+         }
++        else //vlanmanager approach: it expects MAC address of lan0 interface for creating bridge interface
++        {
++            strcpy(g_virtualIfName, "lan0");
++        }
+ 	if (pValue != NULL)
+ 	{
+ 		memset(path, 0, sizeof(path));
