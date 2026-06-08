@@ -76,3 +76,6 @@ DISTRO_FEATURES_append = " rrd"
 #Enable MAP-T
 DISTRO_FEATURES_append = " feature_mapt"
 DISTRO_FEATURES_append = " nat46"
+
+#VLAN Manager integration
+#DISTRO_FEATURES_append = " vlan_manager"
