@@ -35,6 +35,7 @@ then
     sed -i '/kernel6-12/s/^#//' ${_TOPDIR}/meta-cmf-bananapi/conf/distro/include/rdk-bpi-ap-extender.inc
     sed -i '/kernel6-6/s/^/#/' ${_TOPDIR}/meta-cmf-bananapi/conf/distro/include/rdk-bpi.inc
     sed -i '/kernel6-6/s/^/#/' ${_TOPDIR}/meta-cmf-bananapi/conf/distro/include/rdk-bpi-ap-extender.inc
+    echo 'RDEPENDS:${PN}-dev = ""' >> ${_TOPDIR}/meta-filogic/recipes-kernel/linux6-12-libc-headers/linux-libc-headers.inc
     touch ${_TOPDIR}/meta-cmf-filogic/MP4_3_applied
     touch ${_TOPDIR}/meta-filogic/MP4_3_applied
 fi
