@@ -1,3 +1,4 @@
+Source: RDKM
 diff --git a/net/bluetooth/hci_sync.c b/net/bluetooth/hci_sync.c
 index f79b38603205..a3b6b7e6d2ad 100644
 --- a/net/bluetooth/hci_sync.c

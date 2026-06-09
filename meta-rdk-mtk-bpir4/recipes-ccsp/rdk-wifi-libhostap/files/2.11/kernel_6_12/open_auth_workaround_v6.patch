@@ -3,7 +3,6 @@ Date: Apr 3, 2025 1:00 PM
 From:
 Subject: Workaround for MacBook Pro M2 to accept Open auth in SAE mode
 Source: Comcast
-License: BSD
 Upstream-Status: Pending
 Signed-off-by: Bogdan Bogush <bogdan_bogush@comcast.com>
 ##########################################

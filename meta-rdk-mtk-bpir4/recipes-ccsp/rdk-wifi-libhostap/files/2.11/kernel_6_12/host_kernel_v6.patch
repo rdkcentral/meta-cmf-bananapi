@@ -1,3 +1,4 @@
+SOURCE:RDKM
 diff -Naur git.orig/source/hostap-2.11/src/ap/ieee802_11_he.c git/source/hostap-2.11/src/ap/ieee802_11_he.c
 --- git.orig/source/hostap-2.11/src/ap/ieee802_11_he.c	2026-04-28 11:57:06.110431980 +0100
 +++ git/source/hostap-2.11/src/ap/ieee802_11_he.c	2026-04-28 11:57:41.534395318 +0100

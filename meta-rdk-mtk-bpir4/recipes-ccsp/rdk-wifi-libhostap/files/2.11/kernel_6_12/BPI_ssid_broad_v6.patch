@@ -1,3 +1,4 @@
+SOURCE:RDKM
 diff -Naur git.orig/source/hostap-2.11/src/ap/hostapd.c git/source/hostap-2.11/src/ap/hostapd.c
 --- git.orig/source/hostap-2.11/src/ap/hostapd.c	2026-05-13 13:18:26.442695871 +0100
 +++ git/source/hostap-2.11/src/ap/hostapd.c	2026-05-13 13:19:49.187767350 +0100

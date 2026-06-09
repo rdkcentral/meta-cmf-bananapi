@@ -7,6 +7,7 @@ CFLAGS_append = " -D_PLATFORM_BANANAPI_R4_  -DBANANA_PI_PORT  -DFEATURE_SINGLE_P
 
 CFLAGS_append = " ${@bb.utils.contains('DISTRO_FEATURES', 'generic_mlo', ' -DCONFIG_GENERIC_MLO -DCONFIG_MLO ', '', d)}"
 CFLAGS_append = "${@bb.utils.contains_any('DISTRO_FEATURES', 'kernel6-12 kernel6-6' , ' -DKERNEL_6_6 ','', d)}"
+CFLAGS_append = "${@bb.utils.contains('DISTRO_FEATURES', 'kernel6-12' , ' -DKERNEL_6_12 ','', d)}"
 CFLAGS_append = " ${@bb.utils.contains('DISTRO_FEATURES', 'EasyMesh', ' -DEASY_MESH_NODE  ', '', d)}"
 
 CFLAGS_append_kirkstone = " -fcommon"
@@ -21,7 +22,6 @@ SRC_URI += " \
   ${@bb.utils.contains('DISTRO_FEATURES', 'EasyMesh', bb.utils.contains('DISTRO_FEATURES', 'em_extender', 'file://EasymeshCfg_ext.json ','file://EasymeshCfg.json ', d), ' ', d)} \
 "
 
-SRC_URI:append:kernel6-12 = " file://kernel6-12_hal_hostapd.patch;patchdir=../ "
 # Install InterfaceMap.json in /usr/ccsp/wifi
 do_install_append() {
   install -d ${D}/usr/ccsp/wifi

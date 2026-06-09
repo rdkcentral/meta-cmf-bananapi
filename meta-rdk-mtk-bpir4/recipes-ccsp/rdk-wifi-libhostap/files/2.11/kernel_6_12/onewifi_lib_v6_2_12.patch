@@ -1,3 +1,4 @@
+SOURCE:COMCAST
 diff -Naur git.orig/source/hostap-2.11/hostapd/main.c git/source/hostap-2.11/hostapd/main.c
 --- git.orig/source/hostap-2.11/hostapd/main.c	2026-04-21 08:32:25.735224845 +0100
 +++ git/source/hostap-2.11/hostapd/main.c	2026-04-21 08:50:16.834681564 +0100
