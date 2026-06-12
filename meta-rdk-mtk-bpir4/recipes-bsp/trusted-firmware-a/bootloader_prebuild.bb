@@ -15,17 +15,25 @@ do_configure[noexec] = "1"
 
 # also get rid of the default dependency added in bitbake.conf
 # since there is no 'main' package generated (empty)
-RDEPENDS_${PN}-dev = ""
+RDEPENDS:${PN}-dev = ""
 
-SRC_URI_append = " ${@bb.utils.contains('DISTRO_FEATURES', 'kernel6-6', \
-    ' file://bpi-r4_sdmmc_bl2_6-6.img \
-      file://bpi-r4_sdmmc_fip_6-6.bin \
-      file://bpi-r4_sdmmc_bl2_B_6-6.img \
-      file://bpi-r4_sdmmc_fip_B_6-6.bin', \
-    ' file://bpi-r4_sdmmc_bl2.img \
-      file://bpi-r4_sdmmc_fip.bin \
-      file://bpi-r4_sdmmc_bl2_B.img \
-      file://bpi-r4_sdmmc_fip_B.bin', d)}"
+
+python do_unpack:append() {
+    import shutil, os
+    src_bl2 = os.path.join(d.getVar('DL_DIR'), 'bpi-r4_sdmmc_bl2_6-6.img')
+    dst_bl2 = os.path.join(d.getVar('WORKDIR'), 'bpi-r4_sdmmc_bl2_6-6.img')
+    src_B_bl2 = os.path.join(d.getVar('DL_DIR'), 'bpi-r4_sdmmc_bl2_B_6-6.img')
+    dst_B_bl2 = os.path.join(d.getVar('WORKDIR'), 'bpi-r4_sdmmc_bl2_B_6-6.img')
+    shutil.copyfile(src_bl2, dst_bl2)
+    shutil.copyfile(src_B_bl2, dst_B_bl2)
+
+    src_fip = os.path.join(d.getVar('DL_DIR'), 'bpi-r4_sdmmc_fip_6-6.bin')
+    dst_fip = os.path.join(d.getVar('WORKDIR'), 'bpi-r4_sdmmc_fip_6-6.bin')
+    src_B_fip = os.path.join(d.getVar('DL_DIR'), 'bpi-r4_sdmmc_fip_B_6-6.bin')
+    dst_B_fip = os.path.join(d.getVar('WORKDIR'), 'bpi-r4_sdmmc_fip_B_6-6.bin')
+    shutil.copyfile(src_fip, dst_fip)
+    shutil.copyfile(src_B_fip, dst_B_fip)
+}
 
 do_deploy() {
         mkdir -p ${DEPLOYDIR}/atf/

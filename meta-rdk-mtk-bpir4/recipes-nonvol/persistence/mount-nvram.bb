@@ -15,7 +15,7 @@ do_compile[noexec] = "1"
 
 # also get rid of the default dependency added in bitbake.conf
 # since there is no 'main' package generated (empty)
-RDEPENDS_${PN}-dev = ""
+RDEPENDS:${PN}-dev = ""
 
 RDEPENDS:${PN} = "bash"
 INSANE_SKIP:${PN} = "host-user-contaminated"
@@ -33,9 +33,9 @@ do_install() {
       install -m 0644 ${WORKDIR}/mount-nvram.service ${D}${systemd_unitdir}/system/
 }
 
-FILES_${PN} = " \
+FILES:${PN} = " \
       ${base_libdir}/rdk/mount-nvram.sh \
       ${systemd_unitdir}/system/mount-nvram.service \
       "
 
-SYSTEMD_SERVICE_${PN} = "mount-nvram.service"
+SYSTEMD_SERVICE:${PN} = "mount-nvram.service"

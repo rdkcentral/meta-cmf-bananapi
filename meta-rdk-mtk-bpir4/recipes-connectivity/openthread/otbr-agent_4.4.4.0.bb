@@ -33,7 +33,7 @@ SRC_URI += "file://openthread-fix-build-errors.patch;patchdir=${GSDK_DIR} \
 S = "${GSDK_OTBR_DIR}"
 
 DEPENDS += "mdns boost iproute2 jsoncpp ncurses readline cpcd pkgconfig protobuf protobuf-c-native dbus libnetfilter-queue libnetfilter-conntrack"
-RDEPENDS_${PN} = "cpcd (= 4.4.1.0-r0)"
+RDEPENDS:${PN} = "cpcd (= 4.4.1.0-r0)"
 
 inherit cmake systemd pkgconfig
 
@@ -100,7 +100,7 @@ update_otbr() {
     ln -sf ${OTBR_OT_DIR} ${GSDK_OT_DIR}
 }
 
-do_install_append() {
+do_install:append() {
     install -d ${D}${systemd_system_unitdir}
     install -m 0644 ${WORKDIR}/otbr-agent.service ${D}${systemd_system_unitdir}
     install -m 0644 ${WORKDIR}/otbr-agent.path ${D}${systemd_system_unitdir}
@@ -121,8 +121,8 @@ do_install_append() {
     cp -R --no-dereference --preserve=mode,links ${OTBR_OT_DIR}/include/openthread ${D}${includedir}/otbr/
 }
 
-FILES_${PN} += "${systemd_system_unitdir}/"
+FILES:${PN} += "${systemd_system_unitdir}/"
 
 # IMPORTANT! Do not add otbr-agent.service to the SYSTEMD_SERVICE define below. We don't want it automatically
 # started. It will be started by otbr-agent.path
-SYSTEMD_SERVICE_${PN} = "otbr-agent.path"
+SYSTEMD_SERVICE:${PN} = "otbr-agent.path"

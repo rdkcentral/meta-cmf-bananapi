@@ -1,12 +1,12 @@
 include meta-rdk-mtk-bpir4/recipes-ccsp/ccsp/ccsp_common_bananapi.inc
 
-FILESEXTRAPATHS_prepend := "${THISDIR}/${PN}:"
+FILESEXTRAPATHS:prepend := "${THISDIR}/${PN}:"
 
 SRC_URI += "file://service_bridge_bpi.sh"
 
-CFLAGS_append  = " ${@bb.utils.contains('DISTRO_FEATURES', 'matter', ' -DFEATURE_MATTER_ENABLED', '', d)}"
+CFLAGS:append  = " ${@bb.utils.contains('DISTRO_FEATURES', 'matter', ' -DFEATURE_MATTER_ENABLED', '', d)}"
 
-do_install_append() {
+do_install:append() {
 
 install -d ${D}${sysconfdir}/
 install -d ${D}${sysconfdir}/utopia/
@@ -123,6 +123,6 @@ ln -sf /usr/sbin/log_handle.sh ${D}/fss/gw/usr/sbin/log_handle.sh
 sed -i '/Before=CcspPandMSsp.service/a Requires=mount-nvram.service' ${D}/lib/systemd/system/ApplySystemDefaults.service
 }
 
-FILES_${PN} += " \
+FILES:${PN} += " \
                 /minidumps/ \
 "

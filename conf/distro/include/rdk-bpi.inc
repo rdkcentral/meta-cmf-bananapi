@@ -1,78 +1,81 @@
 # USP-PA Feature
-DISTRO_FEATURES_append = " usppa"
+DISTRO_FEATURES:append = " usppa"
 
-DISTRO_FEATURES_append = " WanManagerUnificationEnable"
+DISTRO_FEATURES:append = " WanManagerUnificationEnable"
 
-DISTRO_FEATURES_append = " rdkb_wan_manager"
+DISTRO_FEATURES:append = " rdkb_wan_manager"
 
-DISTRO_FEATURES_append = " halVersion3"
+DISTRO_FEATURES:append = " halVersion3"
 
 #rdk-wifi-libhostap support for broadband
-DISTRO_FEATURES_append = " HOSTAPD_2_11"
+DISTRO_FEATURES:append = " HOSTAPD_2_11"
 
 # OneWifi feature
-DISTRO_FEATURES_append = " OneWifi onewifi_integration"
+DISTRO_FEATURES:append = " OneWifi onewifi_integration"
 
 #No Moca Support
-DISTRO_FEATURES_append = " no_moca_support"
+DISTRO_FEATURES:append = " no_moca_support"
 
-DISTRO_FEATURES_append = " referencepltfm "
+DISTRO_FEATURES:append = " referencepltfm "
 
-MACHINEOVERRIDES_append =. "${@bb.utils.contains('DISTRO_FEATURES', 'OneWifi', ':onewifi', '' ,d)}"
+MACHINEOVERRIDES:append =. "${@bb.utils.contains('DISTRO_FEATURES', 'OneWifi', ':onewifi', '' ,d)}"
+MACHINEOVERRIDES:append =. "${@bb.utils.contains('DISTRO_FEATURES', 'kernel6-6', ':kernel6-6', '' ,d)}"
+MACHINEOVERRIDES:append =. "${@bb.utils.contains('DISTRO_FEATURES', 'kernel6-12', ':kernel6-12', '' ,d)}"
 
-DISTRO_FEATURES_append = " CPUPROCANALYZER_BROADBAND"
+DISTRO_FEATURES:append = " CPUPROCANALYZER_BROADBAND"
 
 # RDKB-51565,RDKB-50795: [HAL] Cellular Hal Implementation
-DISTRO_FEATURES_append = " rdkb_cellular_manager_mm"
+DISTRO_FEATURES:append = " rdkb_cellular_manager_mm"
 
-DISTRO_FEATURES_append = " partner_default_ext"
+DISTRO_FEATURES:append = " partner_default_ext"
 
 #Enable SDcard image as default
-DISTRO_FEATURES_append = " sdmmc"
+DISTRO_FEATURES:append = " sdmmc"
 
-DISTRO_FEATURE_append = " rdkb_voice_manager_dmltr104_v2"
+DISTRO_FEATURE:append = " rdkb_voice_manager_dmltr104_v2"
 
-DISTRO_FEATURE_append = " telco_voice_feature_enable_persist"
+DISTRO_FEATURE:append = " telco_voice_feature_enable_persist"
 
 #PPP Feature
-#DISTRO_FEATURES_append = "ppp-enabled"
+#DISTRO_FEATURES:append = "ppp-enabled"
 
 #disabling lan0_as_wan to allow lan0 interface to come
-DISTRO_FEATURES_remove = " lan0_as_wan"
+DISTRO_FEATURES:remove = " lan0_as_wan"
 
 #Need to enable below distro once required changes are merged 
-#DISTRO_FEATURES_append = " EasyMesh"
-#DISTRO_FEATURES_append = " with_alsap"
-#DISTRO_FEATURES_append = " Em_Unittest"
+#DISTRO_FEATURES:append = " EasyMesh"
+#DISTRO_FEATURES:append = " with_alsap"
+#DISTRO_FEATURES:append = " Em_Unittest"
 PREFERRED_VERSION_go = "1.24.%"
 
 #Enable wps support
-DISTRO_FEATURES_append = " wps_support"
+DISTRO_FEATURES:append = " wps_support"
 
 #Enable resource optimization
-DISTRO_FEATURES_append = " resource_optimization"
+DISTRO_FEATURES:append = " resource_optimization"
 
 #Enable kernel_6_6 support
-DISTRO_FEATURES_append = " kernel6-6"
+#DISTRO_FEATURES:append = " kernel6-6"
+DISTRO_FEATURES:append = " kernel6-12"
 
-DISTRO_FEATURES_append = " CONFIG_IEEE80211BE"
+DISTRO_FEATURES:append = " CONFIG_IEEE80211BE"
 
-DISTRO_FEATURES_append = " matter"
+DISTRO_FEATURES:append = " matter"
 PREFERRED_VERSION_barton-matter = "1.4.2"
 
-DISTRO_FEATURES_append = " generic_mlo"
+DISTRO_FEATURES:append = " generic_mlo"
 
 #Enable the below DISTRO to enable Hybrid Hal(rndis/modem) for cellular devices
-#DISTRO_FEATURES_append_broadband = " cellular_hybrid_support"
+#DISTRO_FEATURES:append_broadband = " cellular_hybrid_support"
 
 #Disable rdm-agent for reference platform
-#DISTRO_FEATURES_append = "RDM"
+#DISTRO_FEATURES:append = "RDM"
 
-DISTRO_FEATURES_append = " dhcp_manager "
-DISTRO_FEATURES_append = " rdkb_configurable_wan_interface"
+DISTRO_FEATURES:append = " dhcp_manager "
+DISTRO_FEATURES:append = " rdkb_configurable_wan_interface"
 #Enable remote debugger
-DISTRO_FEATURES_append = " rrd"
+DISTRO_FEATURES:append = " rrd"
 
 #Enable MAP-T
-DISTRO_FEATURES_append = " feature_mapt"
-DISTRO_FEATURES_append = " nat46"
+DISTRO_FEATURES:append = " feature_mapt"
+DISTRO_FEATURES:append = " nat46"
