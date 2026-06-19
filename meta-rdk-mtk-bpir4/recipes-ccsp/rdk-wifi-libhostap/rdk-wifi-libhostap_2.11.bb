@@ -54,7 +54,7 @@ FILES:${PN} = " \
 "
 EXTRA_OEMAKE += "${@bb.utils.contains('DISTRO_FEATURES', 'Wifi-test-suite', 'WIFI_EMULATOR=true', 'WIFI_EMULATOR=false', d)}"
 do_hostapd_patch () {
-    if ${@bb.utils.contains_any('DISTRO_FEATURES', 'kernel6-12 kernel6-6', 'true', 'true', d)}; then
+    if ${@bb.utils.contains_any('DISTRO_FEATURES', 'kernel6-12 kernel6-6', 'true', 'false', d)}; then
        echo "CONFIG_OCV=y" >> ${WORKDIR}/.config
     fi
     install -m 0644 ${WORKDIR}/.config ${WORKDIR}/2.11/libhostap.mk ${S}/source/hostap-${PV}/hostapd/
@@ -67,7 +67,7 @@ do_configure:append () {
     oe_runmake -C ${S}/source/hostap-${PV}/hostapd clean_libhostap
 
     echo "CONFIG_TESTING_OPTIONS=y" >> ${S}/source/hostap-${PV}/hostapd/.config
-    if ${@bb.utils.contains('DISTRO_FEATURES', 'kernel6-12', 'true', 'true', d)}; then
+    if ${@bb.utils.contains('DISTRO_FEATURES', 'kernel6-12', 'true', 'false', d)}; then
        echo "LIB_HDRS += ../src/common/nan_defs.h" >> ${S}/source/hostap-${PV}/hostapd/libhostap.mk
     fi
     echo "LIB_HDRS += ../src/common/nan.h" >> ${S}/source/hostap-${PV}/hostapd/libhostap.mk

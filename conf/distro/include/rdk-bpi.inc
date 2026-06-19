@@ -19,9 +19,7 @@ DISTRO_FEATURES:append = " no_moca_support"
 DISTRO_FEATURES:append = " referencepltfm "
 
 MACHINEOVERRIDES:append =. "${@bb.utils.contains('DISTRO_FEATURES', 'OneWifi', ':onewifi', '' ,d)}"
-MACHINEOVERRIDES:append =. "${@bb.utils.contains('DISTRO_FEATURES', 'kernel6-6', ':kernel6-6', '' ,d)}"
-MACHINEOVERRIDES:append =. "${@bb.utils.contains('DISTRO_FEATURES', 'kernel6-12', ':kernel6-12', '' ,d)}"
-
+MACHINEOVERRIDES:append = "${@bb.utils.contains('DISTRO_FEATURES', 'kernel6-6', ':kernel6-6', bb.utils.contains('DISTRO_FEATURES', 'kernel6-12', ':kernel6-12','',d), d)}"
 DISTRO_FEATURES:append = " CPUPROCANALYZER_BROADBAND"
 
 # RDKB-51565,RDKB-50795: [HAL] Cellular Hal Implementation
@@ -79,3 +77,4 @@ DISTRO_FEATURES:append = " rrd"
 #Enable MAP-T
 DISTRO_FEATURES:append = " feature_mapt"
 DISTRO_FEATURES:append = " nat46"
+LINUXLIBCVERSION = "${@bb.utils.contains('DISTRO_FEATURES', 'kernel6-12', '6.12%', bb.utils.contains('DISTRO_FEATURES','kernel6-6', '6.6%', '5.4%',d), d)}"
