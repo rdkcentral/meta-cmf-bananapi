@@ -21,7 +21,6 @@ SRC_URI += " \
   ${@bb.utils.contains('DISTRO_FEATURES', 'EasyMesh', bb.utils.contains('DISTRO_FEATURES', 'em_extender', 'file://EasymeshCfg_ext.json ','file://EasymeshCfg.json ', d), ' ', d)} \
 "
 
-SRC_URI:append:kernel6-12 = " file://kernel6-12_hal_hostapd.patch;patchdir=../ "
 # Install InterfaceMap.json in /usr/ccsp/wifi
 do_install:append() {
   install -d ${D}/usr/ccsp/wifi
