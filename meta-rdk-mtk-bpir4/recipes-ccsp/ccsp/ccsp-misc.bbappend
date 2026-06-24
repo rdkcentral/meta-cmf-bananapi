@@ -1,5 +1,5 @@
 include ccsp_common_bananapi.inc
 
-CFLAGS_aarch64_append = "-Werror=format-truncation=1"
+CFLAGS_aarch64_append = "-Werror=format-truncation=1 -DDHCPV6_CLIENT_DIBBLER -DDHCPV4_CLIENT_UDHCPC -DUDHCPC_RUN_IN_BACKGROUND"
 
 CFLAGS += " -DDHCPV4_CLIENT_UDHCPC -DDHCPV6_CLIENT_DIBBLER -DUDHCPC_RUN_IN_BACKGROUND"
