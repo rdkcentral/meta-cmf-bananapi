@@ -7,6 +7,8 @@ DISTRO_FEATURES_append = " rdkb_wan_manager"
 
 DISTRO_FEATURES_append = " halVersion3"
 
+DISTRO_FEATURES_append = " bridgeUtilsBin"
+
 #rdk-wifi-libhostap support for broadband
 DISTRO_FEATURES_append = " HOSTAPD_2_11"
 
