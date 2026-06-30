@@ -88,6 +88,9 @@ echo "#SelfHeal
 #TR069support
 \$EnableTR69Binary=true
 
+#bridgeUtils support
+\$bridge_util_enable=true
+
 #Enablemaptconfig
 \@mapt_config_flag=set
 

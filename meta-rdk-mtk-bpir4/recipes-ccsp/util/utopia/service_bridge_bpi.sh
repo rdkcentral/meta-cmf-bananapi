@@ -627,6 +627,13 @@ del_from_group()
 
   echo "brctl delif brlan0 l$cmdiag_if $wan_if"
   brctl delif brlan0 l$cmdiag_if "$wan_if"
+
+  bridge_curr_status=`ifconfig -a brlan0 | grep "inet addr" | cut -d ':' -f2 | cut -d ' ' -f1`
+  lan_ipaddr=`syscfg get lan_ipaddr`
+  lan_netmask=`syscfg get lan_netmask`
+  if [ -z "$bridge_curr_status" ]; then
+     ifconfig "$bridge_name" "$lan_ipaddr" netmask "$lan_netmask" up
+  fi
 }
 
 filter_local_traffic()
