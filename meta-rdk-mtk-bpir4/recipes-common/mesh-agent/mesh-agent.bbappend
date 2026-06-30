@@ -1,1 +1,1 @@
-CFLAGS_append = " -D_PLATFORM_BANANAPI_R4_ "
+CFLAGS:append = " -D_PLATFORM_BANANAPI_R4_ "

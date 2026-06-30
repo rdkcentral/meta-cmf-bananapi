@@ -14,7 +14,7 @@ SRC_URI += "file://bt-host-cpc-hci-bridge.service \
            "
 
 DEPENDS += "cpcd"
-RDEPENDS_${PN} += "cpcd (= 4.4.1.0-r0) bluez5-noinst-tools"
+RDEPENDS:${PN} += "cpcd (= 4.4.1.0-r0) bluez5-noinst-tools"
 
 S = "${BT_BRIDGE_DIR}"
 
@@ -61,7 +61,7 @@ do_install() {
     install -m 0644 ${WORKDIR}/bt-host-cpc-hci-bridge-attach.service ${D}${systemd_system_unitdir}
 }
 
-FILES_${PN} += "${systemd_system_unitdir}"
+FILES:${PN} += "${systemd_system_unitdir}"
 
-SYSTEMD_SERVICE_${PN} = "bt-host-cpc-hci-bridge.service bt-host-cpc-hci-bridge-attach.service"
+SYSTEMD_SERVICE:${PN} = "bt-host-cpc-hci-bridge.service bt-host-cpc-hci-bridge-attach.service"
 SYSTEMD_AUTO_ENABLE = "enable"

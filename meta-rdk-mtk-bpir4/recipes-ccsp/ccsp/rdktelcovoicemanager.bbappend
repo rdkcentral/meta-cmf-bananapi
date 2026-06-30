@@ -1,6 +1,6 @@
 include ccsp_common_bananapi.inc
 
-FILESEXTRAPATHS_prepend := "${THISDIR}/files:"
+FILESEXTRAPATHS:prepend := "${THISDIR}/files:"
 
 SRC_URI += "file://fix_device_dm_taking_long_time.patch;apply=no "
 

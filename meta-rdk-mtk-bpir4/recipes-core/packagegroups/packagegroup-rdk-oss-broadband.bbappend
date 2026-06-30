@@ -1,3 +1,3 @@
-RDEPENDS_packagegroup-rdk-oss-broadband_append = " \
+RDEPENDS:packagegroup-rdk-oss-broadband:append = " \
       evtest \
 "

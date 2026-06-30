@@ -18,7 +18,7 @@ do_configure[noexec] = "1"
 
 # also get rid of the default dependency added in bitbake.conf
 # since there is no 'main' package generated (empty)
-RDEPENDS_${PN}-dev = ""
+RDEPENDS:${PN}-dev = ""
 
 do_install() {
     install -D -m 0644 ${S}/source/include/autoconf.h ${D}${includedir}/utctx/autoconf.h

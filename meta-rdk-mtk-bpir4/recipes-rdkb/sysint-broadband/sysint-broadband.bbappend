@@ -1,6 +1,6 @@
-FILESEXTRAPATHS_prepend := "${THISDIR}/files:"
+FILESEXTRAPATHS:prepend := "${THISDIR}/files:"
 
-SRC_URI_append = "${CMF_GITHUB_ROOT}/bananapi-sysint;protocol=https;nobranch=1;destsuffix=git/devicebpi;name=sysintdevicebpi"
+SRC_URI:append = "${CMF_GITHUB_ROOT}/bananapi-sysint;protocol=https;nobranch=1;destsuffix=git/devicebpi;name=sysintdevicebpi"
 SRCREV_sysintdevicebpi = "9c9644d7cdb8a50db53b69995d10729192991b21"
 SRCREV_FORMAT = "1.0.0"
 
@@ -8,7 +8,7 @@ SRC_URI += "file://bpi_custom_device.properties \
             file://uploadRDKBLogs.sh \
 "
 
-do_install_append () {
+do_install:append () {
    install -m 644 ${WORKDIR}/bpi_custom_device.properties ${D}${sysconfdir}/device.properties
    ${@bb.utils.contains('DISTRO_FEATURES', 'OneWifi', 'echo "OneWiFiEnabled=true" >> ${D}${sysconfdir}/device.properties', '', d)}
    ${@bb.utils.contains('DISTRO_FEATURES', 'em_extender', 'sed -i "s/eth0/brlan0/g" ${D}/lib/rdk/startSSH.sh', '', d)}

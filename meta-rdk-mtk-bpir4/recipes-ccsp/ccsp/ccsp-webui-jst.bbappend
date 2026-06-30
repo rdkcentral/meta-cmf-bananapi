@@ -1,6 +1,6 @@
 include ccsp_common_bananapi.inc
 
-do_install_append () {
+do_install:append () {
                 if ${@bb.utils.contains('DISTRO_FEATURES', 'OneWifi', 'true', 'false', d)}; then
                    install -m 0755 ${S}/../xb6/jst/wireless_network_configuration_onewifi.jst ${D}/usr/www2/wireless_network_configuration.jst
                    install -m 0755 ${S}/../xb6/jst/wireless_network_configuration_edit_onewifi.jst ${D}/usr/www2/wireless_network_configuration_edit.jst

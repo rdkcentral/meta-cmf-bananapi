@@ -1,0 +1,37 @@
+SOURCE:RDKM
+diff -Naur git.orig/source/hostap-2.11/wpa_supplicant/events.c git/source/hostap-2.11/wpa_supplicant/events.c
+--- git.orig/source/hostap-2.11/wpa_supplicant/events.c	2026-05-22 06:49:59.314637967 +0000
++++ git/source/hostap-2.11/wpa_supplicant/events.c	2026-05-22 06:51:19.915385443 +0000
+@@ -6618,6 +6618,7 @@
+ 				   "Ignore unexpected EVENT_ASSOC in disconnected state");
+ 			break;
+ 		}
++#ifndef _PLATFORM_BANANAPI_R4_
+ #ifndef CONFIG_NO_ROBUST_AV
+ 		if (dl_list_len(&wpa_s->active_scs_ids) > 0) {
+ 			wpa_printf(MSG_DEBUG,
+@@ -6625,6 +6626,7 @@
+ 			wpa_s->scs_reconfigure = true;
+ 		}
+ #endif /* CONFIG_NO_ROBUST_AV */
++#endif /* _PLATFORM_BANANAPI_R4_ */
+ 		wpa_supplicant_event_assoc(wpa_s, data);
+ 		wpa_s->assoc_status_code = WLAN_STATUS_SUCCESS;
+ 		if (data &&
+diff -Naur git.orig/source/hostap-2.11/wpa_supplicant/wpa_supplicant.c git/source/hostap-2.11/wpa_supplicant/wpa_supplicant.c
+--- git.orig/source/hostap-2.11/wpa_supplicant/wpa_supplicant.c	2026-05-22 06:49:59.318638003 +0000
++++ git/source/hostap-2.11/wpa_supplicant/wpa_supplicant.c	2026-05-22 06:51:56.167723589 +0000
+@@ -1270,11 +1270,13 @@
+ 	wpa_s->wpa_state = state;
+ 	wpas_ucode_update_state(wpa_s);
+ 
++#ifndef _PLATFORM_BANANAPI_R4_
+ #ifndef CONFIG_NO_ROBUST_AV
+ 	if (state == WPA_COMPLETED && dl_list_len(&wpa_s->active_scs_ids) &&
+ 	    wpa_s->scs_reconfigure)
+ 		wpas_scs_reconfigure(wpa_s);
+ #endif /* CONFIG_NO_ROBUST_AV */
++#endif /* _PLATFORM_BANANAPI_R4_ */
+ 
+ #ifdef CONFIG_BGSCAN
+ 	if (state == WPA_COMPLETED && wpa_s->current_ssid != wpa_s->bgscan_ssid)
