@@ -1,1 +1,1 @@
-LICENSE = "BSD-3-Clause"
+LICENSE = "LGPL-2.1-or-later"
