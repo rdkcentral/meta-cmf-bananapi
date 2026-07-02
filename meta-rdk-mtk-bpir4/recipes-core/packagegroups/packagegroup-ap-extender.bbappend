@@ -8,8 +8,6 @@ RDEPENDS_packagegroup-ap-extender = "\
     ccsp-gwprovapp \
     ccsp-cr \
     ccsp-cr-ccsp \
-    ccsp-psm \
-    ccsp-psm-ccsp \
     unified-wifi-mesh \
     ${@bb.utils.contains('DISTRO_FEATURES', 'with_alsap','ieee1905-em ','',d)} \
     bpi-macaddress \
