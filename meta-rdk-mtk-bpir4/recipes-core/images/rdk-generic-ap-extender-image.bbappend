@@ -99,6 +99,16 @@ require ${TOPDIR}/../meta-cmf-filogic/recipes-core/images/image-exclude-files.in
 
 remove_unused_file() {
    for i in ${REMOVED_FILE_LIST} ; do rm -rf ${IMAGE_ROOTFS}/$i ; done
+   rm -rf ${IMAGE_ROOTFS}${systemd_unitdir}/systemd/system/CcspEthAgent.service
+   rm -rf ${IMAGE_ROOTFS}${systemd_unitdir}/systemd/system/PsmSsp.service
+   rm -rf ${IMAGE_ROOTFS}${systemd_unitdir}/systemd/system/CcspLMLite.service
+   rm -rf ${IMAGE_ROOTFS}${systemd_unitdir}/systemd/system/CcspTr069PaSsp.service
+   rm -rf ${IMAGE_ROOTFS}${systemd_unitdir}/systemd/system/webconfig.service
+   rm -rf ${IMAGE_ROOTFS}${systemd_unitdir}/systemd/system/dnsmasq.service
+   rm -rf ${IMAGE_ROOTFS}${systemd_unitdir}/systemd/system/RdkFwUpgradeManager.service
+   rm -rf ${IMAGE_ROOTFS}${systemd_unitdir}/systemd/system/RdkTelcoVoiceManager.service
+   rm -rf ${IMAGE_ROOTFS}${systemd_unitdir}/systemd/system/RdkVlanManager.service
+   rm -rf ${IMAGE_ROOTFS}${systemd_unitdir}/systemd/system/RdkWanManager.service
 }
 ROOTFS_POSTPROCESS_COMMAND_append = "remove_unused_file; "
 
