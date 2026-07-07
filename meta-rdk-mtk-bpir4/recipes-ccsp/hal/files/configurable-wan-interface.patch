@@ -31,7 +31,7 @@ Index: ethsw/rdkb_hal/src/ethsw/ccsp_hal_ethsw.c
 +    FILE *fp;
 +    char buffer[32] = {0};
 +
-+    fp = fopen("/tmp/wan_name.txt", "r");
++    fp = fopen("/nvram/wan_name.txt", "r");
 +    if(fp)
 +    {
 +        if(fgets(buffer, sizeof(buffer), fp))
