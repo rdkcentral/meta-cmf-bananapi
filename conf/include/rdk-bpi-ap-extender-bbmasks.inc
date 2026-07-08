@@ -9,3 +9,6 @@ BBMASK .= "|meta-cmf/recipes-core/images/rdk-ipstb-oss-image.bb"
 BBMASK .= "|meta-cmf/recipes-core/images/rdk-ipstb-oss-tdk-image.bb"
 BBMASK .= "|openembedded-core/meta/recipes-devtools/rust/"
 BBMASK .= "|meta-cmf-filogic/recipes-ccsp/ccsp/ccsp-one-wifi.bbappend"
+BBMASK .= "|meta-cmf-bananapi/meta-rdk-mtk-bpir4/recipes-core/barton-core/barton_%.bbappend"
+BBMASK .= "|meta-cmf-bananapi/meta-rdk-mtk-bpir4/recipes-matter/barton-matter/barton-matter_1.%.%.bbappend"
+

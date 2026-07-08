@@ -32,8 +32,7 @@ DISTRO_FEATURES:append = " generic_mlo"
 #DISTRO_FEATURES:append = "ppp-enabled"
 
 # Kernel 6.6
-DISTRO_FEATURES:append = " kernel6-6"
-#DISTRO_FEATURES:append = " kernel6-12"
+DISTRO_FEATURES:append = " kernel6-12"
 
 #Disable rdm-agent for reference platform
 #DISTRO_FEATURES:append = "RDM"
