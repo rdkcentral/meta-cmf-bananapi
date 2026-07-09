@@ -28,6 +28,29 @@ if [ -e "${_TOPDIR}/meta-cmf-filogic/setup-environment-release" ]; then
 	source meta-cmf-filogic/setup-environment-release
 fi
 
+unset ENABLE_4GB_RAM ENABLE_1GB_RAM
+# Prompt for multiple RAM support
+echo ""
+echo "Please select the required RAM size for your hardware (rndis/modem)?"
+echo "1) 4GB RAM(default)"
+echo "2) 1GB RAM"
+read -p "Please enter your choice [1-2]: " ram_choice
+
+case $ram_choice in
+    1|"")
+        echo "RAM size will be 4GB"
+        export ENABLE_4GB_RAM=yes
+        ;;
+    2)
+        echo "RAM size will be 1GB"
+        export ENABLE_1GB_RAM=yes
+        ;;
+    *)
+        echo "Invalid choice. So selecting the default size (4GB)"
+        export ENABLE_4GB_RAM=yes
+        ;;
+esac
+
 if [[ -z $(grep 'meta-rdk-broadband-apps' conf/bblayers.conf) ]] && [[ -d  ../meta-rdk-broadband-apps ]]
 then
     cat >> conf/bblayers.conf <<EOF
@@ -122,13 +145,30 @@ if [ "X$BPI_IMG_TYPE" == "Xnand" ]; then
     sed -i '/sdmmc/s/^/#/' ${_TOPDIR}/meta-cmf-bananapi/conf/distro/include/rdk-bpi.inc
 else # SD card image is default
     mkdir -p ${_TOPDIR}/downloads
-    if [ -f ${_TOPDIR}/downloads/bpi-r4_sdmmc_bl2_6-6.img ] && [ -f ${_TOPDIR}/downloads/bpi-r4_sdmmc_fip_6-6.bin ] && [ -f ${_TOPDIR}/downloads/bpi-r4_sdmmc_bl2_B_6-6.img ] && [ -f ${_TOPDIR}/downloads/bpi-r4_sdmmc_fip_B_6-6.bin ]; then
+    mkdir -p ${_TOPDIR}/downloads/4GB_RAM
+    mkdir -p ${_TOPDIR}/downloads/1GB_RAM
+    if [ "X$ENABLE_4GB_RAM" == "Xyes" ]; then
+        if [ -f ${_TOPDIR}/downloads/4GB_RAM/bpi-r4_sdmmc_bl2_6-6.img ] && [ -f ${_TOPDIR}/downloads/4GB_RAM/bpi-r4_sdmmc_fip_6-6.bin ] && [ -f ${_TOPDIR}/downloads/4GB_RAM/bpi-r4_sdmmc_bl2_B_6-6.img ] && [ -f ${_TOPDIR}/downloads/4GB_RAM/bpi-r4_sdmmc_fip_B_6-6.bin ]; then
 	    echo "Both bl2 and fip binaries are present in local workspace for 6.6 kernel."
-    else
+	    cp ${_TOPDIR}/downloads/4GB_RAM/bpi-r4_sdmmc* ${_TOPDIR}/downloads/
+        else
 	    echo "**********************************************************************"
 	    echo "> Missing files are preventing the build from starting:"
-	    echo "> The BL2 and FIP binaries for kernel-6.6 aren't in the downloads directory. Copy these binaries into the directory and then restart the build. You can find instructions for creating the necessary binaries on the RDK-B Code Releases page: (https://wiki.rdkcentral.com/display/CMF/RDK-B+Code+Releases)"
+	    echo "> The BL2 and FIP binaries for kernel-6.6 aren't in the downloads/4GB_RAM directory. Copy these binaries into the directory and then restart the build. You can find instructions for creating the necessary binaries on the RDK-B Code Releases page: (https://wiki.rdkcentral.com/display/CMF/RDK-B+Code+Releases)"
 	    echo "**********************************************************************"
 	    return 1
-     fi
+	fi
+    fi
+    if [ "X$ENABLE_1GB_RAM" == "Xyes" ]; then
+        if [ -f ${_TOPDIR}/downloads/1GB_RAM/bpi-r4_sdmmc_bl2_6-6.img ] && [ -f ${_TOPDIR}/downloads/1GB_RAM/bpi-r4_sdmmc_fip_6-6.bin ] && [ -f ${_TOPDIR}/downloads/1GB_RAM/bpi-r4_sdmmc_bl2_B_6-6.img ] && [ -f ${_TOPDIR}/downloads/1GB_RAM/bpi-r4_sdmmc_fip_B_6-6.bin ]; then
+	    echo "Both bl2 and fip binaries are present in local workspace for 6.6 kernel."
+	    cp ${_TOPDIR}/downloads/1GB_RAM/bpi-r4_sdmmc* ${_TOPDIR}/downloads/
+        else
+	    echo "**********************************************************************"
+	    echo "> Missing files are preventing the build from starting:"
+	    echo "> The BL2 and FIP binaries for kernel-6.6 aren't in the downloads/1GB_RAM directory. Copy these binaries into the directory and then restart the build. You can find instructions for creating the necessary binaries on the RDK-B Code Releases page: (https://wiki.rdkcentral.com/display/CMF/RDK-B+Code+Releases)"
+	    echo "**********************************************************************"
+	    return 1
+        fi
+    fi
 fi
