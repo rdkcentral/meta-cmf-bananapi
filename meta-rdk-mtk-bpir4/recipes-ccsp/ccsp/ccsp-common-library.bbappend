@@ -1,11 +1,11 @@
 include ccsp_common_bananapi.inc
 
-FILESEXTRAPATHS:prepend := "${THISDIR}/${PN}:${THISDIR}/files:"
+FILESEXTRAPATHS:prepend := "${THISDIR}/${BPN}:${THISDIR}/files:"
 
 SRC_URI:remove = "${CMF_GITHUB_ROOT}/common-library;protocol=https;${BRANCH_ccsp_common_library}"
 
 PV:pn-ccsp-common-library = "2.0.0_stable2_20260109"
-SRC_URI:append = "git://github.com/rdkcentral/common-library.git;protocol=https;name=ccsp_common_library;branch=support/2026q1"
+SRC_URI += "git://github.com/rdkcentral/common-library.git;protocol=https;name=ccsp_common_library;branch=support/2026q1"
 SRCREV_ccsp_common_library = "740a897df8d1b6525b632862814c9ce1cfa4f991"
 
 PV:pn-ccsp-common-library-native = "2.0.0_stable2_20260109"

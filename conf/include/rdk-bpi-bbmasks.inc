@@ -32,5 +32,10 @@ BBMASK .= "|meta-cmf-bananapi/meta-rdk-mtk-bpir4/recipes-kernel/nat46/nat46.bbap
 BBMASK .= "|meta-cmf-bananapi/meta-rdk-mtk-bpir4/recipes-opensync/opensync/opensync_%.bbappend"
 BBMASK .= "|meta-cmf-bananapi/meta-rdk-mtk-bpir4/recipes-support/webcfg/webcfg_1.0.bbappend"
 
-INCOMPATIBLE_LICENSE_EXCEPTIONS += "${MLPREFIX}diffutils:GPL-3.0-or-later ${MLPREFIX}mpfr:LGPL-3.0-or-later ${MLPREFIX}libmpc:LGPL-3.0-only"
-INCOMPATIBLE_LICENSE_EXCEPTIONS += "${MLPREFIX}make:GPL-3.0-only ${MLPREFIX}dejagnu:GPL-3.0-only ${MLPREFIX}gcc-symlinks:GPL-3.0-only"
+BBMASK .= "|meta-filogic/recipes-wifi/wpa-supplicant/wpa-supplicant_2.10.bb"
+BBMASK .= "|meta-rdk-oss-reference/recipes-connectivity/wpa-supplicant/wpa-supplicant_2.10.bb"
+BBMASK .= "|meta-rdk-oss-reference-bck/recipes-connectivity/wpa-supplicant/wpa-supplicant_2.10.bb"
+BBMASK .= "|openembedded-core/meta/recipes-connectivity/wpa-supplicant/wpa-supplicant_2.11.bb"
+BBMASK .= "|meta-rdk-oss-reference/recipes-connectivity/wpa-supplicant/wpa-supplicant_%.bbappend"
+BBMASK .= "|meta-cmf-bananapi/meta-rdk-mtk-bpir4/recipes-connectivity/wpa-supplicant/wpa-supplicant_%.bbappend"
+

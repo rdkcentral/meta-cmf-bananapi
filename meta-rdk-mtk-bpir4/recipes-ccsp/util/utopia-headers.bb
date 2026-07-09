@@ -10,7 +10,7 @@ SRCREV = "${SRCREV:pn-utopia}"
 PV = "${PV:pn-utopia}"
 PR = "${PR:pn-utopia}"
 
-S = "${WORKDIR}/git"
+S = "${UNPACKDIR}/${PN}-$PV}"
 
 # this is a header package only, nothing to build
 do_compile[noexec] = "1"
