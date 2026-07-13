@@ -104,10 +104,11 @@ Index: ethsw/rdkb_hal/src/ethsw/ccsp_hal_ethsw.c
  	return RETURN_OK;
 @@ -1138,7 +1167,7 @@ INT GWP_GetEthWanLinkStatus()
      int link = 0;
-     char path[32] = {0};
+-     char path[32] = {0};
++     char path[64] = {0};
  
 -    sprintf(path, "/sys/class/net/erouter0/carrier");
-+    sprintf(path, "/sys/class/net/%s/carrier",g_virtualIfName);
++    snprintf(path, sizeof(path), "/sys/class/net/%s/carrier", g_virtualIfName);
      link = is_interface_link(path);
  
      if(link){
