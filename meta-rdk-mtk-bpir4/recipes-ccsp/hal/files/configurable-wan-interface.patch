@@ -48,7 +48,7 @@ Index: ethsw/rdkb_hal/src/ethsw/ccsp_hal_ethsw.c
 +    if(fp != NULL)
 +    {
 +
-+         pclose(fp);
++         fclose(fp);
 +    }	 
 +
 +}
