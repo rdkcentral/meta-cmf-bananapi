@@ -24,7 +24,7 @@ Index: platform/rdkb_hal/src/platform/platform_hal.c
         if (pValue != NULL)
         {
 -               const char *path = "/sys/class/net/erouter0/address";
-+               char path[128];
++               memset(path, 0, sizeof(path));
 +               snprintf(path, sizeof(path), "/sys/class/net/%s/address", g_virtualIfName);
                 FILE *fp = fopen(path, "r");
                 if (fp != NULL)
