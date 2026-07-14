@@ -1,0 +1,13 @@
+diff --git a/source/DHCPMgrUtils/dhcpmgr_controller.c b/source/DHCPMgrUtils/dhcpmgr_controller.c
+index a1ea7e1..2a4217f 100644
+--- a/source/DHCPMgrUtils/dhcpmgr_controller.c
++++ b/source/DHCPMgrUtils/dhcpmgr_controller.c
+@@ -687,7 +687,7 @@ static void Process_DHCPv6_Handler(char* if_name, dhcp_info_t dml_set_msg)
+             {
+                 pDhcp6c->Cfg.Renew = dml_set_msg.value.bValue;
+             }
+-            else if (strcmp(dml_set_msg.ParamName, "Restart") == 0 )
++            else if (strcmp(dml_set_msg.ParamName, "X_RDK_Restart") == 0 )
+             {
+                 pDhcp6c->Cfg.Restart = dml_set_msg.value.bValue;
+             }
