@@ -1,0 +1,66 @@
+##########################################
+Date: Jul 8, 2025 11:53 AM
+From:
+Subject: export sme_send_authentication
+Source: Comcast
+Upstream-Status: Pending
+Signed-off-by: Bogdan Bogush <bogdan.bogush@comcast.com>
+##########################################
+diff -Naur git.orig/source/hostap-2.11/wpa_supplicant/bss.c git/source/hostap-2.11/wpa_supplicant/bss.c
+--- git.orig/source/hostap-2.11/wpa_supplicant/bss.c	2026-04-28 07:59:40.384271420 +0100
++++ git/source/hostap-2.11/wpa_supplicant/bss.c	2026-04-28 08:00:19.904234775 +0100
+@@ -1687,7 +1687,7 @@
+ 				   "MLD: Reported link not part of MLD");
+ 		} else if (!(BIT(link_id) & *seen)) {
+ 			struct wpa_bss *neigh_bss;
+-			struct mld_link *l;
++			struct mld_link_wpa *l;
+ 
+ 			if (ssid && ssid->ssid_len)
+ 				neigh_bss = wpa_bss_get(wpa_s, pos + 1,
+@@ -1855,7 +1855,7 @@
+ 	const u8 *ies_pos = wpa_bss_ie_ptr(bss);
+ 	size_t ies_len = bss->ie_len ? bss->ie_len : bss->beacon_ie_len;
+ 	int rsne_type, key_mgmt;
+-	struct mld_link *l;
++	struct mld_link_wpa *l;
+ 
+ 	if (ieee802_11_parse_elems(ies_pos, ies_len, &elems, 1) ==
+ 	    ParseFailed) {
+diff -Naur git.orig/source/hostap-2.11/wpa_supplicant/bss.h git/source/hostap-2.11/wpa_supplicant/bss.h
+--- git.orig/source/hostap-2.11/wpa_supplicant/bss.h	2026-04-28 07:59:40.384271420 +0100
++++ git/source/hostap-2.11/wpa_supplicant/bss.h	2026-04-28 08:00:55.340201916 +0100
+@@ -128,7 +128,7 @@
+ 
+ 	/** An array of MLD links, any link found in the RNR is "valid" */
+ 	u16 valid_links;
+-	struct mld_link {
++	struct mld_link_wpa {
+ 		u8 bssid[ETH_ALEN];
+ 		int freq;
+ 
+diff -Naur git.orig/source/hostap-2.11/wpa_supplicant/sme.c git/source/hostap-2.11/wpa_supplicant/sme.c
+--- git.orig/source/hostap-2.11/wpa_supplicant/sme.c	2026-04-28 07:59:40.384271420 +0100
++++ git/source/hostap-2.11/wpa_supplicant/sme.c	2026-04-28 08:01:26.264173244 +0100
+@@ -622,7 +622,7 @@
+ }
+ 
+ 
+-static void sme_send_authentication(struct wpa_supplicant *wpa_s,
++void sme_send_authentication(struct wpa_supplicant *wpa_s,
+ 				    struct wpa_bss *bss, struct wpa_ssid *ssid,
+ 				    int start)
+ {
+diff -Naur git.orig/source/hostap-2.11/wpa_supplicant/sme.h git/source/hostap-2.11/wpa_supplicant/sme.h
+--- git.orig/source/hostap-2.11/wpa_supplicant/sme.h	2026-04-28 07:59:40.372271431 +0100
++++ git/source/hostap-2.11/wpa_supplicant/sme.h	2026-04-28 08:01:51.992149389 +0100
+@@ -42,6 +42,9 @@
+ 			       union wpa_event_data *data);
+ void sme_external_auth_mgmt_rx(struct wpa_supplicant *wpa_s,
+ 			       const u8 *auth_frame, size_t len);
++void sme_send_authentication(struct wpa_supplicant *wpa_s,
++                    struct wpa_bss *bss, struct wpa_ssid *ssid,
++                    int start);
+ 
+ #else /* CONFIG_SME */
+ 
