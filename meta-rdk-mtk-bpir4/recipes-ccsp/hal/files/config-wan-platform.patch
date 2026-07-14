@@ -6,7 +6,7 @@ Index: platform/rdkb_hal/src/platform/platform_hal.c
 
  INT platform_hal_GetBaseMacAddress(CHAR *pValue)
  {
-+       char path[128];
++       char path[128] = {0};
 +       FILE *fp = fopen("/nvram/wan_name.txt", "r");
 +       char g_virtualIfName[32] = "erouter0";
 +
