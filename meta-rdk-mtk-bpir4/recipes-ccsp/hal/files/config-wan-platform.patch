@@ -1,0 +1,31 @@
+Index: platform/rdkb_hal/src/platform/platform_hal.c
+===================================================================
+--- platform.orig/rdkb_hal/src/platform/platform_hal.c
++++ platform/rdkb_hal/src/platform/platform_hal.c
+@@ -153,9 +153,25 @@ INT platform_hal_GetHardware(CHAR *pValu
+
+ INT platform_hal_GetBaseMacAddress(CHAR *pValue)
+ {
++        char path[128] = {0};
++        FILE *fp = fopen("/nvram/wan_name.txt", "r");
++        char g_virtualIfName[32] = "erouter0";
++
++        if (fp)
++        {
++           if (fgets(g_virtualIfName, sizeof(g_virtualIfName), fp))
++           {
++              g_virtualIfName[strcspn(g_virtualIfName, "\n")] = '\0';
++              if (g_virtualIfName[0] == '\0')
++                  strcpy(g_virtualIfName, "erouter0");
++           }
++           fclose(fp);
++        }
++
+        if (pValue != NULL)
+        {
+-               const char *path = "/sys/class/net/erouter0/address";
++               memset(path, 0, sizeof(path));
++               snprintf(path, sizeof(path), "/sys/class/net/%s/address", g_virtualIfName);
+                FILE *fp = fopen(path, "r");
+                if (fp != NULL)
+                {
