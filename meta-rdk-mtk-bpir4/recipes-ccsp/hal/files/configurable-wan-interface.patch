@@ -42,11 +42,10 @@ Index: ethsw/rdkb_hal/src/ethsw/ccsp_hal_ethsw.c
 +
 +    }
 +
-+    if(fp != NULL)
++    if (fp != NULL)
 +    {
-+
-+         pclose(fp);
-+    }	 
++        fclose(fp);
++    }
 +
 +}
 +
