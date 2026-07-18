@@ -20,7 +20,7 @@ Index: ethsw/rdkb_hal/src/ethsw/ccsp_hal_ethsw.c
  /**********************************************************************
                              MAIN ROUTINES
  **********************************************************************/
-@@ -59,6 +59,33 @@ int is_interface_exists(const char *fnam
+@@ -59,6 +59,32 @@ int is_interface_exists(const char *fnam
      }
      return 0;
  }
@@ -29,32 +29,31 @@ Index: ethsw/rdkb_hal/src/ethsw/ccsp_hal_ethsw.c
 +
 +    FILE *fp;
 +    char buffer[32] = {0};
-+
 +    fp = fopen("/nvram/wan_name.txt", "r");
 +    if(fp)
 +    {
 +       if(fgets(buffer, sizeof(buffer), fp))
 +       {
-+          buffer[strcspn(buffer, "\n")] = '\0';
-+          if(strlen(buffer) > 0)
-+          {
-+	     snprintf(g_virtualIfName,sizeof(g_virtualIfName),"%s",buffer);	 
-+	  }
-+          
-+       }	  
-+    }
++           buffer[strcspn(buffer, "\n")] = '\0';
++           if(strlen(buffer) > 0)
++           {
++             snprintf(g_virtualIfName,sizeof(g_virtualIfName),"%s",buffer);
++           }
++
++        }
++    } 
 +
 +    if(fp != NULL)
 +    {
-+
 +       fclose(fp);
-+    }	 
++    }
 +
 +}
++
  
  int is_interface_link(const char *fname)
  {
-@@ -169,7 +196,7 @@ CcspHalEthSwGetPortStatus
+@@ -169,7 +195,7 @@ CcspHalEthSwGetPortStatus
  #endif
      else if (PortId == 1)
      {
@@ -63,7 +62,7 @@ Index: ethsw/rdkb_hal/src/ethsw/ccsp_hal_ethsw.c
      }
      else{
          sprintf(ifName, "lan%d", (PortId-1));
-@@ -331,7 +358,7 @@ CcspHalEthSwGetPortCfg
+@@ -331,7 +357,7 @@ CcspHalEthSwGetPortCfg
  #endif
      else if (PortId == 1)
      {
@@ -72,7 +71,7 @@ Index: ethsw/rdkb_hal/src/ethsw/ccsp_hal_ethsw.c
      }
      else
      {
-@@ -575,7 +602,7 @@ CcspHalEthSwGetPortAdminStatus
+@@ -575,7 +601,7 @@ CcspHalEthSwGetPortAdminStatus
  
      memset(&ifr, 0, sizeof(ifr));
      if (PortId == 1)
@@ -81,7 +80,7 @@ Index: ethsw/rdkb_hal/src/ethsw/ccsp_hal_ethsw.c
      else
          snprintf(ifr.ifr_name, sizeof(ifr.ifr_name),"lan%d",(PortId-1));
  
-@@ -1039,7 +1066,7 @@ INT CcspHalExtSw_getEthWanEnable(BOOLEAN
+@@ -1039,7 +1065,7 @@ INT CcspHalExtSw_getEthWanEnable(BOOLEAN
      }
  
      memset(&ifr, 0, sizeof(ifr));
@@ -90,7 +89,7 @@ Index: ethsw/rdkb_hal/src/ethsw/ccsp_hal_ethsw.c
  
      if (ioctl(sockfd, SIOCGIFFLAGS, &ifr) < 0)
      {
-@@ -1092,7 +1119,7 @@ INT CcspHalExtSw_setEthWanEnable(BOOLEAN
+@@ -1092,7 +1118,7 @@ INT CcspHalExtSw_setEthWanEnable(BOOLEAN
  {
      char cmd[32] = {0};
  
@@ -99,7 +98,7 @@ Index: ethsw/rdkb_hal/src/ethsw/ccsp_hal_ethsw.c
      system(cmd);
  
  	return RETURN_OK;
-@@ -1124,7 +1151,7 @@ INT GWP_GetEthWanLinkStatus()
+@@ -1124,7 +1150,7 @@ INT GWP_GetEthWanLinkStatus()
      int link = 0;
      char path[32] = {0};
  
@@ -108,11 +107,12 @@ Index: ethsw/rdkb_hal/src/ethsw/ccsp_hal_ethsw.c
      link = is_interface_link(path);
  
      if(link){
-@@ -1155,6 +1182,7 @@ void *ethsw_thread_main(void *context __
- 			sleep(1);
+@@ -1156,6 +1182,8 @@ void *ethsw_thread_main(void *context __
  		}
  	}
-+	GWP_UpdateInterfaceName();
  
++        GWP_UpdateInterfaceName();
++
  	while(1)
  	{
+ 		currentLinkDeteced = GWP_GetEthWanLinkStatus();
