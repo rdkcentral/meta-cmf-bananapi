@@ -1,5 +1,6 @@
 Source: Aishwarya Natarajan <aishwarya_natarajan2@comcast.com>
 Subject: Adding changes for configurable wan feature
+
 Index: platform/rdkb_hal/src/platform/platform_hal.c
 ===================================================================
 --- platform.orig/rdkb_hal/src/platform/platform_hal.c
