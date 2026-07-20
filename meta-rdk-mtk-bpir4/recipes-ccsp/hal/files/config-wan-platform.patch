@@ -1,8 +1,6 @@
-Index: platform/rdkb_hal/src/platform/platform_hal.c
-===================================================================
---- platform.orig/rdkb_hal/src/platform/platform_hal.c
-+++ platform/rdkb_hal/src/platform/platform_hal.c
-@@ -153,9 +153,24 @@ INT platform_hal_GetHardware(CHAR *pValu
+--- plaftorm/rdkb_hal/src/platform/platform_hal.c.orig  2026-07-20 08:00:18.301899560 +0000
++++ platform/rdkb_hal/src/platform/platform_hal.c       2026-07-20 08:03:02.749170902 +0000
+@@ -153,9 +153,24 @@
 
  INT platform_hal_GetBaseMacAddress(CHAR *pValue)
  {
@@ -23,8 +21,8 @@ Index: platform/rdkb_hal/src/platform/platform_hal.c
         if (pValue != NULL)
         {
 -               const char *path = "/sys/class/net/erouter0/address";
-+               memset(path, 0, sizeof(path));
-+               snprintf(path, sizeof(path), "/sys/class/net/%s/address", g_virtualIfName);
++                memset(path, 0, sizeof(path));
++                snprintf(path, sizeof(path), "/sys/class/net/%s/address", g_virtualIfName);
                 FILE *fp = fopen(path, "r");
                 if (fp != NULL)
                 {
