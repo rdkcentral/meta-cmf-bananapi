@@ -1,23 +1,22 @@
-Index: platform/rdkb_hal/src/platform/platform_hal.c
-===================================================================
---- platform.orig/rdkb_hal/src/platform/platform_hal.c
-+++ platform/rdkb_hal/src/platform/platform_hal.c
-@@ -153,9 +153,24 @@ INT platform_hal_GetBaseMacAddress(CHAR *pValue)
+--- platform/rdkb_hal/src/platform/platform_hal.c.orig  2026-07-21 08:49:26.304427416 +0000
++++ platform/rdkb_hal/src/platform/platform_hal.c       2026-07-21 08:56:44.954513936 +0000
+@@ -153,9 +153,24 @@
+
  INT platform_hal_GetBaseMacAddress(CHAR *pValue)
  {
-+        char path[128] = {0};
++       char path[128] = {0};
 +        FILE *fp = fopen("/nvram/wan_name.txt", "r");
 +        char g_virtualIfName[32] = "erouter0";
 +
 +        if (fp)
 +        {
-+            if (fgets(g_virtualIfName, sizeof(g_virtualIfName), fp))
-+            {
-+             g_virtualIfName[strcspn(g_virtualIfName, "\n")] = '\0';
-+             if (g_virtualIfName[0] == '\0')
-+                strcpy(g_virtualIfName, "erouter0");
-+            }
-+            fclose(fp);
++                if (fgets(g_virtualIfName, sizeof(g_virtualIfName), fp))
++                {
++                   g_virtualIfName[strcspn(g_virtualIfName, "\n")] = '\0';
++                   if (g_virtualIfName[0] == '\0')
++                      strcpy(g_virtualIfName, "erouter0");
++                }
++                fclose(fp);
 +        }
         if (pValue != NULL)
         {
