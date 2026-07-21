@@ -251,7 +251,7 @@ do_install:append() {
 	if [ "${PN}" = "${UBOOT_PN}" ]; then
 		if [ -n "${UBOOT_CONFIG}" ]; then
 			for config in ${UBOOT_MACHINE}; do
-				cd ${B}/$config
+				cd ${B}/$config*
 				if [ "${UBOOT_SIGN_ENABLE}" = "1" -o "${UBOOT_FITIMAGE_ENABLE}" = "1" ] && \
 					[ -n "${UBOOT_DTB_BINARY}" ]; then
 					install_helper
