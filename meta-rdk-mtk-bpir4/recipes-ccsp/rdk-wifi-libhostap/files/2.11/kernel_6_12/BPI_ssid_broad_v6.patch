@@ -1,0 +1,34 @@
+SOURCE:RDKM
+diff -Naur git.orig/source/hostap-2.11/src/ap/hostapd.c git/source/hostap-2.11/src/ap/hostapd.c
+--- git.orig/source/hostap-2.11/src/ap/hostapd.c	2026-05-13 13:18:26.442695871 +0100
++++ git/source/hostap-2.11/src/ap/hostapd.c	2026-05-13 13:19:49.187767350 +0100
+@@ -74,6 +74,9 @@
+ 						 void *user_ctx);
+ #endif /* CONFIG_IEEE80211AX */
+ 
++#ifdef _PLATFORM_BANANAPI_R4_
++static void hostapd_mld_started(struct hostapd_iface *iface);
++#endif /* _PLATFORM_BANANAPI_R4_ */
+ 
+ int hostapd_for_each_interface(struct hapd_interfaces *interfaces,
+ 			       int (*cb)(struct hostapd_iface *iface,
+@@ -1477,6 +1480,19 @@
+ 
+ #ifdef CONFIG_IEEE80211BE
+ 
++#ifdef _PLATFORM_BANANAPI_R4_
++       if (hapd->conf->mld_ap && (!hapd->mld->started ||
++                                   hapd->conf->mld_allowed_links == 255)) {
++                u16 valid_links = hapd->mld->valid_links;
++
++                if (valid_links == hapd->conf->mld_allowed_links ||
++                    hapd->conf->mld_allowed_links == 255 ||
++                    !hapd->conf->mld_allowed_links) {
++                       struct hostapd_iface *iface = hapd->iface;
++                       hostapd_mld_started(iface);
++}
++}
++#endif /* _PLATFORM_BANANAPI_R4_ */
+ 	/* set additional beacon to enable beacon for the last link of an AP MLD */
+ 	if (hapd->conf->mld_ap && hapd->mld->started &&
+ 	    ieee802_11_set_beacon_per_bss_only(hapd) < 0)
