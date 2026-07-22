@@ -1,6 +1,6 @@
---- platform/rdkb_hal/src/platform/platform_hal.c.orig  2026-07-21 08:49:26.304427416 +0000
-+++ platform/rdkb_hal/src/platform/platform_hal.c       2026-07-21 08:56:44.954513936 +0000
-@@ -153,9 +153,24 @@
+--- platform/rdkb_hal/src/platform/platform_hal.c.orig  2026-07-22 07:39:38.535765068 +0000
++++ platform/rdkb_hal/src/platform/platform_hal.c       2026-07-22 08:04:17.134631831 +0000
+@@ -167,9 +167,24 @@
 
  INT platform_hal_GetBaseMacAddress(CHAR *pValue)
  {
