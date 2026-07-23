@@ -78,3 +78,5 @@ DISTRO_FEATURES:append = " rrd"
 DISTRO_FEATURES:append = " feature_mapt"
 DISTRO_FEATURES:append = " nat46"
 LINUXLIBCVERSION = "${@bb.utils.contains('DISTRO_FEATURES', 'kernel6-12', '6.12%', bb.utils.contains('DISTRO_FEATURES','kernel6-6', '6.6%', '5.4%',d), d)}"
+
+PREFERRED_VERSION_linux-libc-headers:wrynose = "6.12"
