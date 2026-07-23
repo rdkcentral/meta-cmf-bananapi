@@ -14,5 +14,6 @@ RDEPENDS_packagegroup-ap-extender = "\
     bpi-serialnumber \
     mount-nvram \
     e2fsprogs-mke2fs \
+    rdk-wps-monitor \
 "
 DEPENDS += " ccsp-common-library"

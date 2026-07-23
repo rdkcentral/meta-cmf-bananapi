@@ -1,0 +1,30 @@
+--- git/source/hostap-2.11/src/eap_server/eap_server_wsc.c	2026-04-23 03:37:10.051987854 +0000
++++ git/source/hostap-2.11/src/eap_server/eap_server_wsc.c	2026-04-23 03:38:49.600184411 +0000
+@@ -157,7 +157,8 @@
+ {
+ 	struct eap_wsc_data *data = priv;
+ 	eloop_cancel_timeout(eap_wsc_ext_reg_timeout, sm, data);
+-	wpabuf_free(data->in_buf);
++	if (data->in_buf)
++		wpabuf_free(data->in_buf);
+ 	wpabuf_free(data->out_buf);
+ 	wps_deinit(data->wps);
+ 	os_free(data);
+@@ -441,6 +442,7 @@
+ 		wpa_printf(MSG_DEBUG, "EAP-WSC: WPS processing completed "
+ 			   "successfully - report EAP failure");
+ 		eap_wsc_state(data, FAIL);
++		data->in_buf = NULL;
+ 		break;
+ 	case WPS_CONTINUE:
+ 		eap_wsc_state(data, MESG);
+@@ -458,7 +460,7 @@
+ 		break;
+ 	}
+ 
+-	if (data->in_buf != &tmpbuf)
++	if (data->in_buf && data->in_buf != &tmpbuf)
+ 		wpabuf_free(data->in_buf);
+ 	data->in_buf = NULL;
+ }
+
