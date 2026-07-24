@@ -1,3 +1,4 @@
+Upstream-Status: Pending
 diff -Naur platform.orig/rdkb_hal/src/platform/platform_hal.c platform/rdkb_hal/src/platform/platform_hal.c
 --- platform.orig/rdkb_hal/src/platform/platform_hal.c	2026-03-12 12:07:58.349484102 +0000
 +++ platform/rdkb_hal/src/platform/platform_hal.c	2026-03-12 12:15:28.428644242 +0000

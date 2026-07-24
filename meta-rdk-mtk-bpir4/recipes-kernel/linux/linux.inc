@@ -5,7 +5,7 @@ LIC_FILES_CHKSUM = "file://COPYING;md5=d7810fab7487fb0aad327b76f1be7cd7"
 
 INC_PR = "r0"
 
-inherit kernel_bpi siteinfo
+inherit kernel siteinfo
 
 # Enable OABI compat for people stuck with obsolete userspace
 ARM_KEEP_OABI ?= "0"

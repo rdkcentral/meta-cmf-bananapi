@@ -1,3 +1,4 @@
+Upstream-Status: Pending
 Source: Comcast
 diff -Naur git.orig/source/hostap-2.11/src/ap/ap_drv_ops.c git/source/hostap-2.11/src/ap/ap_drv_ops.c
 --- git.orig/source/hostap-2.11/src/ap/ap_drv_ops.c	2026-04-28 08:15:05.363417234 +0100
