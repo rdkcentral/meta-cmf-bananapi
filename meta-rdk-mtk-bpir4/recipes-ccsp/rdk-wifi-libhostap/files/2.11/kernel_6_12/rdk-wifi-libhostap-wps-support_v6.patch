@@ -6,10 +6,10 @@
 
 --- git/source/hostap-2.11/src/ap/wps_hostapd.c	2026-02-25 02:46:35.506793146 +0000
 +++ git/source/hostap-2.11/src/ap/wps_hostapd.c	2026-03-10 05:18:02.021299051 +0000
-@@ -1135,8 +1135,8 @@
+@@ -1135,10 +1135,10 @@
  	if (hapd->wps_event_cb)
  		hapd->wps_event_cb(hapd->wps_event_cb_ctx, event, data);
-
+ 
 -#ifdef RDK_ONEWIFI
 -        hostapd_drv_wps_event_notify_cb(hapd, event, data);
 -#endif //RDK_ONEWIFI
@@ -19,22 +19,22 @@
 +#endif // WPS_NOTIFY_DISABLE
 +
  }
-
-
+ 
+ 
 --- git/source/hostap-2.11/wpa_supplicant/scan.c	2026-02-25 02:44:57.204620077 +0000
 +++ git/source/hostap-2.11/wpa_supplicant/scan.c	2026-03-10 05:18:02.110296838 +0000
-@@ -31,11 +31,35 @@
+@@ -31,11 +31,34 @@
  {
  	struct wpa_ssid *ssid;
  	union wpa_event_data data;
 +#ifdef UWM_EXT_WPS_SUPPORT
 +	u8 bssid[ETH_ALEN];
 +#endif
-
+ 
  	ssid = wpa_supplicant_get_ssid(wpa_s);
  	if (ssid == NULL)
  		return;
-
+ 
 +#ifdef UWM_EXT_WPS_SUPPORT
 +	/* Check if we're actually associated before generating ASSOC event.
 +	 * During WPS, we may have a matching network config but not be
@@ -60,7 +60,7 @@
  		wpas_notify_network_changed(wpa_s);
 @@ -1101,8 +1125,31 @@
  	}
-
+ 
  	if (wpa_s->conf->ap_scan == 0) {
 -		wpa_supplicant_gen_assoc_event(wpa_s);
 -		return;
@@ -90,7 +90,7 @@
 +                return;
 +#endif
  	}
-
+ 
  	ssid = NULL;
 --- git/source/hostap-2.11/wpa_supplicant/wps_supplicant.c     2026-03-18 07:38:19.811802513 +0000
 +++ git/source/hostap-2.11/wpa_supplicant/wps_supplicant.c     2026-03-18 07:39:07.037371812 +0000
@@ -133,9 +133,9 @@
 +int wpa_supplicant_drv_wps_event_notify_cb(struct wpa_supplicant *wpa_s, enum wps_event event,
 +					   union wps_event_data *data);
 +#endif //UWM_EXT_WPS_SUPPORT
-
+ 
  #else /* CONFIG_WPS */
-
+ 
 --- git/source/hostap-2.11/src/rsn_supp/wpa.c	2026-02-25 02:46:34.077819745 +0000
 +++ git/source/hostap-2.11/src/rsn_supp/wpa.c	2026-03-10 05:39:26.067886494 +0000
 @@ -4543,6 +4543,8 @@
@@ -148,7 +148,7 @@
  	eloop_cancel_timeout(wpa_sm_rekey_ptk, sm, NULL);
  	rsn_preauth_deinit(sm);
 @@ -5743,7 +5745,8 @@
-
+ 
  void wpa_sm_drop_sa(struct wpa_sm *sm)
  {
 -	wpa_dbg(sm->ctx->msg_ctx, MSG_DEBUG, "WPA: Clear old PMK and PTK");
@@ -158,20 +158,20 @@
  	sm->pmk_len = 0;
  	os_memset(sm->pmk, 0, sizeof(sm->pmk));
 @@ -5796,13 +5799,15 @@
-
+ 
  void wpa_sm_pmksa_cache_flush(struct wpa_sm *sm, void *network_ctx)
  {
 -	pmksa_cache_flush(sm->pmksa, network_ctx, NULL, 0, false);
 +	if (sm && sm->pmksa)
 +		pmksa_cache_flush(sm->pmksa, network_ctx, NULL, 0, false);
  }
-
-
+ 
+ 
  void wpa_sm_external_pmksa_cache_flush(struct wpa_sm *sm, void *network_ctx)
  {
 -	pmksa_cache_flush(sm->pmksa, network_ctx, NULL, 0, true);
 +	if (sm && sm->pmksa)
 +		pmksa_cache_flush(sm->pmksa, network_ctx, NULL, 0, true);
  }
-
-
+ 
+ 

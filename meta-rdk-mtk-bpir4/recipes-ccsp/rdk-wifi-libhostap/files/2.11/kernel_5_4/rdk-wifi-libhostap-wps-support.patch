@@ -15,7 +15,7 @@
  
 --- git/source/hostap-2.11/wpa_supplicant/scan.c	2026-02-25 02:44:57.204620077 +0000
 +++ git/source/hostap-2.11/wpa_supplicant/scan.c	2026-03-10 05:18:02.110296838 +0000
-@@ -31,11 +31,35 @@
+@@ -31,11 +31,34 @@
  {
  	struct wpa_ssid *ssid;
  	union wpa_event_data data;
