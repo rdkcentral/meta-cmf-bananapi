@@ -20,6 +20,9 @@ do_install_append () {
    install -m 0755 ${S}/devicebpi/scripts/self_heal_connectivity_test.sh ${D}/usr/ccsp/tad
    install -m 0755 ${S}/devicebpi/scripts/resource_monitor.sh ${D}/usr/ccsp/tad
    install -m 0755 ${S}/devicebpi/scripts/task_health_monitor.sh ${D}/usr/ccsp/tad
+   install -m 0755 ${S}/devicebpi/scripts/dca_utility.sh ${D}/usr/ccsp/tad
+   install -m 0755 ${S}/devicebpi/scripts/DCMscript.sh ${D}/usr/ccsp/tad
+   install -m 0755 ${S}/devicebpi/scripts/uploadSTBLogs.sh ${D}/usr/ccsp/tad
    install -m 0755 ${WORKDIR}/uploadRDKBLogs.sh ${D}/rdklogger/
 
    # Changing CLOUDURL and DCM_LOG_SERVER_URL values with migrated server
