@@ -200,7 +200,7 @@ concat_spl_dtb() {
 		if [ -n "${UBOOT_CONFIG}" ]; then
 			for config in ${UBOOT_MACHINE}; do
 				CONFIG_B_PATH="$config"
-				cd ${B}/$config
+				cd ${B}/$config*
 				concat_spl_dtb_helper
 			done
 		else

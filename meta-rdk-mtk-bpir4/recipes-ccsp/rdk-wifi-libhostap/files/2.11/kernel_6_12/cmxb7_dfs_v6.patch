@@ -1,3 +1,4 @@
+Upstream-Status: Pending
 Source: COMCAST
 
 diff -Naur git.orig/source/hostap-2.11/src/ap/dfs.c git/source/hostap-2.11/src/ap/dfs.c
