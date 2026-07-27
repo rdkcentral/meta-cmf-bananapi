@@ -51,7 +51,7 @@ IMAGE_INSTALL += " \
     util-linux-readprofile \    
     iputils \ 
     bc \
-    ${@bb.utils.contains('DISTRO_FEATURES','kirkstone','','python-core',d)} \ 
+    ${@bb.utils.contains_any('DISTRO_FEATURES','kirkstone wrynose','','python-core',d)} \ 
     dosfstools \
     pptp-linux \
     rp-pppoe  \  

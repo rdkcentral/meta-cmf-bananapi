@@ -14,7 +14,7 @@ CFLAGS:append = " -D_PLATFORM_BANANAPI_R4_  -DCONFIG_SME -DCONFIG_GAS "
 CFLAGS:append = "${@bb.utils.contains_any('DISTRO_FEATURES', 'kernel6-12 kernel6-6' , '-DCONFIG_AP','', d)}"
 
 do_configure:prepend() {
-  cp ${WORKDIR}/2.11/libhostap.mk ${S}/source/hostap-${HOSTAPD_PV}/hostapd/
+  cp ${UNPACKDIR}/2.11/libhostap.mk ${S}/source/hostap-${HOSTAPD_PV}/hostapd/
 }
 
 do_install:append() {

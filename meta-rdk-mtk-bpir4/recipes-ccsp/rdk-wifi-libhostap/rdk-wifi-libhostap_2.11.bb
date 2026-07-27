@@ -12,12 +12,13 @@ DEPENDS += "libnl openssl"
 
 DEPENDS:append = " ucode"
 
-inherit autotools pkgconfig
+#inherit autotools pkgconfig
+inherit pkgconfig
 
 SRC_URI = "git://w1.fi/hostap.git;protocol=https;branch=main;destsuffix=${S}/source/hostap-${PV};name=${PV}"
 SRCREV = "96e48a05aa0a82e91e3cab75506297e433e253d0"
 SRCREV_kernel6-6 = "4b8ac10cb77c3d4dbf7ccefbe697dc0578da374c"
-SRCREV_kernel6-12 = "53d12cd44da765ee446b2834aad92e9670319f8c"
+SRCREV:kernel6-12 = "53d12cd44da765ee446b2834aad92e9670319f8c"
 
 LIC_FILES_CHKSUM = "file://source/hostap-2.11/README;md5=6e4b25e7d74bfc44a32ba37bdf5210a6"
 
@@ -30,6 +31,7 @@ EXTRA_OEMAKE:append = " \
 "
 CFLAGS:append = " \
     -fcommon \
+    -Wno-implicit-function-declaration \
 "
 
 SRC_URI += " \
@@ -47,7 +49,7 @@ SRC_URI += "${@'${EMULATOR_HOSTAPD_PATCH}' if '${EMULATOR_FEATURE_ENABLED}' == '
 
 EXTRA_OECONF += " --disable-static --enable-shared "
 
-S = "${WORKDIR}/git/"
+S = "${UNPACKDIR}"
 
 FILES:${PN} = " \
         ${libdir}/libhostap.so* \
@@ -55,9 +57,9 @@ FILES:${PN} = " \
 EXTRA_OEMAKE += "${@bb.utils.contains('DISTRO_FEATURES', 'Wifi-test-suite', 'WIFI_EMULATOR=true', 'WIFI_EMULATOR=false', d)}"
 do_hostapd_patch () {
     if ${@bb.utils.contains_any('DISTRO_FEATURES', 'kernel6-12 kernel6-6', 'true', 'false', d)}; then
-       echo "CONFIG_OCV=y" >> ${WORKDIR}/.config
+       echo "CONFIG_OCV=y" >> ${UNPACKDIR}/.config
     fi
-    install -m 0644 ${WORKDIR}/.config ${WORKDIR}/2.11/libhostap.mk ${S}/source/hostap-${PV}/hostapd/
+    install -m 0644 ${UNPACKDIR}/.config ${UNPACKDIR}/2.11/libhostap.mk ${S}/source/hostap-${PV}/hostapd/
     echo "include libhostap.mk" >> ${S}/source/hostap-${PV}/hostapd/Makefile
 }
 
