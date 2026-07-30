@@ -1,0 +1,177 @@
+##########################################
+# WPS support for kernel_6_6 based hostapd
+# Adapted from rdk-wifi-libhostap-wps-support.patch
+# for kernel_6_6 source tree
+##########################################
+
+--- git/source/hostap-2.11/src/ap/wps_hostapd.c	2026-02-25 02:46:35.506793146 +0000
++++ git/source/hostap-2.11/src/ap/wps_hostapd.c	2026-03-10 05:18:02.021299051 +0000
+@@ -1135,10 +1135,10 @@
+ 	if (hapd->wps_event_cb)
+ 		hapd->wps_event_cb(hapd->wps_event_cb_ctx, event, data);
+ 
+-#ifdef RDK_ONEWIFI
+-        hostapd_drv_wps_event_notify_cb(hapd, event, data);
+-#endif //RDK_ONEWIFI
+-
++#if !defined(WPS_NOTIFY_DISABLE)
++        hostapd_drv_wps_event_notify_cb(hapd, event, data);
++#endif // WPS_NOTIFY_DISABLE
++
+ }
+ 
+ 
+--- git/source/hostap-2.11/wpa_supplicant/scan.c	2026-02-25 02:44:57.204620077 +0000
++++ git/source/hostap-2.11/wpa_supplicant/scan.c	2026-03-10 05:18:02.110296838 +0000
+@@ -31,11 +31,34 @@
+ {
+ 	struct wpa_ssid *ssid;
+ 	union wpa_event_data data;
++#ifdef UWM_EXT_WPS_SUPPORT
++	u8 bssid[ETH_ALEN];
++#endif
+ 
+ 	ssid = wpa_supplicant_get_ssid(wpa_s);
+ 	if (ssid == NULL)
+ 		return;
+ 
++#ifdef UWM_EXT_WPS_SUPPORT
++	/* Check if we're actually associated before generating ASSOC event.
++	 * During WPS, we may have a matching network config but not be
++	 * associated yet. For WPS, we need to allow scanning to proceed,
++	 * so only skip ASSOC event generation if we're not associated.
++	 * For non-WPS networks, we also need to be associated. */
++	if (wpa_drv_get_bssid(wpa_s, bssid) < 0 || is_zero_ether_addr(bssid)) {
++		/* If this is a WPS network, allow scan to proceed by not
++		 * generating ASSOC event; return so the caller can continue the WPS scan/enrollee flow (non-WPS also skips ASSOC here). */
++		if (ssid->key_mgmt & WPA_KEY_MGMT_WPS) {
++			wpa_dbg(wpa_s, MSG_DEBUG, "WPS network not associated yet - "
++				"skipping ASSOC event, allowing scan to proceed");
++		} else {
++			wpa_dbg(wpa_s, MSG_DEBUG, "Not actually associated - skipping "
++				"ASSOC event generation");
++		}
++		return;
++	}
++#endif
++
+ 	if (wpa_s->current_ssid == NULL) {
+ 		wpa_s->current_ssid = ssid;
+ 		wpas_notify_network_changed(wpa_s);
+@@ -1101,8 +1125,31 @@
+ 	}
+ 
+ 	if (wpa_s->conf->ap_scan == 0) {
+-		wpa_supplicant_gen_assoc_event(wpa_s);
+-		return;
++#ifdef UWM_EXT_WPS_SUPPORT
++		struct wpa_ssid *ssid_check;
++		u8 bssid_check[ETH_ALEN];
++		int is_wps_not_associated = 0;
++
++		/* Check if we're in WPS mode and not associated - if so, allow scan to proceed */
++		ssid_check = wpa_supplicant_get_ssid(wpa_s);
++		if (ssid_check && (ssid_check->key_mgmt & WPA_KEY_MGMT_WPS)) {
++			if (wpa_drv_get_bssid(wpa_s, bssid_check) < 0 ||
++			    is_zero_ether_addr(bssid_check)) {
++				is_wps_not_associated = 1;
++				wpa_dbg(wpa_s, MSG_DEBUG, "WPS network not associated - "
++					"allowing scan to proceed");
++			}
++		}
++
++		if (!is_wps_not_associated) {
++			wpa_supplicant_gen_assoc_event(wpa_s);
++			return;
++		}
++		/* For WPS when not associated, continue with scan below */
++#else
++                wpa_supplicant_gen_assoc_event(wpa_s);
++                return;
++#endif
+ 	}
+ 
+ 	ssid = NULL;
+--- git/source/hostap-2.11/wpa_supplicant/wps_supplicant.c     2026-03-18 07:38:19.811802513 +0000
++++ git/source/hostap-2.11/wpa_supplicant/wps_supplicant.c     2026-03-18 07:39:07.037371812 +0000
+@@ -929,6 +929,10 @@
+ 	case WPS_EV_AP_PIN_SUCCESS:
+ 		break;
+ 	}
++
++#ifdef UWM_EXT_WPS_SUPPORT
++	wpa_supplicant_drv_wps_event_notify_cb(wpa_s, event, data);
++#endif //UWM_EXT_WPS_SUPPORT
+ }
+ 
+ 
+@@ -943,6 +947,17 @@
+                (wpa_s->assoc_freq > 2484) ? WPS_RF_50GHZ : WPS_RF_24GHZ;
+ }
+ 
++#ifdef UWM_EXT_WPS_SUPPORT
++int wpa_supplicant_drv_wps_event_notify_cb(struct wpa_supplicant *wpa_s, enum wps_event event,
++                                           union wps_event_data *data)
++{
++       if (!wpa_s->driver || !wpa_s->driver->wps_event_notify_cb || !wpa_s->drv_priv) {
++               return 0;
++       }
++
++       return wpa_s->driver->wps_event_notify_cb(wpa_s->drv_priv, event, (union wps_event_data *)data);
++}
++#endif //UWM_EXT_WPS_SUPPORT
+ 
+ enum wps_request_type wpas_wps_get_req_type(struct wpa_ssid *ssid)
+ {
+--- git/source/hostap-2.11/wpa_supplicant/wps_supplicant.h	2026-02-25 02:46:34.090819503 +0000
++++ git/source/hostap-2.11/wpa_supplicant/wps_supplicant.h	2026-03-10 05:18:01.879302585 +0000
+@@ -88,6 +88,10 @@
+ bool wpas_wps_partner_link_overlap_detect(struct wpa_supplicant *wpa_s);
+ void wpas_wps_notify_assoc(struct wpa_supplicant *wpa_s, const u8 *bssid);
+ int wpas_wps_reenable_networks_pending(struct wpa_supplicant *wpa_s);
++#ifdef UWM_EXT_WPS_SUPPORT
++int wpa_supplicant_drv_wps_event_notify_cb(struct wpa_supplicant *wpa_s, enum wps_event event,
++					   union wps_event_data *data);
++#endif //UWM_EXT_WPS_SUPPORT
+ 
+ #else /* CONFIG_WPS */
+ 
+--- git/source/hostap-2.11/src/rsn_supp/wpa.c	2026-02-25 02:46:34.077819745 +0000
++++ git/source/hostap-2.11/src/rsn_supp/wpa.c	2026-03-10 05:39:26.067886494 +0000
+@@ -4543,6 +4543,8 @@
+  */
+ void wpa_sm_notify_disassoc(struct wpa_sm *sm)
+ {
++	if (sm == NULL)
++		return;
+ 	eloop_cancel_timeout(wpa_sm_start_preauth, sm, NULL);
+ 	eloop_cancel_timeout(wpa_sm_rekey_ptk, sm, NULL);
+ 	rsn_preauth_deinit(sm);
+@@ -5743,7 +5745,8 @@
+ 
+ void wpa_sm_drop_sa(struct wpa_sm *sm)
+ {
+-	wpa_dbg(sm->ctx->msg_ctx, MSG_DEBUG, "WPA: Clear old PMK and PTK");
++	if (sm == NULL)
++		return;
+ 	wpa_sm_clear_ptk(sm);
+ 	sm->pmk_len = 0;
+ 	os_memset(sm->pmk, 0, sizeof(sm->pmk));
+@@ -5796,13 +5799,15 @@
+ 
+ void wpa_sm_pmksa_cache_flush(struct wpa_sm *sm, void *network_ctx)
+ {
+-	pmksa_cache_flush(sm->pmksa, network_ctx, NULL, 0, false);
++	if (sm && sm->pmksa)
++		pmksa_cache_flush(sm->pmksa, network_ctx, NULL, 0, false);
+ }
+ 
+ 
+ void wpa_sm_external_pmksa_cache_flush(struct wpa_sm *sm, void *network_ctx)
+ {
+-	pmksa_cache_flush(sm->pmksa, network_ctx, NULL, 0, true);
++	if (sm && sm->pmksa)
++		pmksa_cache_flush(sm->pmksa, network_ctx, NULL, 0, true);
+ }
+ 
+ 

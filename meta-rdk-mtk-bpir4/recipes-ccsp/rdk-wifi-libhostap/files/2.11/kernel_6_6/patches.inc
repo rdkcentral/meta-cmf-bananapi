@@ -272,4 +272,7 @@ SRC_URI:append = " \
     file://bpi.patch \
     file://fixed_disassoc_after_assoc_retry.patch \
     file://xfi_tel_compete_2_11.patch \
+    file://rdk-wifi-libhostap-wps-support.patch \
+    file://wps_crash_fix.patch \
+    file://fix-auth-timeout-completed-guard.patch;patchdir=source/hostap-2.11/ \
     "

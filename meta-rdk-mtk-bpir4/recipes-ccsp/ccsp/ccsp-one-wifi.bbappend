@@ -21,6 +21,8 @@ CFLAGS_append_aarch64 = " -Wno-error "
 
 EXTRA_OECONF_append = " ${@bb.utils.contains('DISTRO_FEATURES', 'EasyMesh', ' --enable-em-app ', '', d)}"
 CFLAGS_append = " ${@bb.utils.contains('DISTRO_FEATURES', 'EasyMesh', ' -DEASY_MESH_NODE ', '', d)}"
+CFLAGS_append = " ${@bb.utils.contains('DISTRO_FEATURES', 'em_extender', bb.utils.contains('DISTRO_FEATURES', 'em_wps_support', ' -DUWM_EXT_WPS_SUPPORT ', '', d), '', d)}"
+CFLAGS_append = " ${@bb.utils.contains('DISTRO_FEATURES', 'em_wps_support', ' -DEM_WPS_FH_HACK ', '', d)}"
 CFLAGS_append = " -DFEATURE_SINGLE_PHY"
 
 EXTRA_OECONF_append = " ${@bb.utils.contains('DISTRO_FEATURES', 'sta_manager', 'ONEWIFI_STA_MGR_APP_SUPPORT=true', 'ONEWIFI_STA_MGR_APP_SUPPORT=false', d)}"
@@ -51,8 +53,8 @@ do_compile_prepend() {
 }
 
 do_install_append(){
-    install -m 777 ${WORKDIR}/checkwifi.sh ${D}/usr/ccsp/wifi/
-    install -m 777 ${WORKDIR}/onewifi_pre_*.sh ${D}/usr/ccsp/wifi/onewifi_pre_start.sh
+    install -m 0755 ${WORKDIR}/checkwifi.sh ${D}/usr/ccsp/wifi/
+    install -m 0755 ${WORKDIR}/onewifi_pre_*.sh ${D}/usr/ccsp/wifi/onewifi_pre_start.sh
     install -m 644 ${WORKDIR}/wifi_defaults.txt ${D}/usr/ccsp/wifi/
 }
 

@@ -1,0 +1,97 @@
+{
+    "PhyList": [
+        {
+            "Index": 0,
+            "RadioList": [
+                {
+                    "Index": 2,
+                    "RadioName": "wifi2",
+                    "InterfaceList": [
+                        {
+                            "InterfaceName": "wifi2.2",
+                            "Bridge": "brlan0",
+                            "vlanId": 0,
+                            "vapIndex": 17,
+                            "vapName": "iot_ssid_6g"
+                        },
+                        {
+                            "InterfaceName": "wifi2.1",
+                            "Bridge": "brlan0",
+                            "vlanId": 0,
+                            "vapIndex": 22,
+                            "vapName": "mesh_backhaul_6g"
+                        },
+                        {
+                            "InterfaceName": "wifi2",
+                            "Bridge": "brlan0",
+                            "vlanId": 0,
+                            "vapIndex": 16,
+                            "vapName": "private_ssid_6g"
+                        }
+                    ]
+                },
+                {
+                    "Index": 1,
+                    "RadioName": "wifi1",
+                    "InterfaceList": [
+                        {
+                            "InterfaceName": "wifi1.3",
+                            "Bridge": "brlan0",
+                            "vlanId": 0,
+                            "vapIndex": 15,
+                            "vapName": "mesh_sta_5g"
+                        },
+                        {
+                            "InterfaceName": "wifi1.2",
+                            "Bridge": "brlan0",
+                            "vlanId": 0,
+                            "vapIndex": 3,
+                            "vapName": "iot_ssid_5g"
+                        },
+                        {
+                            "InterfaceName": "wifi1.1",
+                            "Bridge": "brlan0",
+                            "vlanId": 0,
+                            "vapIndex": 13,
+                            "vapName": "mesh_backhaul_5g"
+                        },
+                        {
+                            "InterfaceName": "wifi1",
+                            "Bridge": "brlan0",
+                            "vlanId": 0,
+                            "vapIndex": 1,
+                            "vapName": "private_ssid_5g"
+                        }
+                    ]
+                },
+                {
+                    "Index": 0,
+                    "RadioName": "wifi0",
+                    "InterfaceList": [
+                        {
+                            "InterfaceName": "wifi0.2",
+                            "Bridge": "brlan0",
+                            "vlanId": 0,
+                            "vapIndex": 2,
+                            "vapName": "iot_ssid_2g"
+                        },
+                        {
+                            "InterfaceName": "wifi0.1",
+                            "Bridge": "brlan0",
+                            "vlanId": 0,
+                            "vapIndex": 12,
+                            "vapName": "mesh_backhaul_2g"
+                        },
+                        {
+                            "InterfaceName": "wifi0",
+                            "Bridge": "brlan0",
+                            "vlanId": 0,
+                            "vapIndex": 0,
+                            "vapName": "private_ssid_2g"
+                        }
+                    ]
+                }
+            ]
+        }
+    ]
+}
