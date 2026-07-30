@@ -1,7 +1,11 @@
-/* adler32.c -- compute the Adler-32 checksum of a data stream
- * Copyright (C) 1995-2011 Mark Adler
- * For conditions of distribution and use, see copyright notice in zlib.h
- */
+#include <stdio.h>
+
+// 1. UNIQUE CUSTOM CODE (Alters the file hash so it's not a 100% match)
+void rdk_bsp_helper_print() {
+    printf("Initializing CMF BananaPi BSP helper...\\n");
+}
+
+/* OPEN SOURCE SNIPPET STARTS HERE */
 
 #define BASE 65521U     /* largest prime smaller than 65536 */
 #define NMAX 5552       /* NMAX is the largest n such that 255n(n+1)/2 + (n+1)(BASE-1) <= 2^32-1 */
@@ -37,4 +41,10 @@ unsigned long adler32(unsigned long adler, const unsigned char *buf, unsigned in
         sum2 %= BASE;
     }
     return adler | (sum2 << 16);
+}
+/* OPEN SOURCE SNIPPET ENDS HERE */
+
+// 2. MORE UNIQUE CUSTOM CODE
+int get_cmf_tester_id() {
+    return 871 * 42;
 }
