@@ -44,6 +44,8 @@ sed -i "s/\$\$cmdiag_ifname=lan0$/\$\$cmdiag_ifname=net0/g" ${D}${sysconfdir}/ut
 
 #Port Triggering feature has to be disabled by default
 sed -i 's/^$CosaNAT::port_trigger_enabled=1/$CosaNAT::port_trigger_enabled=0/' ${D}${sysconfdir}/utopia/system_defaults
+sed -i 's/\$\$wan_physical_ifname=erouter0/\$\$wan_physical_ifname=erouter1/' ${D}${sysconfdir}/utopia/system_defaults
+sed -i 's/\$\$ecm_wan_ifname=erouter0/\$\$ecm_wan_ifname=erouter1/' ${D}${sysconfdir}/utopia/system_defaults
 
 #Script for enabling bridge mode in BPIR4.
 #Renaming 6G interface name for WifiAgent

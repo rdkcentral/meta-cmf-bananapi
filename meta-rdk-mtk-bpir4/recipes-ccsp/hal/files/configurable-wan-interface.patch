@@ -1,0 +1,118 @@
+Source: Aishwarya Natarajan <aishwarya_natarajan2@comcast.com>
+Subject: Adding changes for configurable wan feature
+Index: ethsw/rdkb_hal/src/ethsw/ccsp_hal_ethsw.c
+===================================================================
+--- ethsw.orig/rdkb_hal/src/ethsw/ccsp_hal_ethsw.c
++++ ethsw/rdkb_hal/src/ethsw/ccsp_hal_ethsw.c
+@@ -25,7 +25,6 @@
+ #define MACADDRESS_SIZE 6
+ #define LM_ARP_ENTRY_FORMAT  "%63s %63s %63s %63s %17s %63s"
+ 
+-#define ETH_WAN_INTERFACE  "erouter0"
+ #if defined(_PLATFORM_BANANAPI_R4_)
+ #define ETH_WAN_IFNAME   "lan0"
+ #else
+@@ -43,6 +42,7 @@ void *ethsw_thread_main(void *context __
+ #define  MIITOOL         "mii_mgr_cl45"
+ #define  WANLINKUP       "0x796D"
+ #define  MAX_LAN_PORT     6
++static char g_virtualIfName[32] = "erouter0";
+ /**********************************************************************
+                             MAIN ROUTINES
+ **********************************************************************/
+@@ -59,6 +59,33 @@ int is_interface_exists(const char *fnam
+     }
+     return 0;
+ }
++static void GWP_UpdateInterfaceName()
++{
++
++    FILE *fp;
++    char buffer[32] = {0};
++
++    fp = fopen("/nvram/wan_name.txt", "r");
++    if(fp)
++    {
++       if(fgets(buffer, sizeof(buffer), fp))
++       {
++          buffer[strcspn(buffer, "\n")] = '\0';
++          if(strlen(buffer) > 0)
++          {
++	     snprintf(g_virtualIfName,sizeof(g_virtualIfName),"%s",buffer);	 
++	  }
++          
++       }	  
++    }
++
++    if(fp != NULL)
++    {
++
++       fclose(fp);
++    }	 
++
++}
+ 
+ int is_interface_link(const char *fname)
+ {
+@@ -169,7 +196,7 @@ CcspHalEthSwGetPortStatus
+ #endif
+     else if (PortId == 1)
+     {
+-	sprintf(ifName,"%s", "erouter0");
++	sprintf(ifName,"%s", g_virtualIfName);
+     }
+     else{
+         sprintf(ifName, "lan%d", (PortId-1));
+@@ -331,7 +358,7 @@ CcspHalEthSwGetPortCfg
+ #endif
+     else if (PortId == 1)
+     {
+-        sprintf(ifName,"%s", "erouter0");
++        sprintf(ifName,"%s", g_virtualIfName);
+     }
+     else
+     {
+@@ -575,7 +602,7 @@ CcspHalEthSwGetPortAdminStatus
+ 
+     memset(&ifr, 0, sizeof(ifr));
+     if (PortId == 1)
+-	       snprintf(ifr.ifr_name, sizeof(ifr.ifr_name), "%s", "erouter0");
++	       snprintf(ifr.ifr_name, sizeof(ifr.ifr_name), "%s", g_virtualIfName);
+     else
+         snprintf(ifr.ifr_name, sizeof(ifr.ifr_name),"lan%d",(PortId-1));
+ 
+@@ -1039,7 +1066,7 @@ INT CcspHalExtSw_getEthWanEnable(BOOLEAN
+     }
+ 
+     memset(&ifr, 0, sizeof(ifr));
+-    snprintf(ifr.ifr_name, sizeof(ifr.ifr_name), "%s", ETH_WAN_INTERFACE);
++    snprintf(ifr.ifr_name, sizeof(ifr.ifr_name), "%s", g_virtualIfName);
+ 
+     if (ioctl(sockfd, SIOCGIFFLAGS, &ifr) < 0)
+     {
+@@ -1092,7 +1119,7 @@ INT CcspHalExtSw_setEthWanEnable(BOOLEAN
+ {
+     char cmd[32] = {0};
+ 
+-    sprintf(cmd,"ifconfig %s %s",ETH_WAN_INTERFACE, enable ? "up":"down");
++    sprintf(cmd,"ifconfig %s %s",g_virtualIfName, enable ? "up":"down");
+     system(cmd);
+ 
+ 	return RETURN_OK;
+@@ -1124,7 +1151,7 @@ INT GWP_GetEthWanLinkStatus()
+     int link = 0;
+     char path[32] = {0};
+ 
+-    sprintf(path, "/sys/class/net/erouter0/carrier");
++    sprintf(path, "/sys/class/net/%s/carrier",g_virtualIfName);
+     link = is_interface_link(path);
+ 
+     if(link){
+@@ -1155,6 +1182,7 @@ void *ethsw_thread_main(void *context __
+ 			sleep(1);
+ 		}
+ 	}
++	GWP_UpdateInterfaceName();
+ 
+ 	while(1)
+ 	{
