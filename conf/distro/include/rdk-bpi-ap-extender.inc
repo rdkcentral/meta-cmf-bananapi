@@ -39,3 +39,6 @@ DISTRO_FEATURES_append = " kernel6-6"
 
 #Disable rdm-agent for reference platform
 #DISTRO_FEATURES_append = "RDM"
+
+#Enable below distro to build Easymesh and dependent Wi-Fi components from tip (AUTOREV) during CI validation
+#DISTRO_FEATURES_append = " BuildFromTip"
