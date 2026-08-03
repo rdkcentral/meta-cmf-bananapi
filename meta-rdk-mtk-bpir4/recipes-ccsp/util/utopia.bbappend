@@ -48,10 +48,10 @@ sed -i 's/^$CosaNAT::port_trigger_enabled=1/$CosaNAT::port_trigger_enabled=0/' $
 #Script for enabling bridge mode in BPIR4.
 #Renaming 6G interface name for WifiAgent
 if [ "${@bb.utils.contains('DISTRO_FEATURES', 'OneWifi', 'true', 'false', d)}" == "false" ]; then
-    sed -i "s/wifi2/wifi16/g" ${WORKDIR}/service_bridge_bpi.sh
+    sed -i "s/wifi2/wifi16/g" ${UNPACKDIR}/service_bridge_bpi.sh
 fi
-install -m 755 ${WORKDIR}/service_bridge_bpi.sh ${D}${sysconfdir}/utopia/service.d/
-install -m 755 ${WORKDIR}/service_bridge_bpi.sh ${D}${sysconfdir}/utopia/service.d/service_bridge.sh
+install -m 755 ${UNPACKDIR}/service_bridge_bpi.sh ${D}${sysconfdir}/utopia/service.d/
+install -m 755 ${UNPACKDIR}/service_bridge_bpi.sh ${D}${sysconfdir}/utopia/service.d/service_bridge.sh
 
 sed -i '/^#TOT_MSG_MAX=\$/s/^#//' ${D}${sysconfdir}/utopia/utopia_init.sh
 
@@ -120,7 +120,7 @@ ln -sf /usr/sbin/log_handle.sh ${D}/fss/gw/usr/sbin/log_handle.sh
 
 
 #Mounting nvram
-sed -i '/Before=CcspPandMSsp.service/a Requires=mount-nvram.service' ${D}/lib/systemd/system/ApplySystemDefaults.service
+sed -i '/Before=CcspPandMSsp.service/a Requires=mount-nvram.service' ${D}${libdir}/systemd/system/ApplySystemDefaults.service
 }
 
 FILES:${PN} += " \
