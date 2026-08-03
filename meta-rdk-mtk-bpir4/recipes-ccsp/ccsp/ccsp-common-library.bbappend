@@ -50,7 +50,7 @@ do_install:append:class-target() {
    install -D -m 0644 ${S}/systemd_units/notifyComp.service ${D}${systemd_unitdir}/system/notifyComp.service
    install -D -m 0644 ${S}/systemd_units/gwprovapp.service ${D}${systemd_unitdir}/system/gwprovapp.service
    sed -i "s/After=securemount.service/After=PsmSsp.service/g" ${D}${systemd_unitdir}/system/gwprovapp.service
-   install -D -m 0644 ${WORKDIR}/gwprovapp.conf ${D}${systemd_unitdir}/system/gwprovapp.service.d/gwprovapp.conf
+   install -D -m 0644 ${UNPACKDIR}/gwprovapp.conf ${D}${systemd_unitdir}/system/gwprovapp.service.d/gwprovapp.conf
    rm ${D}${systemd_unitdir}/system/utopia.service
 
    #SNMP SUPPORT
@@ -75,8 +75,7 @@ do_install:append:class-target() {
    sed -i '$a [Install]\nWantedBy=multi-user.target' ${D}${systemd_unitdir}/system/onewifi.service
    fi
    sed -i '/IsErouterRunningStatus/,/fi/ s/^/#/' ${D}/usr/ccsp/ccspPAMCPCheck.sh
-   sed -i '/ExecStart=/i ExecStartPre=/usr/bin/start_cron' ${D}/lib/systemd/system/RdkFwUpgradeManager.service
-   sed -i 's/ RdkWanManager.service//g' ${D}${systemd_unitdir}/system/CcspEthAgent.service
+   sed -i '/ExecStart=/i ExecStartPre=/usr/bin/start_cron' ${D}${libdir}/systemd/system/RdkFwUpgradeManager.service
 }
 
 

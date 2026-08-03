@@ -7,7 +7,7 @@ inherit autotools ${@bb.utils.contains_any("DISTRO_FEATURES", "kirkstone wrynose
 
 SRC_URI = "${CMF_GITHUB_ROOT}/broadband-utils;protocol=https;branch=develop"
 
-S = "${WORKDIR}/git"
+S = "${UNPACKDIR}/${PN}-${PV}"
 PV = "1.0.0"
 SRCREV = "d7510271e6860402dd6ecc30e50ebe530d7969bf"
 
@@ -22,7 +22,7 @@ do_install() {
 	install -m 0755 rdkmmap ${D}${bindir}/rdkmmap
 #	install -D -m 0644 ${S}/rdkmmap/rdkmmap.service ${D}${systemd_unitdir}/system/rdkmmap.service
 }
-
+do_configure[noexec] = "1"
 #SYSTEMD_SERVICE:${PN} += " rdkmmap.service"
 
 #FILES:${PN}:append = "${systemd_unitdir}/system/rdkmmap.service"

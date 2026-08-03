@@ -42,9 +42,9 @@ do_install:append() {
     rm -rf ${D}${nonarch_base_libdir}/firmware/mediatek/mt7996/mt7996*
     kernel6_12_ENABLED="${@bb.utils.contains('DISTRO_FEATURES','kernel6-12','true','false',d)}"
     if [ $kernel6_12_ENABLED = 'true' ]; then
-          install -m 644 ${WORKDIR}/airoha/EthMD32*  ${D}${nonarch_base_libdir}/firmware/airoha
-          cp -rf ${WORKDIR}/airoha/EthMD32* ${WORKDIR}/${PN}-${PV}/airoha/
-          cp -rf ${WORKDIR}/airoha/EthMD32* ${TOPDIR}/firmware/airoha/
+          install -m 644 ${UNPACKDIR}/airoha/EthMD32*  ${D}${nonarch_base_libdir}/firmware/airoha
+          cp -rf ${UNPACKDIR}/airoha/EthMD32* ${UNPACKDIR}/${PN}-${PV}/airoha/
+          cp -rf ${UNPACKDIR}/airoha/EthMD32* ${TOPDIR}/firmware/airoha/
     fi
 }
 

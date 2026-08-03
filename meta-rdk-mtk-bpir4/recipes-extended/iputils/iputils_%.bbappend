@@ -7,3 +7,4 @@ do_install:append() {
 # Remove iputils-ping package entirely
 PACKAGES:remove = "${PN}-ping"
 RDEPENDS:${PN}:remove = "${PN}-ping"
+INSANE_SKIP:${PN} += "installed-vs-shipped"
