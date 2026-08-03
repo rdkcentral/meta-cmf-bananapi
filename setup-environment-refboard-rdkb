@@ -122,7 +122,7 @@ if [ "X$FEATURE_TYPE" == "XEasyMesh" ]; then
     fi	
 fi
 
-if [ "X$FEATURE_TYPE" == "Xci-Staged-AUTOREV-Validation" ]; then
+if [ "X$ci_Staged_AUTOREV_Validation_Enabled" == "Xyes" ]; then
     sed -i '/BuildFromTip/s/^#//' ${_TOPDIR}/meta-cmf-bananapi/conf/distro/include/rdk-bpi.inc
     sed -i '/BuildFromTip/s/^#//' ${_TOPDIR}/meta-cmf-bananapi/conf/distro/include/rdk-bpi-ap-extender.inc
 fi
