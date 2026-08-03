@@ -50,6 +50,9 @@ DISTRO_FEATURES_remove = " lan0_as_wan"
 #DISTRO_FEATURES_append = " Em_Unittest"
 PREFERRED_VERSION_go = "1.24.%"
 
+#Enable below distro to build Easymesh and dependent Wi-Fi components from tip (AUTOREV) during CI validation
+#DISTRO_FEATURES_append = " BuildFromTip"
+
 #Enable wps support
 DISTRO_FEATURES_append = " wps_support"
 
