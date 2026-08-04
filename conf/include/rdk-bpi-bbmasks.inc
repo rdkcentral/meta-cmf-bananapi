@@ -32,14 +32,20 @@ BBMASK .= "|meta-cmf-bananapi/meta-rdk-mtk-bpir4/recipes-kernel/nat46/nat46.bbap
 BBMASK .= "|meta-cmf-bananapi/meta-rdk-mtk-bpir4/recipes-opensync/opensync/opensync_%.bbappend"
 BBMASK .= "|meta-cmf-bananapi/meta-rdk-mtk-bpir4/recipes-support/webcfg/webcfg_1.0.bbappend"
 
+# Packages to build from filogic layer
 BBMASK .= "|meta-filogic/recipes-wifi/wpa-supplicant/wpa-supplicant_2.10.bb"
 BBMASK .= "|meta-rdk-oss-reference/recipes-connectivity/wpa-supplicant/wpa-supplicant_2.10.bb"
 BBMASK .= "|meta-rdk-oss-reference-bck/recipes-connectivity/wpa-supplicant/wpa-supplicant_2.10.bb"
 BBMASK .= "|openembedded-core/meta/recipes-connectivity/wpa-supplicant/wpa-supplicant_2.11.bb"
 BBMASK .= "|meta-rdk-oss-reference/recipes-connectivity/wpa-supplicant/wpa-supplicant_%.bbappend"
 BBMASK .= "|meta-cmf-bananapi/meta-rdk-mtk-bpir4/recipes-connectivity/wpa-supplicant/wpa-supplicant_%.bbappend"
+BBMASK .= "|openembedded-core/meta/recipes-connectivity/iw/iw_6.17.bb"
 
 # Make change for Wrynose build
 IMAGE_CLASSES:remove = 'apparmor_binprofiles'
 BBMASK .= "|meta-rdk-oss-reference/recipes-gplv2/tar/tar_1.17.bb"
-INCOMPATIBLE_LICENSE_EXCEPTIONS += "${MLPREFIX}tar:GPL-3.0-only ${MLPREFIX}tar-native:GPL-3.0-only"
+INCOMPATIBLE_LICENSE_EXCEPTIONS += "${MLPREFIX}tar:GPL-3.0-only ${MLPREFIX}tar-native:GPL-3.0-only ${MLPREFIX}elfutils:GPL-3.0-or-later"
+INCOMPATIBLE_LICENSE_EXCEPTIONS += "${MLPREFIX}binutils:GPL-3.0-only ${MLPREFIX}binutils-src:GPL-3.0-only"
+INCOMPATIBLE_LICENSE_EXCEPTIONS += "${MLPREFIX}elfutils-src:GPL-3.0-or-later ${MLPREFIX}elfutils-binutils:GPL-3.0-or-later ${MLPREFIX}elfutils-dbg:GPL-3.0-or-later"
+INCOMPATIBLE_LICENSE_EXCEPTIONS += "${MLPREFIX}elfutils-staticdev:GPL-3.0-or-later ${MLPREFIX}elfutils-dev:GPL-3.0-or-later ${MLPREFIX}elfutils-doc:GPL-3.0-or-later"
+INCOMPATIBLE_LICENSE_EXCEPTIONS += "${MLPREFIX}elfutils-locale:GPL-3.0-or-later"
