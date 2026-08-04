@@ -1,7 +1,7 @@
 FILESEXTRAPATHS_prepend := "${THISDIR}/files:"
 
 SRC_URI_append = "${CMF_GITHUB_ROOT}/bananapi-sysint;protocol=https;nobranch=1;destsuffix=git/devicebpi;name=sysintdevicebpi"
-SRCREV_sysintdevicebpi = "9c9644d7cdb8a50db53b69995d10729192991b21"
+SRCREV_sysintdevicebpi = "4ebc617660feedc84a184243167191ab7347814d"
 SRCREV_FORMAT = "1.0.0"
 
 SRC_URI += "file://bpi_custom_device.properties \
