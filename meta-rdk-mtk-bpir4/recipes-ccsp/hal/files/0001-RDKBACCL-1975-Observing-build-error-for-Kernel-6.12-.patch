@@ -1,0 +1,71 @@
+From bac2db6ed692e25b54af13fce1f4d66d3ea6a01e Mon Sep 17 00:00:00 2001
+From: ssiras826 <ssiras826@cable.comcast.com>
+Date: Fri, 24 Jul 2026 18:11:27 +0530
+Subject: [PATCH] RDKBACCL-1975 : Observing build error for Kernel 6.12 builds
+
+Reason for change: Recent kernel6.12 builds are broken, since kernel6.12 using updated code of rdk-wifilibhostap
+Test Procedure: Test the wifi sanity
+Risks: Low
+Priority: P1
+
+Signed-off-by: ssiras826 <ssiras826@cable.comcast.com>
+
+Potential fix for pull request finding
+
+Co-authored-by: Copilot Autofix powered by AI <175728472+Copilot@users.noreply.github.com>
+---
+ src/wifi_hal_nl80211.c       |  5 +++++
+ src/wifi_hal_nl80211_utils.c | 10 ++++++++++
+ 2 files changed, 15 insertions(+)
+
+diff --git a/src/wifi_hal_nl80211.c b/src/wifi_hal_nl80211.c
+index f3dc636..eb4f838 100644
+--- a/src/wifi_hal_nl80211.c
++++ b/src/wifi_hal_nl80211.c
+@@ -11073,7 +11073,12 @@ int nl80211_connect_sta(wifi_interface_info_t *interface)
+         interface->wpa_s.drv_flags2 |= WPA_DRIVER_FLAGS2_MLO;
+ 
+     if (interface->wpa_s.conf) {
++#if !defined(KERNEL_6_12)
+         interface->wpa_s.conf->mld_allowed_phy = DEFAULT_MLD_ALLOWED_PHY;
++#endif
++#if defined(KERNEL_6_12)
++        interface->wpa_s.conf->disable_mld = 0;
++#endif
+         interface->wpa_s.conf->mld_force_single_link = 0;
+     }
+ #else
+diff --git a/src/wifi_hal_nl80211_utils.c b/src/wifi_hal_nl80211_utils.c
+index a93b3d0..8b3e656 100644
+--- a/src/wifi_hal_nl80211_utils.c
++++ b/src/wifi_hal_nl80211_utils.c
+@@ -6494,7 +6494,9 @@ static int alloc_mld(wifi_interface_info_t *interface)
+     hapd->mld = mld;
+     mld->refcount++;
+     mld->num_links = 0;
++#if !defined(KERNEL_6_12)
+     mld->next_link_id = 0;
++#endif
+ 
+     g_wifi_hal.mld_array.mld_count++;
+ 
+@@ -6759,8 +6761,16 @@ int setup_mlo_vap(wifi_interface_info_t *interface, wifi_vap_info_t *new_vap_con
+         struct hostapd_data *link_bss = NULL;
+         for (uint8_t i = 0; i < MAX_NUM_MLD_LINKS; i++) {
+             link_id_free = true;
++#if !defined(KERNEL_6_12)
+             hapd->mld_link_id = hapd->mld->next_link_id % MAX_NUM_MLD_LINKS;
+             hapd->mld->next_link_id++;
++#endif
++#if defined(KERNEL_6_12)
++	         if ((hapd->mld->allocated_links & BIT(i)) == 0) {
++                                hapd->mld_link_id = i;
++                                hapd->mld->allocated_links |= BIT(i);
++                        }
++#endif
+             for_each_mld_link(link_bss, hapd) {
+                 if (link_bss == hapd) {
+                     continue;
+-- 
+2.43.0
+
