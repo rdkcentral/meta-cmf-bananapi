@@ -33,6 +33,6 @@ DISTRO_FEATURES:append = " generic_mlo"
 
 # Kernel 6.6
 DISTRO_FEATURES:append = " kernel6-12"
-
+DISTRO_FEATURES:append = " rdkb_configurable_wan_interface"
 #Disable rdm-agent for reference platform
 #DISTRO_FEATURES:append = "RDM"
