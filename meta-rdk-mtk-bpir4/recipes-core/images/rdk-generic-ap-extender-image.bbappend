@@ -75,6 +75,7 @@ IMAGE_INSTALL += " \
     "
 #IMAGE_INSTALL += " opensync openvswitch mesh-agent e2fsprogs "
 
+IMAGE_INSTALL_append = " gptfdisk e2fsprogs-mke2fs util-linux util-linux-losetup coreutils"
 IMAGE_INSTALL_append_mt7988 = " ${@bb.utils.contains('DISTRO_FEATURES','kernel6-12','eth-firmware','marvell-eth-firmware',d)} mediatek-eth-firmware "
 
 BB_HASH_IGNORE_MISMATCH = "1"
@@ -105,7 +106,6 @@ remove_unused_file() {
    rm -rf ${IMAGE_ROOTFS}${systemd_unitdir}/systemd/system/CcspTr069PaSsp.service
    rm -rf ${IMAGE_ROOTFS}${systemd_unitdir}/systemd/system/webconfig.service
    rm -rf ${IMAGE_ROOTFS}${systemd_unitdir}/systemd/system/dnsmasq.service
-   rm -rf ${IMAGE_ROOTFS}${systemd_unitdir}/systemd/system/RdkFwUpgradeManager.service
    rm -rf ${IMAGE_ROOTFS}${systemd_unitdir}/systemd/system/RdkTelcoVoiceManager.service
    rm -rf ${IMAGE_ROOTFS}${systemd_unitdir}/systemd/system/RdkVlanManager.service
    rm -rf ${IMAGE_ROOTFS}${systemd_unitdir}/systemd/system/RdkWanManager.service
