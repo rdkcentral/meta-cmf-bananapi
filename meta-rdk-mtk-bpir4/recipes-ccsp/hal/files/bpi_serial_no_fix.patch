@@ -1,36 +1,32 @@
-diff -Naur platform.orig/rdkb_hal/src/platform/platform_hal.c platform/rdkb_hal/src/platform/platform_hal.c
---- platform.orig/rdkb_hal/src/platform/platform_hal.c	2026-03-12 12:07:58.349484102 +0000
-+++ platform/rdkb_hal/src/platform/platform_hal.c	2026-03-12 12:15:28.428644242 +0000
-@@ -48,6 +48,7 @@
- 
- INT platform_hal_PandMDBInit(void) { return RETURN_OK; }
- INT platform_hal_DocsisParamsDBInit(void) { return RETURN_OK; }
-+char *get_current_wan_ifname(void);
- 
- INT platform_hal_GetDeviceConfigStatus(CHAR *pValue)
- {
-@@ -106,8 +107,19 @@
+Index: platform/rdkb_hal/src/platform/platform_hal.c
+===================================================================
+--- platform.orig/rdkb_hal/src/platform/platform_hal.c
++++ platform/rdkb_hal/src/platform/platform_hal.c
+@@ -89,19 +89,17 @@ INT platform_hal_GetSerialNumber(CHAR* pValue)
  	if (pValue != NULL)
  	{
  		INT arr[6] = {0};
 -		const char *path = "/sys/class/net/eth1/address";
-+		const char *path = "/sys/class/net/lan0/address";
-+		char wan_path[128] = {0};
++		const char *path = "/nvram/serial_number.txt";
  		FILE *fp = fopen(path, "r");
-+		if (fp == NULL)
-+		{
-+		       char *wan_ifname = get_current_wan_ifname();
-+		       if (strcmp(wan_ifname, "0") != 0)
-+		       {
-+		               snprintf(wan_path, sizeof(wan_path), "/sys/class/net/%s/address", wan_ifname);
-+		               path = wan_path;
-+		               fp = fopen(path, "r");
-+		       }
-+		}
  		if (fp != NULL)
  		{
  			char *end;
-@@ -171,7 +183,7 @@
+ 			char buf[64] = {0};
+ 			fgets(buf, sizeof(buf), fp);
++			buf[strcspn(buf, "\n")] = '\0';
+ 			fclose(fp);
+-			if(6  == sscanf(buf, "%02x:%02x:%02x:%02x:%02x:%02x",&arr[0],&arr[1],&arr[2],&arr[3],&arr[4],&arr[5]))
+-			{
+-				sprintf(pValue,"%02x%02x%02x%02x%02x%02x",arr[0],arr[1],arr[2],arr[3],arr[4],arr[5]);
+-				return RETURN_OK;
+-			}	
++			sprintf(pValue,"%s",buf);
++			return RETURN_OK;
+ 		}
+ 	}
+ 	return RETURN_ERR;
+@@ -154,7 +152,7 @@ INT platform_hal_GetBaseMacAddress(CHAR *pValue)
  {
  	if (pValue != NULL)
  	{

@@ -3,7 +3,10 @@ FILESEXTRAPATHS_prepend := "${THISDIR}/files:"
 SRC_URI_remove = "${CMF_GIT_ROOT}/rdkb/components/opensource/ccsp/OneWifi;protocol=${CMF_GIT_PROTOCOL};branch=${CMF_GIT_BRANCH};name=libwebconfig"
 
 SRC_URI = "git://github.com/rdkcentral/OneWifi.git;protocol=https;branch=develop;name=libwebconfig"
-SRCREV_libwebconfig = "d75f84251c2f251b5d384ca57a29dcfdbdc2beaf"
+SRCREV_libwebconfig = "${@bb.utils.contains('DISTRO_FEATURES', 'BuildFromTip', '${AUTOREV}', '61543dfc644366392caac092e81a3511340701ab', d)}"
+
+CFLAGS_remove = " -DONEWIFI_MULTIAP_APP_SUPPORT"
+EXTRA_OECONF_remove = " ONEWIFI_MULTIAP_APP_SUPPORT=true"
 
 DEPENDS += " ${@bb.utils.contains('DISTRO_FEATURES', 'EasyMesh', ' rdk-wifi-libhostap unified-wifi-mesh-header ', '', d)}"
 EXTRA_OECONF_append = " ${@bb.utils.contains('DISTRO_FEATURES', 'EasyMesh', ' --enable-easymesh ', '', d)}"

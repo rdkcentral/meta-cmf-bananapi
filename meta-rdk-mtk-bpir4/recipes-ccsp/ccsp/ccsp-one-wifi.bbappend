@@ -4,7 +4,13 @@ FILESEXTRAPATHS_prepend := "${THISDIR}/files:"
 
 SRC_URI_remove = "${CMF_GIT_ROOT}/rdkb/components/opensource/ccsp/OneWifi;protocol=${CMF_GIT_PROTOCOL};branch=${CMF_GIT_BRANCH};name=OneWifi"
 SRC_URI = "git://github.com/rdkcentral/OneWifi.git;protocol=https;branch=develop;name=OneWifi"
-SRCREV_OneWifi = "d75f84251c2f251b5d384ca57a29dcfdbdc2beaf"
+SRCREV_OneWifi = "${@bb.utils.contains('DISTRO_FEATURES', 'BuildFromTip', '${AUTOREV}', '61543dfc644366392caac092e81a3511340701ab', d)}"
+
+SRC_URI_remove += "git://github.com/rdk-gdcs/lan_web.git;protocol=https;branch=main_branch_multiap_update;name=lan_web;destsuffix=lan_web"
+CFLAGS_remove = " -DONEWIFI_MULTIAP_APP_SUPPORT"
+EXTRA_OECONF_remove = " ONEWIFI_MULTIAP_APP_SUPPORT=true"
+SRCREV_FORMAT = "OneWifi"
+
 DEPENDS_append = " mesh-agent "
 DEPENDS_remove = " opensync "
 DEPENDS += " ${@bb.utils.contains('DISTRO_FEATURES', 'EasyMesh', ' rdk-wifi-libhostap ', '', d)}"
@@ -38,6 +44,12 @@ SRC_URI += " \
     ${@bb.utils.contains('DISTRO_FEATURES', 'EasyMesh', bb.utils.contains('DISTRO_FEATURES', 'em_extender', 'file://onewifi_pre_start_em_ext.sh ','file://onewifi_pre_start_em_ctrl.sh ', d), 'file://onewifi_pre_start.sh ', d)} \
     file://wifi_defaults.txt \
 "
+
+do_compile_prepend() {
+    mkdir -p ${S}/../lan_web/
+    touch ${S}/../lan_web/multiap_stub_removed
+}
+
 do_install_append(){
     install -m 777 ${WORKDIR}/checkwifi.sh ${D}/usr/ccsp/wifi/
     install -m 777 ${WORKDIR}/onewifi_pre_*.sh ${D}/usr/ccsp/wifi/onewifi_pre_start.sh

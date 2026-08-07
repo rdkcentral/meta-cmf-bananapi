@@ -50,6 +50,33 @@ POSTD_START_FILE="/tmp/.postd_started"
 BRIDGE_MODE_TABLE=69
 
 
+#Setting erouter0 as default wan_if
+wan_if="erouter0"
+determine_wan_ifname()
+{
+   retry=0
+   while [ "30" -ge "$retry" ]
+   do
+      retry=`expr $retry + 1`
+      interface1_status=`dmcli eRT getv Device.X_RDK_WanManager.Interface.1.Status | grep value | cut -d':' -f3 | xargs`
+      interface2_status=`dmcli eRT getv Device.X_RDK_WanManager.Interface.2.Status | grep value | cut -d':' -f3 | xargs`
+      if [ "$interface1_status" == "Active" ] || [ "$interface2_status" == "Active" ]; then
+          break
+      fi
+      sleep 1
+   done
+   #Currently BPI has 2 Interfaces
+   interface1_status=`dmcli eRT getv Device.X_RDK_WanManager.Interface.1.Status | grep value | cut -d':' -f3 | xargs`
+   if [ "$interface1_status" == "Active" ]; then
+      interface_name=`dmcli eRT getv Device.X_RDK_WanManager.Interface.1.VirtualInterface.1.Name | grep value | cut -d':' -f3 | xargs`
+      wan_if=$interface_name
+      return
+   fi
+   interface_name=`dmcli eRT getv Device.X_RDK_WanManager.Interface.2.VirtualInterface.1.Name | grep value | cut -d':' -f3 | xargs`
+   wan_if=$interface_name
+   #Legacy approach to determine wan interface name
+   #wan_if=`sysevent get current_wan_ifname`
+}
 
 #-------------------------------------------------------------
 # Registration/Deregistration of dhcp client restart/release/renew handlers
@@ -196,10 +223,8 @@ add_ebtable_rule()
     cmdiag_if=`syscfg get cmdiag_ifname`
     cmdiag_if_mac=`ip link show "$cmdiag_if" | awk '/link/ {print $2}'`
     cmdiag_ip="192.168.100.1"
-    wan_if=`syscfg get wan_physical_ifname`
 
 
-    wan_if=`syscfg get wan_physical_ifname` #erouter0
     subnet_wan=`ip route show | awk '/'"$wan_if"'/ {print $1}' | tail -1` 
 
      echo "###############################################"
@@ -236,7 +261,6 @@ del_ebtable_rule()
     cmdiag_if=`syscfg get cmdiag_ifname`
     cmdiag_if_mac=`ip link show "$cmdiag_if" | awk '/link/ {print $2}'`
     
-    wan_if=`syscfg get wan_physical_ifname`
     wan_ip=`sysevent get ipv4_wan_ipaddr`
     subnet_wan=`ip route show | grep "$cmdiag_if" | grep -v 192.168.100. | grep -v 10.0.0 | awk '/'"$cmdiag_if"'/ {print $1}'`
 
@@ -276,7 +300,7 @@ do_start()
 
 
    # enslave interfaces to the bridge
-   enslave_a_interface "$SYSCFG_wan_physical_ifname" "$SYSCFG_lan_ifname"
+   enslave_a_interface "$wan_if" "$SYSCFG_lan_ifname"
    for loop in $LAN_IFNAMES
    do
       enslave_a_interface "$loop" "$SYSCFG_lan_ifname"
@@ -286,7 +310,7 @@ do_start()
    ip link set "$SYSCFG_lan_ifname" up 
    ip link set "$SYSCFG_lan_ifname" allmulticast on
 
-   ifconfig "$SYSCFG_lan_ifname" hw ether "`get_mac "$SYSCFG_wan_physical_ifname"`" 
+   ifconfig "$SYSCFG_lan_ifname" hw ether "`get_mac "$wan_if"`"
 
    # bridge_mode 1 is dhcp, bridge_mode 2 is static
    if [ "2" = "$SYSCFG_bridge_mode" ] && [ -n "$SYSCFG_bridge_ipaddr" ] && [ -n "$SYSCFG_bridge_netmask" ] && [ -n "$SYSCFG_bridge_default_gateway" ]; then
@@ -349,7 +373,7 @@ do_stop()
       ip link set "$loop" down
       brctl delif "$SYSCFG_lan_ifname" "$loop"
    done
-   ip link set "$SYSCFG_wan_physical_ifname" down
+   ip link set "$wan_if" down
 
    ip link set "$SYSCFG_lan_ifname" down
 
@@ -524,16 +548,15 @@ virtual_interface_ebtables_rules ()
 wan_wait ()
 {
    retry=0
-   WAN_INTERFACE=erouter0
-   if [ ! -f /tmp/wan_ip_assigned_to_erouter0 ]; then
+   if [ ! -f /tmp/wan_ip_assigned_to_erouter ]; then
    while [ "30" -ge "$retry" ]
    do
        sleep 1
        retry=`expr $retry + 1`
        #Make sure WAN interface has an IP address before mounting to brlan0
-       WAN_IP=`ifconfig -a "$WAN_INTERFACE" | grep inet | grep -v inet6 | tr -s " " | cut -d ":" -f2 | cut -d " " -f1`
+       WAN_IP=`ifconfig -a "$wan_if" | grep inet | grep -v inet6 | tr -s " " | cut -d ":" -f2 | cut -d " " -f1`
        if [ -n "$WAN_IP" ] ; then
-          touch /tmp/wan_ip_assigned_to_erouter0
+          touch /tmp/wan_ip_assigned_to_erouter
           break
        fi
    done
@@ -565,13 +588,20 @@ add_to_group()
   brctl addif "$bridge_name" "$lan_ethernet_ifname"
 
   cmdiag_if=`syscfg get cmdiag_ifname`
-  wan_if=`syscfg get wan_physical_ifname`
   
   echo "brctl addif brlan0 l$cmdiag_if"
   brctl addif brlan0 l"$cmdiag_if"
 
-  echo "brctl addif brlan0 $wan_if"
-  brctl addif brlan0 "$wan_if"
+  if [ -f /sys/class/net/$wan_if/bridge/bridge_id ]; then
+        ip link add wanbr-link type veth peer name lanbr-link
+        brctl addif $wan_if wanbr-link
+        brctl addif brlan0 lanbr-link
+        ip link set up dev wanbr-link
+        ip link set up dev lanbr-link
+  else
+        echo "brctl addif brlan0 $wan_if"
+        brctl addif brlan0 "$wan_if"
+  fi
 
   echo "brctl delif $bridge_name wifi0 wifi1 wifi2"
   brctl delif "$bridge_name" wifi0
@@ -605,10 +635,22 @@ del_from_group()
   brctl addif "$bridge_name" mld0
 
   cmdiag_if=`syscfg get cmdiag_ifname`
-  wan_if=`syscfg get wan_physical_ifname`
+
+  if [ -f /sys/class/net/$wan_if/bridge/bridge_id ]; then
+        ip link del wanbr-link
+        brctl delif brlan0 l$cmdiag_if
+        return
+  fi
 
   echo "brctl delif brlan0 l$cmdiag_if $wan_if"
   brctl delif brlan0 l$cmdiag_if "$wan_if"
+
+  bridge_curr_status=`ifconfig -a brlan0 | grep "inet addr" | cut -d ':' -f2 | cut -d ' ' -f1`
+  lan_ipaddr=`syscfg get lan_ipaddr`
+  lan_netmask=`syscfg get lan_netmask`
+  if [ -z "$bridge_curr_status" ]; then
+     ifconfig "$bridge_name" "$lan_ipaddr" netmask "$lan_netmask" up
+  fi
 }
 
 filter_local_traffic()
@@ -761,6 +803,7 @@ CMDIAG_IF=`syscfg get cmdiag_ifname`
 INSTANCE=`sysevent get primary_lan_l2net`
 LAN_NETMASK=`syscfg get lan_netmask`
 
+determine_wan_ifname
 
 service_init 
 echo "service_bridge.sh called with $1 $2" > /dev/console

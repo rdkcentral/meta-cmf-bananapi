@@ -7,6 +7,8 @@ DISTRO_FEATURES_append = " rdkb_wan_manager"
 
 DISTRO_FEATURES_append = " halVersion3"
 
+DISTRO_FEATURES_append = " bridgeUtilsBin"
+
 #rdk-wifi-libhostap support for broadband
 DISTRO_FEATURES_append = " HOSTAPD_2_11"
 
@@ -19,6 +21,8 @@ DISTRO_FEATURES_append = " no_moca_support"
 DISTRO_FEATURES_append = " referencepltfm "
 
 MACHINEOVERRIDES_append =. "${@bb.utils.contains('DISTRO_FEATURES', 'OneWifi', ':onewifi', '' ,d)}"
+
+MACHINEOVERRIDES_append = "${@bb.utils.contains('DISTRO_FEATURES', 'kernel6-6', ':kernel6-6', bb.utils.contains('DISTRO_FEATURES', 'kernel6-12', ':kernel6-12','',d), d)}"
 
 DISTRO_FEATURES_append = " CPUPROCANALYZER_BROADBAND"
 
@@ -46,6 +50,9 @@ DISTRO_FEATURES_remove = " lan0_as_wan"
 #DISTRO_FEATURES_append = " Em_Unittest"
 PREFERRED_VERSION_go = "1.24.%"
 
+#Enable below distro to build Easymesh and dependent Wi-Fi components from tip (AUTOREV) during CI validation
+#DISTRO_FEATURES_append = " BuildFromTip"
+
 #Enable wps support
 DISTRO_FEATURES_append = " wps_support"
 
@@ -54,6 +61,7 @@ DISTRO_FEATURES_append = " resource_optimization"
 
 #Enable kernel_6_6 support
 DISTRO_FEATURES_append = " kernel6-6"
+#DISTRO_FEATURES_append = " kernel6-12"
 
 DISTRO_FEATURES_append = " CONFIG_IEEE80211BE"
 
@@ -76,3 +84,4 @@ DISTRO_FEATURES_append = " rrd"
 #Enable MAP-T
 DISTRO_FEATURES_append = " feature_mapt"
 DISTRO_FEATURES_append = " nat46"
+LINUXLIBCVERSION = "${@bb.utils.contains('DISTRO_FEATURES', 'kernel6-12', '6.12%', bb.utils.contains('DISTRO_FEATURES','kernel6-6', '6.6%', '5.4%',d), d)}"

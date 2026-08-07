@@ -59,8 +59,8 @@ IMAGE_INSTALL += " \
     strongswan \
     libpcap \
     tcpdump \
-    ${@bb.utils.contains('DISTRO_FEATURES','kernel6-6','linux-firmware-mt7988  fitblk','',d)} \
-    ${@bb.utils.contains('DISTRO_FEATURES','kernel6-6','','perf',d)} \
+    ${@bb.utils.contains_any('DISTRO_FEATURES','kernel6-6 kernel6-12','linux-firmware-mt7988  fitblk','',d)} \
+    ${@bb.utils.contains_any('DISTRO_FEATURES','kernel6-6 kernel6-12','','perf',d)} \
     ${@bb.utils.contains('DISTRO_FEATURES','mt76','packagegroup-filogic-mt76','',d)} \
     ${@bb.utils.contains('DISTRO_FEATURES','em_extender','packagegroup-ap-extender','',d)} \
     ${@bb.utils.contains('DISTRO_FEATURES','logan','packagegroup-filogic-logan','',d)} \
@@ -75,7 +75,7 @@ IMAGE_INSTALL += " \
     "
 #IMAGE_INSTALL += " opensync openvswitch mesh-agent e2fsprogs "
 
-IMAGE_INSTALL_append_mt7988 += " marvell-eth-firmware mediatek-eth-firmware "
+IMAGE_INSTALL_append_mt7988 = " ${@bb.utils.contains('DISTRO_FEATURES','kernel6-12','eth-firmware','marvell-eth-firmware',d)} mediatek-eth-firmware "
 
 BB_HASH_IGNORE_MISMATCH = "1"
 IMAGE_NAME[vardepsexclude] = "DATETIME"
@@ -99,6 +99,16 @@ require ${TOPDIR}/../meta-cmf-filogic/recipes-core/images/image-exclude-files.in
 
 remove_unused_file() {
    for i in ${REMOVED_FILE_LIST} ; do rm -rf ${IMAGE_ROOTFS}/$i ; done
+   rm -rf ${IMAGE_ROOTFS}${systemd_unitdir}/systemd/system/CcspEthAgent.service
+   rm -rf ${IMAGE_ROOTFS}${systemd_unitdir}/systemd/system/PsmSsp.service
+   rm -rf ${IMAGE_ROOTFS}${systemd_unitdir}/systemd/system/CcspLMLite.service
+   rm -rf ${IMAGE_ROOTFS}${systemd_unitdir}/systemd/system/CcspTr069PaSsp.service
+   rm -rf ${IMAGE_ROOTFS}${systemd_unitdir}/systemd/system/webconfig.service
+   rm -rf ${IMAGE_ROOTFS}${systemd_unitdir}/systemd/system/dnsmasq.service
+   rm -rf ${IMAGE_ROOTFS}${systemd_unitdir}/systemd/system/RdkFwUpgradeManager.service
+   rm -rf ${IMAGE_ROOTFS}${systemd_unitdir}/systemd/system/RdkTelcoVoiceManager.service
+   rm -rf ${IMAGE_ROOTFS}${systemd_unitdir}/systemd/system/RdkVlanManager.service
+   rm -rf ${IMAGE_ROOTFS}${systemd_unitdir}/systemd/system/RdkWanManager.service
 }
 ROOTFS_POSTPROCESS_COMMAND_append = "remove_unused_file; "
 
@@ -114,7 +124,7 @@ do_filogic_gen_image(){
             cp ${DEPLOY_DIR_IMAGE}/fitImage ${IMGDEPLOYDIR}/sysupgrade-${PN}-${MACHINE}/kernel
             cp ${IMGDEPLOYDIR}/${PN}-${MACHINE}.squashfs-xz ${IMGDEPLOYDIR}/sysupgrade-${PN}-${MACHINE}/root
 
-            if ${@bb.utils.contains('DISTRO_FEATURES','kernel6-6','true','false',d)}; then
+            if ${@bb.utils.contains_any('DISTRO_FEATURES','kernel6-6 kernel6-12','true','false',d)}; then
                 fit-rootfs-hash-tool ${IMGDEPLOYDIR}/sysupgrade-${PN}-${MACHINE}/kernel ${IMGDEPLOYDIR}/sysupgrade-${PN}-${MACHINE}/root
             fi
             cd ${IMGDEPLOYDIR}
@@ -132,7 +142,7 @@ do_filogic_gen_image(){
 
             cp ${IMGDEPLOYDIR}/${PN}-${MACHINE}.squashfs-xz ${IMGDEPLOYDIR}/sysupgrade-${PN}-${MACHINE}-sb/root
 
-            if ${@bb.utils.contains('DISTRO_FEATURES','kernel6-6','true','false',d)}; then
+            if ${@bb.utils.contains_any('DISTRO_FEATURES','kernel6-6 kernel6-12','true','false',d)}; then
                 fit-rootfs-hash-tool ${IMGDEPLOYDIR}/sysupgrade-${PN}-${MACHINE}-sb/kernel ${IMGDEPLOYDIR}/sysupgrade-${PN}-${MACHINE}-sb/root
             fi
             cd ${IMGDEPLOYDIR}
