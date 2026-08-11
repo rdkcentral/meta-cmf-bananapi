@@ -317,7 +317,7 @@
   <Record name="dmsb.l2net.1.InstanceNum" type="astr">1</Record>
   <Record name="dmsb.l2net.1.Type" type="astr">Bridge</Record>
   <Record name="dmsb.l2net.1.Members.SW" type="astr">sw_1 sw_2 sw_3 sw_4 sw_5</Record>
-  <Record name="dmsb.l2net.1.Members.Eth" type="astr"> </Record>
+  <Record name="dmsb.l2net.1.Members.Eth" type="astr">lan1 lan2 lan3</Record>
   <Record name="dmsb.l2net.1.Members.Moca" type="astr"> </Record>
   <Record name="dmsb.l2net.1.Members.Gre" type="astr"> </Record>
   <Record name="dmsb.l2net.1.Members.WiFi" type="astr">ath0 ath1</Record>

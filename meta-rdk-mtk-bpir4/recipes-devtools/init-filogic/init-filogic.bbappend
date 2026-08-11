@@ -5,6 +5,7 @@ do_install_append(){
    if [ $DISTRO_EM_EXT_ENABLED = 'false' ]; then
        sed -i '/brctl addif brlan0 lan0/d' ${D}${sbindir}/init-bridge.sh
    fi
+   sed -i '/eth2/,/fi/ s/^/#/' ${D}${sbindir}/init-bridge.sh
 sed -i '/model/a \
 while [ `mount | grep nvram | wc -l` -eq 0 ]; do usleep 500000 ; done; \
 if [ ! -d /nvram/secure ]; then \
@@ -27,6 +28,7 @@ fi' ${D}${sbindir}/init-bridge.sh
 #Mounting nvram
    sed -i '/Before=CcspPandMSsp.service/a Requires=mount-nvram.service' ${D}/lib/systemd/system/init-Lanbridge.service
    sed -i 's/utopia.service/mount-nvram.service &/' ${D}/lib/systemd/system/init-Lanbridge.service
+   sed -i '/After=hostapd.service/d' ${D}/lib/systemd/system/init-IPv6.service
 }
 
 #ESDK support - Avoid conflict file is installed by both systemd and init-filogic in kirkstone

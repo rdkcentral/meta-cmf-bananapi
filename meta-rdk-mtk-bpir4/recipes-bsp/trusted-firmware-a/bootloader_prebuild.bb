@@ -17,7 +17,7 @@ do_configure[noexec] = "1"
 # since there is no 'main' package generated (empty)
 RDEPENDS_${PN}-dev = ""
 
-SRC_URI_append = " ${@bb.utils.contains('DISTRO_FEATURES', 'kernel6-6', \
+SRC_URI_append = " ${@bb.utils.contains_any('DISTRO_FEATURES', 'kernel6-6 kernel6-12', \
     ' file://bpi-r4_sdmmc_bl2_6-6.img \
       file://bpi-r4_sdmmc_fip_6-6.bin \
       file://bpi-r4_sdmmc_bl2_B_6-6.img \
@@ -29,8 +29,8 @@ SRC_URI_append = " ${@bb.utils.contains('DISTRO_FEATURES', 'kernel6-6', \
 
 do_deploy() {
         mkdir -p ${DEPLOYDIR}/atf/
-        if ${@bb.utils.contains('DISTRO_FEATURES', 'kernel6-6', 'true', 'false', d)}; then
-        echo "Deploying kernel 6.6 BL2/FIP binaries..."
+        if ${@bb.utils.contains_any('DISTRO_FEATURES', 'kernel6-6 kernel6-12', 'true', 'false', d)}; then
+        echo "Deploying kernel 6.x BL2/FIP binaries..."
         install -m 0644 ${WORKDIR}/bpi-r4_sdmmc_bl2_6-6.img ${DEPLOYDIR}/atf/
         install -m 0644 ${WORKDIR}/bpi-r4_sdmmc_bl2_B_6-6.img ${DEPLOYDIR}/atf/
         install -m 0644 ${WORKDIR}/bpi-r4_sdmmc_fip_6-6.bin ${DEPLOYDIR}/atf/

@@ -23,6 +23,25 @@ _TOPDIR=`pwd`
 
 export RDK_BSP_LAYER=none
 
+if [ "X$MP_version" == "X4.3" ] && [ ! -e ${_TOPDIR}/meta-cmf-filogic/MP4_3_applied ] && [ ! -e ${_TOPDIR}/meta-filogic/MP4_3_applied ];
+then
+    cd ${_TOPDIR}/meta-filogic
+    git checkout 77e17792f60279b6e1deb1f1c6abf5705972bc6f
+    cd -
+    cd ${_TOPDIR}/meta-cmf-filogic
+    git checkout a68043b58a049ee5a93f3509c1f268fea73cc388
+    cd -
+    sed -i '/^#*DISTRO_FEATURES_append = " kernel6-12"$/s/^#//' \
+    ${_TOPDIR}/meta-cmf-bananapi/conf/distro/include/{rdk-bpi.inc,rdk-bpi-ap-extender.inc}
+    sed -i '/^DISTRO_FEATURES_append = " kernel6-6"$/s/^/#/' \
+    ${_TOPDIR}/meta-cmf-bananapi/conf/distro/include/{rdk-bpi.inc,rdk-bpi-ap-extender.inc}
+    echo 'RDEPENDS:${PN}-dev = ""' >> ${_TOPDIR}/meta-filogic/recipes-kernel/linux6-12-libc-headers/linux-libc-headers.inc
+    #since rdm-agent recipe updated, commented rdm-agent recipe lines from filogic source to avoid build issues
+    sed -i '150,$ s/^/#/' ${_TOPDIR}/meta-cmf-filogic/setup-environment
+    touch ${_TOPDIR}/meta-cmf-filogic/MP4_3_applied
+    touch ${_TOPDIR}/meta-filogic/MP4_3_applied
+fi
+
 #select filogic880-bpi-r4.conf for BPI R4
 if [ -e "${_TOPDIR}/meta-cmf-filogic/setup-environment-release" ]; then
 	source meta-cmf-filogic/setup-environment-release
@@ -94,7 +113,6 @@ if [ ! -e ${_TOPDIR}/meta-rdk/recipes-common/rdm-agent/rdm_hal_change ]; then
     touch ${_TOPDIR}/meta-rdk/recipes-common/rdm-agent/rdm_hal_change
 fi
 
-
 if [ "X$FEATURE_TYPE" == "XEasyMesh" ]; then
     sed -i '/EasyMesh/s/^#//' ${_TOPDIR}/meta-cmf-bananapi/conf/distro/include/rdk-bpi.inc
     sed -i '/with_alsap/s/^#//' ${_TOPDIR}/meta-cmf-bananapi/conf/distro/include/rdk-bpi.inc
@@ -102,6 +120,11 @@ if [ "X$FEATURE_TYPE" == "XEasyMesh" ]; then
     if [ "X$EM_UNITTEST" == "Xyes" ]; then
     	sed -i '/Em_Unittest/s/^#//' ${_TOPDIR}/meta-cmf-bananapi/conf/distro/include/rdk-bpi.inc
     fi	
+fi
+
+if [ "X$ci_Staged_AUTOREV_Validation_Enabled" == "Xyes" ]; then
+    sed -i '/BuildFromTip/s/^#//' ${_TOPDIR}/meta-cmf-bananapi/conf/distro/include/rdk-bpi.inc
+    sed -i '/BuildFromTip/s/^#//' ${_TOPDIR}/meta-cmf-bananapi/conf/distro/include/rdk-bpi-ap-extender.inc
 fi
 
 if [ "X$FEATURE_TYPE" == "XEasyMesh" ] && [ "X$WITHOUT_ALSAP" == "Xyes" ]; then
@@ -123,11 +146,11 @@ if [ "X$BPI_IMG_TYPE" == "Xnand" ]; then
 else # SD card image is default
     mkdir -p ${_TOPDIR}/downloads
     if [ -f ${_TOPDIR}/downloads/bpi-r4_sdmmc_bl2_6-6.img ] && [ -f ${_TOPDIR}/downloads/bpi-r4_sdmmc_fip_6-6.bin ] && [ -f ${_TOPDIR}/downloads/bpi-r4_sdmmc_bl2_B_6-6.img ] && [ -f ${_TOPDIR}/downloads/bpi-r4_sdmmc_fip_B_6-6.bin ]; then
-	    echo "Both bl2 and fip binaries are present in local workspace for 6.6 kernel."
+	    echo "Both bl2 and fip binaries are present in local workspace for 6.x kernel."
     else
 	    echo "**********************************************************************"
 	    echo "> Missing files are preventing the build from starting:"
-	    echo "> The BL2 and FIP binaries for kernel-6.6 aren't in the downloads directory. Copy these binaries into the directory and then restart the build. You can find instructions for creating the necessary binaries on the RDK-B Code Releases page: (https://wiki.rdkcentral.com/display/CMF/RDK-B+Code+Releases)"
+	    echo "> The BL2 and FIP binaries for kernel-6.x aren't in the downloads directory. Copy these binaries into the directory and then restart the build. You can find instructions for creating the necessary binaries on the RDK-B Code Releases page: (https://wiki.rdkcentral.com/display/CMF/RDK-B+Code+Releases)"
 	    echo "**********************************************************************"
 	    return 1
      fi
