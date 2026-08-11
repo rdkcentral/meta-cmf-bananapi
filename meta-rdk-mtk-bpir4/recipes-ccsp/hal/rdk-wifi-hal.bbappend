@@ -21,6 +21,7 @@ SRC_URI += " \
   ${@bb.utils.contains('DISTRO_FEATURES', 'EasyMesh', ' file://InterfaceMap_em.json ', 'file://InterfaceMap.json ', d)} \
   ${@bb.utils.contains('DISTRO_FEATURES', 'EasyMesh', bb.utils.contains('DISTRO_FEATURES', 'em_extender', 'file://EasymeshCfg_ext.json ','file://EasymeshCfg.json ', d), ' ', d)} \
   file://0001-RDKBACCL-1975-Observing-build-error-for-Kernel-6.12-.patch;patchdir=../ \
+  file://0002-RDKBACCL-2025-Observing-build-issues-in-non-mlo-q2-r.patch;patchdir=../ \
 "
 
 # Install InterfaceMap.json in /usr/ccsp/wifi
