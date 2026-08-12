@@ -28,9 +28,9 @@ SRC_URI = " \
 do_install() {
       echo "Installing service and script files."
       mkdir -p ${D}${base_libdir}/rdk
-      install -m 0777 ${WORKDIR}/mount-nvram.sh ${D}${base_libdir}/rdk/
+      install -m 0777 ${UNPACKDIR}/mount-nvram.sh ${D}${base_libdir}/rdk/
       mkdir -p ${D}${systemd_unitdir}/system
-      install -m 0644 ${WORKDIR}/mount-nvram.service ${D}${systemd_unitdir}/system/
+      install -m 0644 ${UNPACKDIR}/mount-nvram.service ${D}${systemd_unitdir}/system/
 }
 
 FILES:${PN} = " \

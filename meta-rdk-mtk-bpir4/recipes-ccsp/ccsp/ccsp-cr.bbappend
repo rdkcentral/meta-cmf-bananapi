@@ -7,6 +7,7 @@ SRC_URI:append = " \
 
 do_install:append() {
     # Config files and scripts
-    install -m 644 ${WORKDIR}/cr-deviceprofile_bpi.xml ${D}/usr/ccsp/cr-deviceprofile.xml
-    install -m 644 ${WORKDIR}/cr-deviceprofile_bpi.xml ${D}/usr/ccsp/cr-ethwan-deviceprofile.xml
+    install -m 644 ${UNPACKDIR}/cr-deviceprofile_bpi.xml ${D}/usr/ccsp/cr-deviceprofile.xml
+    install -m 644 ${UNPACKDIR}/cr-deviceprofile_bpi.xml ${D}/usr/ccsp/cr-ethwan-deviceprofile.xml
 }
+CFLAGS:append:wrynose = "-Wno-error=header-guard"

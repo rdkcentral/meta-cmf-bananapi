@@ -39,9 +39,9 @@ SRC_URI += " \
     file://wifi_defaults.txt \
 "
 do_install:append(){
-    install -m 777 ${WORKDIR}/checkwifi.sh ${D}/usr/ccsp/wifi/
-    install -m 777 ${WORKDIR}/onewifi_pre_*.sh ${D}/usr/ccsp/wifi/onewifi_pre_start.sh
-    install -m 644 ${WORKDIR}/wifi_defaults.txt ${D}/usr/ccsp/wifi/
+    install -m 777 ${UNPACKDIR}/checkwifi.sh ${D}/usr/ccsp/wifi/
+    install -m 777 ${UNPACKDIR}/onewifi_pre_*.sh ${D}/usr/ccsp/wifi/onewifi_pre_start.sh
+    install -m 644 ${UNPACKDIR}/wifi_defaults.txt ${D}/usr/ccsp/wifi/
 }
 
 FILES:${PN} += " \
