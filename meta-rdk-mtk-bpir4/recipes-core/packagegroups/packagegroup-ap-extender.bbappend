@@ -4,6 +4,8 @@ RDEPENDS_packagegroup-ap-extender = "\
     ccsp-common-startup \
     sysint-broadband \
     ccsp-one-wifi \
+    telemetry \
+    webconfig-framework \  
     rbus \
     ccsp-gwprovapp \
     ccsp-cr \
