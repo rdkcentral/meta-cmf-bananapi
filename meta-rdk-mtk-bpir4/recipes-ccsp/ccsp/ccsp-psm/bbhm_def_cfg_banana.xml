@@ -1280,16 +1280,12 @@
    <Record name="dmsb.wanmanager.if.1.AliasName" type="astr">WanOE</Record>
    <Record name="dmsb.wanmanager.if.1.Enable" type="astr">TRUE</Record>
    <Record name="dmsb.wanmanager.if.1.ActiveLink" type="astr">FALSE</Record>
-   <Record name="dmsb.wanmanager.if.1.Type" type="astr">2</Record>
-   <Record name="dmsb.wanmanager.if.1.ConnectionType" type="astr">1</Record>
+   <Record name="dmsb.wanmanager.if.1.ConnectionType" type="astr">0</Record>
    <Record name="dmsb.wanmanager.if.1.Priority" type="astr">0</Record>
    <Record name="dmsb.wanmanager.if.1.SelectionTimeout" type="astr">20</Record>
    <Record name="dmsb.wanmanager.if.1.EnablePPP" type="astr">FALSE</Record>
    <Record name="dmsb.wanmanager.if.1.EnableMAPT" type="astr">TRUE</Record>
    <Record name="dmsb.wanmanager.if.1.EnableDSLite" type="astr">FALSE</Record>
-   <Record name="dmsb.wanmanager.if.1.EnableIPoE" type="astr">TRUE</Record>
-   <Record name="dmsb.wanmanager.if.1.DynTriggerEnable" type="astr">FALSE</Record>
-   <Record name="dmsb.wanmanager.if.1.DynTriggerDelay" type="astr">0</Record>
    <Record name="dmsb.wanmanager.if.1.Marking.List" type="astr">DATA</Record>
    <Record name="dmsb.wanmanager.if.1.Marking.DATA.Alias" type="astr">DATA</Record>
    <Record name="dmsb.wanmanager.if.1.Marking.DATA.SKBPort" type="astr">1</Record>
@@ -1300,7 +1296,6 @@
    <Record name="dmsb.wanmanager.if.1.PPPLinkType" type="astr">PPPoE</Record>
    <Record name="dmsb.wanmanager.if.1.PPPIPCPEnable" type="astr">FALSE</Record>
    <Record name="dmsb.wanmanager.if.1.PPPIPV6CPEnable" type="astr">FALSE</Record>
-   <Record name="dmsb.wanmanager.if.1.EnableIPoEHealthCheck" type="astr">FALSE</Record>
    <Record name="dmsb.wanmanager.if.1.RebootOnConfiguration" type="astr">TRUE</Record>
    <Record name="dmsb.wanmanager.if.1.Group" type="astr">1</Record>
 
