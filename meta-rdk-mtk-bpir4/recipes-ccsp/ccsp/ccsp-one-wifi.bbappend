@@ -16,6 +16,11 @@ SRC_URI += " \
 do_compile_prepend() {
     mkdir -p ${S}/../lan_web/
     touch ${S}/../lan_web/multiap_stub_removed
+    touch ${S}/scripts/mesh_aclmac.sh
+    touch ${S}/scripts/mesh_setip.sh
+    touch ${S}/scripts/meshapcfg.sh
+    touch ${S}/scripts/handle_mesh
+    touch ${S}/scripts/mesh_status.sh
 }
 
 do_install_append(){
