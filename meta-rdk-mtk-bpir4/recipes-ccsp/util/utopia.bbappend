@@ -1,12 +1,13 @@
 include meta-rdk-mtk-bpir4/recipes-ccsp/ccsp/ccsp_common_bananapi.inc
 
-FILESEXTRAPATHS_prepend := "${THISDIR}/${PN}:"
+FILESEXTRAPATHS:prepend := "${THISDIR}/${PN}:"
 
 SRC_URI += "file://service_bridge_bpi.sh"
+SRC_URI += "file://0001-RDKBACCL-1853-SSH-and-WebUI-not-working-Ethernet-Con.patch"
 
-CFLAGS_append  = " ${@bb.utils.contains('DISTRO_FEATURES', 'matter', ' -DFEATURE_MATTER_ENABLED', '', d)}"
+CFLAGS:append  = " ${@bb.utils.contains('DISTRO_FEATURES', 'matter', ' -DFEATURE_MATTER_ENABLED', '', d)}"
 
-do_install_append() {
+do_install:append() {
 
 install -d ${D}${sysconfdir}/
 install -d ${D}${sysconfdir}/utopia/
@@ -48,10 +49,10 @@ sed -i 's/^$CosaNAT::port_trigger_enabled=1/$CosaNAT::port_trigger_enabled=0/' $
 #Script for enabling bridge mode in BPIR4.
 #Renaming 6G interface name for WifiAgent
 if [ "${@bb.utils.contains('DISTRO_FEATURES', 'OneWifi', 'true', 'false', d)}" == "false" ]; then
-    sed -i "s/wifi2/wifi16/g" ${WORKDIR}/service_bridge_bpi.sh
+    sed -i "s/wifi2/wifi16/g" ${UNPACKDIR}/service_bridge_bpi.sh
 fi
-install -m 755 ${WORKDIR}/service_bridge_bpi.sh ${D}${sysconfdir}/utopia/service.d/
-install -m 755 ${WORKDIR}/service_bridge_bpi.sh ${D}${sysconfdir}/utopia/service.d/service_bridge.sh
+install -m 755 ${UNPACKDIR}/service_bridge_bpi.sh ${D}${sysconfdir}/utopia/service.d/
+install -m 755 ${UNPACKDIR}/service_bridge_bpi.sh ${D}${sysconfdir}/utopia/service.d/service_bridge.sh
 
 sed -i '/^#TOT_MSG_MAX=\$/s/^#//' ${D}${sysconfdir}/utopia/utopia_init.sh
 
@@ -123,9 +124,9 @@ ln -sf /usr/sbin/log_handle.sh ${D}/fss/gw/usr/sbin/log_handle.sh
 
 
 #Mounting nvram
-sed -i '/Before=CcspPandMSsp.service/a Requires=mount-nvram.service' ${D}/lib/systemd/system/ApplySystemDefaults.service
+sed -i '/Before=CcspPandMSsp.service/a Requires=mount-nvram.service' ${D}${libdir}/systemd/system/ApplySystemDefaults.service
 }
 
-FILES_${PN} += " \
+FILES:${PN} += " \
                 /minidumps/ \
 "

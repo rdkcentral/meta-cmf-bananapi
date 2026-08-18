@@ -1,13 +1,13 @@
 include ccsp_common_bananapi.inc
 
-FILESEXTRAPATHS_prepend := "${THISDIR}/${PN}:${THISDIR}/files:"
+FILESEXTRAPATHS:prepend := "${THISDIR}/${BPN}:${THISDIR}/files:"
 
 SRC_URI_append = " \
                    file://gwprovapp.conf \
                 "
-CFLAGS_aarch64_append = " -Werror=format-truncation=1 "
+CFLAGS:aarch64:append = " -Werror=format-truncation=1 "
 
-do_install_append_class-target() {
+do_install:append:class-target() {
    install -D -m 0644 ${S}/systemd_units/parodus.service ${D}${systemd_unitdir}/system/parodus.service
    install -D -m 0644 ${S}/systemd_units/webpa.service ${D}${systemd_unitdir}/system/webpa.service
    sed -i 's/parodusCmd.cmd &/parodusCmd.cmd/' ${D}${systemd_unitdir}/system/parodus.service
@@ -50,7 +50,7 @@ do_install_append_class-target() {
    install -D -m 0644 ${S}/systemd_units/notifyComp.service ${D}${systemd_unitdir}/system/notifyComp.service
    install -D -m 0644 ${S}/systemd_units/gwprovapp.service ${D}${systemd_unitdir}/system/gwprovapp.service
    sed -i "s/After=securemount.service/After=PsmSsp.service/g" ${D}${systemd_unitdir}/system/gwprovapp.service
-   install -D -m 0644 ${WORKDIR}/gwprovapp.conf ${D}${systemd_unitdir}/system/gwprovapp.service.d/gwprovapp.conf
+   install -D -m 0644 ${UNPACKDIR}/gwprovapp.conf ${D}${systemd_unitdir}/system/gwprovapp.service.d/gwprovapp.conf
    rm ${D}${systemd_unitdir}/system/utopia.service
 
    #SNMP SUPPORT
@@ -75,7 +75,7 @@ do_install_append_class-target() {
    sed -i '$a [Install]\nWantedBy=multi-user.target' ${D}${systemd_unitdir}/system/onewifi.service
    fi
    sed -i '/IsErouterRunningStatus/,/fi/ s/^/#/' ${D}/usr/ccsp/ccspPAMCPCheck.sh
-   sed -i '/ExecStart=/i ExecStartPre=/usr/bin/start_cron' ${D}/lib/systemd/system/RdkFwUpgradeManager.service
+   sed -i '/ExecStart=/i ExecStartPre=/usr/bin/start_cron' ${D}${libdir}/systemd/system/RdkFwUpgradeManager.service
 }
 
 
@@ -93,10 +93,10 @@ SYSTEMD_SERVICE_${PN}_remove = " utopia.service"
 SYSTEMD_SERVICE_${PN} += " CcspAdvSecuritySsp.service"
 SYSTEMD_SERVICE_${PN} += "CcspXdnsSsp.service"
 
-FILES_${PN}_remove_onewifi = "${systemd_unitdir}/system/ccspwifiagent.service"
-FILES_${PN}_remove = "${systemd_unitdir}/system/utopia.service" 
-FILES_${PN}_append = "${@bb.utils.contains('DISTRO_FEATURES', 'OneWifi', ' ${systemd_unitdir}/system/onewifi.service ', '', d)}"
-FILES_${PN}_append = " \
+FILES:${PN}:remove_onewifi = "${systemd_unitdir}/system/ccspwifiagent.service"
+FILES:${PN}:remove = "${systemd_unitdir}/system/utopia.service" 
+FILES:${PN}:append = "${@bb.utils.contains('DISTRO_FEATURES', 'OneWifi', ' ${systemd_unitdir}/system/onewifi.service ', '', d)}"
+FILES:${PN}:append = " \
    ${systemd_unitdir}/system/wan-initialized.target \
    ${systemd_unitdir}/system/wan-initialized.path \
    ${systemd_unitdir}/system/CcspTelemetry.service \

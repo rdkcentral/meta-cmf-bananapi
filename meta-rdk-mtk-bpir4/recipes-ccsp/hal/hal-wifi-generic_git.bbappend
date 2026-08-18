@@ -1,14 +1,14 @@
-SRC_URI_append = " \
-    ${CMF_GIT_ROOT}/rdkb/devices/raspberrypi/hal;protocol=${CMF_GIT_PROTOCOL};branch=${CMF_GIT_BRANCH};destsuffix=git/source/wifi/devices_bpi;name=wifihal-bananapi \
+SRC_URI:append = " \
+    ${CMF_GIT_ROOT}/rdkb/devices/raspberrypi/hal;protocol=${CMF_GIT_PROTOCOL};branch=${CMF_GIT_BRANCH};destsuffix=${BP}/source/wifi/devices_bpi;name=wifihal-bananapi \
 "
 
 SRCREV_wifihal-bananapi = "${AUTOREV}"
 
-DEPENDS_append =" libev wpa-supplicant"
-DEPENDS_append = "${@bb.utils.contains('DISTRO_FEATURES', 'OneWifi', ' rdk-wifi-hal', '', d)}"
-LDFLAGS_append = " -lev -lwpa_client -lpthread"
+DEPENDS:append =" libev wpa-supplicant"
+DEPENDS:append = "${@bb.utils.contains('DISTRO_FEATURES', 'OneWifi', ' rdk-wifi-hal', '', d)}"
+LDFLAGS:append = " -lev -lwpa_client -lpthread"
 
-do_configure_prepend(){
+do_configure:prepend(){
     rm ${S}/wifi_hal.c
     rm ${S}/Makefile.am
     ln -sf ${S}/devices_bpi/source/wifi/wifi_hal.c ${S}/wifi_hal.c
@@ -28,13 +28,13 @@ do_configure_prepend(){
     sed  -i '5096i #endif' ${S}/devices_rpi/source/wifi/wifi_hal.c 
 }
 
-do_install_append(){
+do_install:append(){
     install -d ${D}/usr/bin
     install -m 777 ${B}/wifihal ${D}/usr/bin/
 }
 
-CFLAGS_append = " -DWIFI_HAL_VERSION_3 "
-CFLAGS_append = " ${@bb.utils.contains('DISTRO_FEATURES', 'OneWifi', ' -D_ONE_WIFI_ ', '', d)}"
+CFLAGS:append = " -DWIFI_HAL_VERSION_3 "
+CFLAGS:append = " ${@bb.utils.contains('DISTRO_FEATURES', 'OneWifi', ' -D_ONE_WIFI_ ', '', d)}"
 
-RDEPENDS_${PN} += "wpa-supplicant"
+RDEPENDS:${PN} += "wpa-supplicant"
 
