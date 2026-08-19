@@ -272,4 +272,5 @@ SRC_URI:append = " \
     file://bpi.patch \
     file://fixed_disassoc_after_assoc_retry.patch \
     file://xfi_tel_compete_2_11.patch \
+    file://ACL_DENY-Status-code-33-in-Auth-Assoc-Frames.patch;patchdir=source/hostap-2.11/ \
     "
