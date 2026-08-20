@@ -397,7 +397,7 @@
   <Record name="dmsb.l2net.1.Port.6.PriorityTag" type="astr">FALSE</Record>
   <Record name="dmsb.l2net.1.Port.6.Enable" type="astr">TRUE</Record>
   <Record name="dmsb.l2net.1.Port.6.Alias" type="astr">Port6</Record>
-  <Record name="dmsb.l2net.1.Port.6.Name" type="astr">ath0</Record>
+  <Record name="dmsb.l2net.1.Port.6.Name" type="astr">wifi0</Record>
   <Record name="dmsb.l2net.1.Port.6.LinkName" type="astr">ath0</Record>
   <Record name="dmsb.l2net.1.Port.6.LinkType" type="astr">WiFi</Record>
   <Record name="dmsb.l2net.1.Port.6.Management" type="astr">FALSE</Record>
@@ -410,7 +410,7 @@
   <Record name="dmsb.l2net.1.Port.7.PriorityTag" type="astr">FALSE</Record>
   <Record name="dmsb.l2net.1.Port.7.Enable" type="astr">TRUE</Record>
   <Record name="dmsb.l2net.1.Port.7.Alias" type="astr">Port7</Record>
-  <Record name="dmsb.l2net.1.Port.7.Name" type="astr">ath1</Record>
+  <Record name="dmsb.l2net.1.Port.7.Name" type="astr">wifi1</Record>
   <Record name="dmsb.l2net.1.Port.7.LinkName" type="astr">ath1</Record>
   <Record name="dmsb.l2net.1.Port.7.LinkType" type="astr">WiFi</Record>
   <Record name="dmsb.l2net.1.Port.7.Management" type="astr">FALSE</Record>
