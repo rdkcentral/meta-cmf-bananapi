@@ -76,6 +76,8 @@ do_install_append_class-target() {
    fi
    sed -i '/IsErouterRunningStatus/,/fi/ s/^/#/' ${D}/usr/ccsp/ccspPAMCPCheck.sh
    sed -i '/ExecStart=/i ExecStartPre=/usr/bin/start_cron' ${D}/lib/systemd/system/RdkFwUpgradeManager.service
+   sed -i 's/ RdkWanManager.service//g' ${D}${systemd_unitdir}/system/CcspEthAgent.service
+   sed -i '/^ExecStart=/i ExecStartPre=/bin/sh -c "(/usr/ccsp/utopiaInitCheck.sh)"' ${D}${systemd_unitdir}/system/CcspEthAgent.service
 }
 
 
