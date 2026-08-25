@@ -11,7 +11,6 @@ CFLAGS:append += " -DRBUS_BUILD_INTEGRATED"
 CFLAGS:append += " -DRBUS_BUILD_FLAG_ENABLE"
 LDFLAGS:append = "-liperf -ltelemetry_msgsender -lrbus -lrtMessage -lrbuscore"
 
-S = "${WORKDIR}/git"
 
 inherit autotools ${@bb.utils.contains_any("DISTRO_FEATURES", "kirkstone wrynose", "python3native", "pythonnative", d)}
 

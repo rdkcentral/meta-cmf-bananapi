@@ -1,19 +1,18 @@
 DESCRIPTION = "OpenThread Border Router Agent"
 HOMEPAGE = "https://github.com/openthread/ot-br-posix"
 
-
 LICENSE = "BSD-3-Clause"
 LIC_FILES_CHKSUM = "file://LICENSE;md5=87109e44b2fda96a8991f27684a7349c \
                     file://third_party/openthread/repo/LICENSE;md5=543b6fe90ec5901a683320a36390c65f \
 "
 
 # OTBR and openthread dir paths inside the gecko sdk
-GSDK_DIR="${WORKDIR}/git/gsdk"
+GSDK_DIR="${UNPACKDIR}/git/gsdk"
 GSDK_OTBR_DIR="${GSDK_DIR}/util/third_party/ot-br-posix"
 GSDK_OT_DIR="${GSDK_DIR}/util/third_party/openthread"
 
 # Openthread repo path inside the OTBR repo
-OTBR_DIR="${WORKDIR}/git/otbr"
+OTBR_DIR="${UNPACKDIR}/git/otbr"
 OTBR_OT_DIR="${OTBR_DIR}/third_party/openthread/repo"
 
 SRC_URI = "git://github.com/SiliconLabs/gecko_sdk.git;protocol=https;branch=gsdk_4.4;destsuffix=git/gsdk;name=gsdk"
@@ -29,6 +28,7 @@ SRC_URI += "file://openthread-fix-build-errors.patch;patchdir=${GSDK_DIR} \
             file://otbr-agent.service \
             file://otbr-agent.path \
 "
+ERROR_QA:remove = "patch-fuzz"
 
 S = "${GSDK_OTBR_DIR}"
 
@@ -102,8 +102,8 @@ update_otbr() {
 
 do_install:append() {
     install -d ${D}${systemd_system_unitdir}
-    install -m 0644 ${WORKDIR}/otbr-agent.service ${D}${systemd_system_unitdir}
-    install -m 0644 ${WORKDIR}/otbr-agent.path ${D}${systemd_system_unitdir}
+    install -m 0644 ${UNPACKDIR}/otbr-agent.service ${D}${systemd_system_unitdir}
+    install -m 0644 ${UNPACKDIR}/otbr-agent.path ${D}${systemd_system_unitdir}
 
     install -d ${D}${libdir}
     install -m 0644 ${WORKDIR}/build/src/dbus/common/*.a ${D}${libdir}

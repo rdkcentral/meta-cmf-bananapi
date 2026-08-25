@@ -1,5 +1,6 @@
 From 51008cad7c38a29dbc6a721602507053ba1d932b Mon Sep 17 00:00:00 2001
 From: Thomas Lea <thomas_lea@comcast.com>
+Upstream-Status: Pending
 Date: Fri, 14 Feb 2025 11:09:25 -0600
 Subject: [PATCH] Extend d-bus properties and signals
 

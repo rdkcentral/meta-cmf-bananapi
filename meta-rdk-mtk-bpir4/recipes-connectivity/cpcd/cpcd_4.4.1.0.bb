@@ -11,7 +11,6 @@ SRC_URI += "file://cpcd.service \
 "
 DEPENDS += "mbedtls systemd"
 RDEPENDS:${PN} += "systemd"
-S = "${WORKDIR}/git"
 inherit cmake pkgconfig
 EXTRA_OECMAKE += "-DUSE_LEGACY_GPIO_SYSFS=TRUE \
 "

@@ -9,7 +9,6 @@ SRC_URI = "${CMF_GITHUB_ROOT}/broadband-utils.git;protocol=https;branch=develop"
 
 SRCREV = "8dc573c6b82ba5e164cf1287d4ab5c659bd38641"
 
-S = "${WORKDIR}/git"
 
 DEPENDS = "rdkb-halif-ethsw hal-ethsw rbus"
 
