@@ -1,4 +1,5 @@
 From: RDKM
+Upstream-Status: Pending
 Date: Wed, 29 Oct 2025
 Subject: [PATCH] Enable Thread 1.3+ features for newer versions
 

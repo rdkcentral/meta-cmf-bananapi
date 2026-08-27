@@ -1,4 +1,5 @@
 From: RDKM
+Upstream-Status: Pending
 Date: Wed, 29 Oct 2025
 Subject: [PATCH] Fix namespace and constant usage in CPC and vendor spinel
 

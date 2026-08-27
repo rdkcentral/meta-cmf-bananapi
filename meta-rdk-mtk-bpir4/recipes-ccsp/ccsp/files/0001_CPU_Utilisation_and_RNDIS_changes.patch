@@ -3,6 +3,7 @@ SOURCE: RDKM and https://github.com/rdkcentral/dhcp-manager/pull/85, https://git
 From e41564e2e3521677ab5538620ef8ea55d6c54175 Mon Sep 17 00:00:00 2001
 From: Manigandan Gopalakrishnan <Manigandan_Gopalakrishnan@comcast.com>
 Date: Wed, 1 Apr 2026 20:39:01 +0530
+Upstream-Status: Submitted [https://github.com/rdkcentral/dhcp-manager/pull/85, https://github.com/rdkcentral/dhcp-manager/pull/94]
 Subject: [PATCH] RDKBDEV-3416, RDKBACCL-1603: >95% CPU Utilisation observed
  for CcspDHCPMgr service
 
