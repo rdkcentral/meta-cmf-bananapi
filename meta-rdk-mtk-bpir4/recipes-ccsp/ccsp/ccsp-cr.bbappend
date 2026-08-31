@@ -10,4 +10,4 @@ do_install:append() {
     install -m 644 ${UNPACKDIR}/cr-deviceprofile_bpi.xml ${D}/usr/ccsp/cr-deviceprofile.xml
     install -m 644 ${UNPACKDIR}/cr-deviceprofile_bpi.xml ${D}/usr/ccsp/cr-ethwan-deviceprofile.xml
 }
-CFLAGS:append:wrynose = "-Wno-error=header-guard"
+CFLAGS:append:wrynose = " -Wno-error=header-guard"
