@@ -38,6 +38,11 @@ SRC_URI += " \
     ${@bb.utils.contains('DISTRO_FEATURES', 'EasyMesh', bb.utils.contains('DISTRO_FEATURES', 'em_extender', 'file://onewifi_pre_start_em_ext.sh ','file://onewifi_pre_start_em_ctrl.sh ', d), 'file://onewifi_pre_start.sh ', d)} \
     file://wifi_defaults.txt \
 "
+
+do_configure:prepend:wrynose () {
+         sed -i 's/^SUBDIRS += sampleapps/#SUBDIRS += sampleapps/' ${S}/source/Makefile.am
+}
+
 do_install:append(){
     install -m 777 ${UNPACKDIR}/checkwifi.sh ${D}/usr/ccsp/wifi/
     install -m 777 ${UNPACKDIR}/onewifi_pre_*.sh ${D}/usr/ccsp/wifi/onewifi_pre_start.sh
