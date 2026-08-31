@@ -1,4 +1,4 @@
-inherit kernel-uboot kernel-artifact-names uboot-sign_bpi
+inherit kernel-uboot kernel-artifact-names uboot-sign_backport
 
 def get_fit_replacement_type(d):
     kerneltypes = d.getVar('KERNEL_IMAGETYPES') or ""

@@ -23,7 +23,7 @@ SRC_URI += " \
   file://0001-RDKBACCL-1975-Observing-build-error-for-Kernel-6.12-.patch;patchdir=../ \
   file://0002-RDKBACCL-2025-Observing-build-issues-in-non-mlo-q2-r.patch;patchdir=../ \
 "
-
+SRC_URI:append:wrynose = " file://rdk_wifi_hal_Wrynose.patch;patchdir=../"
 # Install InterfaceMap.json in /usr/ccsp/wifi
 do_install:append() {
   install -d ${D}/usr/ccsp/wifi

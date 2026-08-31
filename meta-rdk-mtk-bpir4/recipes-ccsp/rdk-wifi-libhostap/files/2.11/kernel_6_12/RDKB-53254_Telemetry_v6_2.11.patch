@@ -1,3 +1,6 @@
+Upstream-Status: Pending
+Date: 10-Jan-2024
+From: Pavithra_Sundaravadivel@Comcast.com
 Source: COMCAST
 
 diff -Naur git.orig/source/hostap-2.11/src/ap/ap_drv_ops.c git/source/hostap-2.11/src/ap/ap_drv_ops.c

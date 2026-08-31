@@ -1,5 +1,5 @@
 #WebPA Feature
-IMAGE_INSTALL:append = " parodus parodus2ccsp rdktelcovoicemanager asterisk hal-voice-asterisk cpcd otbr-agent bluez5-bluetoothd bt-host-cpc-hci-bridge barton"
+IMAGE_INSTALL:append = " parodus parodus2ccsp rdktelcovoicemanager asterisk hal-voice-asterisk cpcd otbr-agent ${@'bluez5' if 'wrynose' in (d.getVar('OVERRIDES') or '').split(':') else 'bluez5-bluetoothd'} bt-host-cpc-hci-bridge barton"
 
 #TR069 Feature
 IMAGE_INSTALL:append = " ccsp-tr069-pa"
@@ -13,6 +13,8 @@ IMAGE_INSTALL:append = " gptfdisk e2fsprogs-mke2fs util-linux util-linux-losetup
 
 #Router discovery tool
 IMAGE_INSTALL:append = " ndisc6"
+
+IMAGE_INSTALL:append = " net-tools"
 
 ROOTFS_POSTPROCESS_COMMAND:append = "add_busybox_fixes; "
 

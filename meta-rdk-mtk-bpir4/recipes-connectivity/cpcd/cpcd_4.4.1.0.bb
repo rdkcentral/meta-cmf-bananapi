@@ -17,10 +17,10 @@ EXTRA_OECMAKE += "-DUSE_LEGACY_GPIO_SYSFS=TRUE \
 "
 do_install:append() {
    install -d ${D}${sysconfdir}
-   install -m 0644 ${WORKDIR}/cpcd.conf ${D}${sysconfdir}/cpcd.conf
+   install -m 0644 ${UNPACKDIR}/cpcd.conf ${D}${sysconfdir}/cpcd.conf
    install -d ${D}${bindir}
    install -d ${D}${systemd_unitdir}/system
-   install -m 0644 ${WORKDIR}/cpcd.service ${D}${systemd_unitdir}/system/cpcd.service
+   install -m 0644 ${UNPACKDIR}/cpcd.service ${D}${systemd_unitdir}/system/cpcd.service
 }
 FILES:${PN} += "${systemd_unitdir}/system/"
 inherit systemd

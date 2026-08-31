@@ -7,7 +7,8 @@ Subject: [PATCH] RDKBACCL-1853 SSH and WebUI not working - Ethernet
 Reason for change: Verify configurable wan interface in BPI R4 (ethagent functionality)
 Test Procedure: Build and flash the image ,Validate wan functionality for the customized interface name
 Risks: None
-
+Source: RDKM
+Upstream-Status: Pending
 Update firewall.c
 
 Updating the buffer size to fix the build issue

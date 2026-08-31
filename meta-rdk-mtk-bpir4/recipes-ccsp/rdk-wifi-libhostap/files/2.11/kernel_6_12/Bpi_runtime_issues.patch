@@ -1,4 +1,5 @@
 SOURCE:RDKM
+Upstream-Status: Pending
 diff -Naur git.orig/source/hostap-2.11/wpa_supplicant/events.c git/source/hostap-2.11/wpa_supplicant/events.c
 --- git.orig/source/hostap-2.11/wpa_supplicant/events.c	2026-05-22 06:49:59.314637967 +0000
 +++ git/source/hostap-2.11/wpa_supplicant/events.c	2026-05-22 06:51:19.915385443 +0000
