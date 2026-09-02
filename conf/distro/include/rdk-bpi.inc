@@ -60,8 +60,9 @@ DISTRO_FEATURES:append = " wps_support"
 DISTRO_FEATURES:append = " resource_optimization"
 
 #Enable kernel_6_6 support
-DISTRO_FEATURES:append = " kernel6-6"
-#DISTRO_FEATURES:append = " kernel6-12"
+#DISTRO_FEATURES:append = " kernel6-6"
+DISTRO_FEATURES:append = " kernel6-12"
+PREFERRED_VERSION_linux-libc-headers:wrynose = "6.12"
 
 DISTRO_FEATURES:append = " CONFIG_IEEE80211BE"
 

@@ -1,7 +1,7 @@
 SRC_URI:remove = "git://github.com/rdkcentral/rdk-wifi-hal.git;protocol=https;branch=main;name=rdk-wifi-hal"
 
 SRC_URI += "git://github.com/rdkcentral/rdk-wifi-hal.git;protocol=https;branch=develop;name=rdk-wifi-hal"
-SRCREV_rdk-wifi-hal = "8a830706ac1d96a285bb13a13f8225ea9382238a"
+SRCREV_rdk-wifi-hal = "${@bb.utils.contains('DISTRO_FEATURES', 'BuildFromTip', '${AUTOREV}', '8a830706ac1d96a285bb13a13f8225ea9382238a', d)}"
 
 CFLAGS:append = " -D_PLATFORM_BANANAPI_R4_  -DBANANA_PI_PORT  -DFEATURE_SINGLE_PHY -DCONFIG_HW_CAPABILITIES "
 
@@ -10,7 +10,6 @@ CFLAGS:append = "${@bb.utils.contains_any('DISTRO_FEATURES', 'kernel6-12 kernel6
 CFLAGS:append = "${@bb.utils.contains('DISTRO_FEATURES', 'kernel6-12' , ' -DKERNEL_6_12 ','', d)}"
 CFLAGS:append = " ${@bb.utils.contains('DISTRO_FEATURES', 'EasyMesh', ' -DEASY_MESH_NODE  ', '', d)}"
 
-CFLAGS:append:kernel6-12 = " -DKERNEL_6_12 -DHOSTAPD_2_11"
 CFLAGS:append_kirkstone = " -fcommon"
 CFLAGS:remove = "-DCONFIG_MBO"
 EXTRA_OECONF:append = " ${@bb.utils.contains('DISTRO_FEATURES', 'OneWifi', ' ONE_WIFIBUILD=true ', '', d)}"
