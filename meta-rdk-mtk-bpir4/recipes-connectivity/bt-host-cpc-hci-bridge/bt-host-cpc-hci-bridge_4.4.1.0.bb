@@ -19,6 +19,9 @@ RDEPENDS:${PN} += "cpcd (= 4.4.1.0-r0) bluez5-noinst-tools"
 S = "${BT_BRIDGE_DIR}"
 
 inherit pkgconfig systemd
+
+BTHOST_PREFIX_MAP:wrynose = " -ffile-prefix-map=${WORKDIR}=/usr/src/debug/${PN}/${PV}"
+CFLAGS:append = "${BTHOST_PREFIX_MAP}"
 do_unpack[network] = "1"
 # Ensure we're using the correct toolchain
 TOOLCHAIN = "gcc"

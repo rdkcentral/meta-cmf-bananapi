@@ -28,6 +28,7 @@ SRC_URI += "file://openthread-fix-build-errors.patch;patchdir=${GSDK_DIR} \
             file://otbr-agent.service \
             file://otbr-agent.path \
 "
+CXXFLAGS += "-Wno-error=attributes"
 ERROR_QA:remove = "patch-fuzz"
 
 S = "${GSDK_OTBR_DIR}"
@@ -36,6 +37,15 @@ DEPENDS += "mdns boost iproute2 jsoncpp ncurses readline cpcd pkgconfig protobuf
 RDEPENDS:${PN} = "cpcd (= 4.4.1.0-r0)"
 
 inherit cmake systemd pkgconfig
+
+OTBR_PREFIX_MAP:wrynose = " -ffile-prefix-map=${WORKDIR}=/usr/src/debug/${PN}/${PV}"
+CFLAGS:append = "${OTBR_PREFIX_MAP}"
+
+EXTRA_OECMAKE:append:wrynose = " \
+    -DOT_POSIX_FACTORY_CONFIG=${sysconfdir}/openthread/openthread.conf.example \
+    -DOT_POSIX_PRODUCT_CONFIG=${sysconfdir}/openthread/openthread.conf.example \
+"
+CXXFLAGS:append = "${OTBR_PREFIX_MAP}"
 
 # Adding otbr version on to version.txt file
 inherit add-version

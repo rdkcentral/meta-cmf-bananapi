@@ -4,5 +4,5 @@ FILESEXTRAPATHS:prepend := "${THISDIR}/${PN}:"
 SRC_URI += "file://SpeedReference.sh"
 
 do_install:append () {
-       install -m 755 ${WORKDIR}/SpeedReference.sh ${D}/usr/ccsp/tad/speedtest.sh
+       install -m 755 ${UNPACKDIR}/SpeedReference.sh ${D}/usr/ccsp/tad/speedtest.sh
 }
