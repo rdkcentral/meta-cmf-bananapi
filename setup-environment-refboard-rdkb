@@ -23,6 +23,25 @@ _TOPDIR=`pwd`
 
 export RDK_BSP_LAYER=none
 
+if [ "X$MP_version" == "X4.3" ] && [ ! -e ${_TOPDIR}/meta-cmf-filogic/MP4_3_applied ] && [ ! -e ${_TOPDIR}/meta-filogic/MP4_3_applied ];
+then
+    cd ${_TOPDIR}/meta-filogic
+    git checkout 77e17792f60279b6e1deb1f1c6abf5705972bc6f
+    cd -
+    cd ${_TOPDIR}/meta-cmf-filogic
+    git checkout a68043b58a049ee5a93f3509c1f268fea73cc388
+    cd -
+    sed -i '/^#*DISTRO_FEATURES_append = " kernel6-12"$/s/^#//' \
+    ${_TOPDIR}/meta-cmf-bananapi/conf/distro/include/{rdk-bpi.inc,rdk-bpi-ap-extender.inc}
+    sed -i '/^DISTRO_FEATURES_append = " kernel6-6"$/s/^/#/' \
+    ${_TOPDIR}/meta-cmf-bananapi/conf/distro/include/{rdk-bpi.inc,rdk-bpi-ap-extender.inc}
+    echo 'RDEPENDS:${PN}-dev = ""' >> ${_TOPDIR}/meta-filogic/recipes-kernel/linux6-12-libc-headers/linux-libc-headers.inc
+    #since rdm-agent recipe updated, commented rdm-agent recipe lines from filogic source to avoid build issues
+    sed -i '150,$ s/^/#/' ${_TOPDIR}/meta-cmf-filogic/setup-environment
+    touch ${_TOPDIR}/meta-cmf-filogic/MP4_3_applied
+    touch ${_TOPDIR}/meta-filogic/MP4_3_applied
+fi
+
 #select filogic880-bpi-r4.conf for BPI R4
 if [ -e "${_TOPDIR}/meta-cmf-filogic/setup-environment-release" ]; then
 	source meta-cmf-filogic/setup-environment-release
@@ -83,14 +102,18 @@ echo "DEPENDS += \"rdk-wifi-halif\"" >> ${_TOPDIR}/meta-cmf-broadband/recipes-cc
 touch ${_TOPDIR}/meta-filogic/recipes-wifi/hal/mt76_hal_change
 fi
 
-if [ ! -e ${_TOPDIR}/meta-rdk/recipes-common/rdm-agent/rdm_hal_change ]; then
-sed -i '77 s/^/#/' ${_TOPDIR}/meta-rdk/recipes-common/rdm-agent/rdm-agent.bb
-sed -i '78 s/^/#/' ${_TOPDIR}/meta-rdk/recipes-common/rdm-agent/rdm-agent.bb
-sed -i '79 s/^/#/' ${_TOPDIR}/meta-rdk/recipes-common/rdm-agent/rdm-agent.bb
-sed -i '80 s/^/#/' ${_TOPDIR}/meta-rdk/recipes-common/rdm-agent/rdm-agent.bb
-touch ${_TOPDIR}/meta-rdk/recipes-common/rdm-agent/rdm_hal_change
+if grep -q 'librdmopenssl' ${_TOPDIR}/meta-rdk/recipes-common/rdm-agent/rdm-agent.bb; then
+    sed -i \
+        -e '/downloadUtils\.sh/s/^#//' \
+        -e '/loggerUtils\.sh/s/^#//' \
+        -e '/rdm-manifest\.json/s/^#//' \
+        -e '/rdm_rsa_signature_verify\.h ]; then/,/fi/d' \
+        -e '/librdmopenssl/d' \
+        -e '/rdm_rsa_signature_verify/d' \
+        -e 's/\(rdm\/\*\) \\$/\1"/' \
+        ${_TOPDIR}/meta-rdk/recipes-common/rdm-agent/rdm-agent.bb
+    touch ${_TOPDIR}/meta-rdk/recipes-common/rdm-agent/rdm_hal_change
 fi
-
 
 if [ "X$FEATURE_TYPE" == "XEasyMesh" ]; then
     sed -i '/EasyMesh/s/^#//' ${_TOPDIR}/meta-cmf-bananapi/conf/distro/include/rdk-bpi.inc
@@ -99,6 +122,11 @@ if [ "X$FEATURE_TYPE" == "XEasyMesh" ]; then
     if [ "X$EM_UNITTEST" == "Xyes" ]; then
     	sed -i '/Em_Unittest/s/^#//' ${_TOPDIR}/meta-cmf-bananapi/conf/distro/include/rdk-bpi.inc
     fi	
+fi
+
+if [ "X$ci_Staged_AUTOREV_Validation_Enabled" == "Xyes" ]; then
+    sed -i '/BuildFromTip/s/^#//' ${_TOPDIR}/meta-cmf-bananapi/conf/distro/include/rdk-bpi.inc
+    sed -i '/BuildFromTip/s/^#//' ${_TOPDIR}/meta-cmf-bananapi/conf/distro/include/rdk-bpi-ap-extender.inc
 fi
 
 if [ "X$FEATURE_TYPE" == "XEasyMesh" ] && [ "X$WITHOUT_ALSAP" == "Xyes" ]; then

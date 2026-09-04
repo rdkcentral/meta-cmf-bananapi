@@ -22,6 +22,7 @@ SRC_URI:append:mt7988 = "${@bb.utils.contains('DISTRO_FEATURES', 'cellular_hybri
 CMDLINE:append = " cgroup_enable=cpuset cgroup_enable=memory cgroup_memory=1 "
 
 do_filogic_patches:append() {
+    cd ${S}
     Enable_sd_6_6="${@bb.utils.contains( 'DISTRO_FEATURES','kernel6-6','true','false',d)}"
     Enable_sd_v6="${@bb.utils.contains( 'DISTRO_FEATURES','kernel6-12','true','false',d)}"
     if [ ! -e patch_applied_v6 ];then

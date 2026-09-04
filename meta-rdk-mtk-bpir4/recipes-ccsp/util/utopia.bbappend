@@ -3,6 +3,7 @@ include meta-rdk-mtk-bpir4/recipes-ccsp/ccsp/ccsp_common_bananapi.inc
 FILESEXTRAPATHS:prepend := "${THISDIR}/${PN}:"
 
 SRC_URI += "file://service_bridge_bpi.sh"
+SRC_URI += "file://0001-RDKBACCL-1853-SSH-and-WebUI-not-working-Ethernet-Con.patch"
 
 CFLAGS:append  = " ${@bb.utils.contains('DISTRO_FEATURES', 'matter', ' -DFEATURE_MATTER_ENABLED', '', d)}"
 
@@ -87,6 +88,9 @@ echo "#SelfHeal
 
 #TR069support
 \$EnableTR69Binary=true
+
+#bridgeUtils support
+\$bridge_util_enable=true
 
 #Enablemaptconfig
 \@mapt_config_flag=set

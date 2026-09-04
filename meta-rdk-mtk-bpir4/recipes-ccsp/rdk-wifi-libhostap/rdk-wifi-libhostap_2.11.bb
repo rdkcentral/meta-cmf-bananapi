@@ -16,8 +16,9 @@ DEPENDS:append = " ucode"
 inherit pkgconfig
 
 SRC_URI = "git://w1.fi/hostap.git;protocol=https;branch=main;destsuffix=${S}/source/hostap-${PV};name=${PV}"
+SRC_URI_append_kernel6-6 = " file://banana-pi-sta-mlo-connection.patch "
 SRCREV = "96e48a05aa0a82e91e3cab75506297e433e253d0"
-SRCREV_kernel6-6 = "4b8ac10cb77c3d4dbf7ccefbe697dc0578da374c"
+SRCREV:kernel6-6 = "4b8ac10cb77c3d4dbf7ccefbe697dc0578da374c"
 SRCREV:kernel6-12 = "53d12cd44da765ee446b2834aad92e9670319f8c"
 
 LIC_FILES_CHKSUM = "file://source/hostap-2.11/README;md5=6e4b25e7d74bfc44a32ba37bdf5210a6"

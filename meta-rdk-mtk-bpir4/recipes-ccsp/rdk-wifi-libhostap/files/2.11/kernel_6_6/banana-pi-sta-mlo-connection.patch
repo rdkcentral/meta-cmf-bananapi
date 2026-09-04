@@ -1,0 +1,22 @@
+Source: RDKM
+Upstream-Status: Pending
+diff --git git.orig/source/hostap-2.11/src/rsn_supp/wpa.c git/source/hostap-2.11/src/rsn_supp/wpa.c
+index e127093ca..3c61ef6be 100644
+--- git.orig/source/hostap-2.11/src/rsn_supp/wpa.c
++++ git/source/hostap-2.11/src/rsn_supp/wpa.c
+@@ -2501,6 +2501,7 @@ static int wpa_supplicant_validate_link_kde(struct wpa_sm *sm, u8 link_id,
+ 		rsnxe_len = rsnxe[1] + 2;
+ 	}
+ 
++#ifndef _PLATFORM_BANANAPI_R4_
+ 	if (wpa_compare_rsn_ie(wpa_key_mgmt_ft(sm->key_mgmt),
+ 			       sm->mlo.links[link_id].ap_rsne,
+ 			       sm->mlo.links[link_id].ap_rsne_len,
+@@ -2608,6 +2609,7 @@ static int wpa_supplicant_validate_link_kde(struct wpa_sm *sm, u8 link_id,
+ 			    rsnxoe, rsnxoe_len);
+ 		goto fail;
+ 	}
++#endif /* _PLATFORM_BANANAPI_R4_ */
+ 
+ 	return 0;
+ fail:

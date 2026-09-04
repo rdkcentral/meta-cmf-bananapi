@@ -2,15 +2,6 @@ include ccsp_common_bananapi.inc
 
 FILESEXTRAPATHS:prepend := "${THISDIR}/${BPN}:${THISDIR}/files:"
 
-SRC_URI:remove = "${CMF_GITHUB_ROOT}/common-library;protocol=https;${BRANCH_ccsp_common_library}"
-
-PV:pn-ccsp-common-library = "2.0.0_stable2_20260109"
-SRC_URI += "git://github.com/rdkcentral/common-library.git;protocol=https;name=ccsp_common_library;branch=support/2026q1"
-SRCREV_ccsp_common_library = "740a897df8d1b6525b632862814c9ce1cfa4f991"
-
-PV:pn-ccsp-common-library-native = "2.0.0_stable2_20260109"
-SRCREV:pn-ccsp-common-library-native = "740a897df8d1b6525b632862814c9ce1cfa4f991"
-
 SRC_URI:append = " \
                    file://gwprovapp.conf \
                 "
@@ -85,6 +76,7 @@ do_install:append:class-target() {
    fi
    sed -i '/IsErouterRunningStatus/,/fi/ s/^/#/' ${D}/usr/ccsp/ccspPAMCPCheck.sh
    sed -i '/ExecStart=/i ExecStartPre=/usr/bin/start_cron' ${D}/lib/systemd/system/RdkFwUpgradeManager.service
+   sed -i 's/ RdkWanManager.service//g' ${D}${systemd_unitdir}/system/CcspEthAgent.service
 }
 
 
@@ -93,7 +85,6 @@ SYSTEMD_SERVICE:${PN} += "${@bb.utils.contains('DISTRO_FEATURES', 'OneWifi', 'on
 SYSTEMD_SERVICE:${PN} += "${@bb.utils.contains('DISTRO_FEATURES', 'webconfig_bin', 'webconfig.service', '', d)}"
 SYSTEMD_SERVICE:${PN} += "${@bb.utils.contains('DISTRO_FEATURES', 'rdkb_wan_manager', 'RdkTelcoVoiceManager.service', '', d)}"
 SYSTEMD_SERVICE:${PN} += " CcspTelemetry.service"
-SYSTEMD_SERVICE:${PN} += " notifyComp.service"
 SYSTEMD_SERVICE:${PN} += "gwprovapp.service"
 SYSTEMD_SERVICE:${PN} += "wan-initialized.target"
 SYSTEMD_SERVICE:${PN} += "wan-initialized.path"

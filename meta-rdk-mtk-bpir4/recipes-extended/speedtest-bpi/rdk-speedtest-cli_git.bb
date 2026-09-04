@@ -24,6 +24,10 @@ CFLAGS:append = " \
     "
 
 
+do_configure:wrynose() {
+    install -d ${B}
+}
+
 do_compile() {
         ${CC} ${S}/source/rdk-speedtest-cli.c ${CFLAGS} ${LDFLAGS} -I ${S}/include -o RefSpeedtestClient
 }
