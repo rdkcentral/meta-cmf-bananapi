@@ -42,7 +42,6 @@ BBMASK .= "|meta-cmf-bananapi/meta-rdk-mtk-bpir4/recipes-connectivity/wpa-suppli
 BBMASK .= "|openembedded-core/meta/recipes-connectivity/iw/iw_6.17.bb"
 
 # Make change for Wrynose build
-IMAGE_CLASSES:remove = 'apparmor_binprofiles'
 BBMASK .= "|meta-rdk-oss-reference/recipes-gplv2/tar/tar_1.17.bb"
 INCOMPATIBLE_LICENSE_EXCEPTIONS += "${MLPREFIX}tar:GPL-3.0-only ${MLPREFIX}tar-native:GPL-3.0-only ${MLPREFIX}elfutils:GPL-3.0-or-later"
 INCOMPATIBLE_LICENSE_EXCEPTIONS += "${MLPREFIX}binutils:GPL-3.0-only ${MLPREFIX}binutils-src:GPL-3.0-only"
