@@ -320,7 +320,8 @@
   <Record name="dmsb.l2net.1.Members.Eth" type="astr">lan1 lan2 lan3</Record>
   <Record name="dmsb.l2net.1.Members.Moca" type="astr"> </Record>
   <Record name="dmsb.l2net.1.Members.Gre" type="astr"> </Record>
-  <Record name="dmsb.l2net.1.Members.WiFi" type="astr">wifi0 wifi1 wifi2</Record>
+  <Record name="dmsb.l2net.1.Members.WiFi" type="astr">wifi0 wifi1 wifi16</Record>
+  <Record name="dmsb.l2net.1.Members.OneWiFi" type="astr">mld0 wifi0 wifi1 wifi2</Record>
   <Record name="dmsb.l2net.1.Members.Link" type="astr"> </Record>
 
   <Record name="dmsb.l2net.1.Vlan.1.Alias" type="astr">CPE-VLAN1</Record>
@@ -396,8 +397,8 @@
   <Record name="dmsb.l2net.1.Port.6.PriorityTag" type="astr">FALSE</Record>
   <Record name="dmsb.l2net.1.Port.6.Enable" type="astr">TRUE</Record>
   <Record name="dmsb.l2net.1.Port.6.Alias" type="astr">Port6</Record>
-  <Record name="dmsb.l2net.1.Port.6.Name" type="astr">wifi1</Record>
-  <Record name="dmsb.l2net.1.Port.6.LinkName" type="astr">wifi1</Record>
+  <Record name="dmsb.l2net.1.Port.6.Name" type="astr">wifi0</Record>
+  <Record name="dmsb.l2net.1.Port.6.LinkName" type="astr">wifi0</Record>
   <Record name="dmsb.l2net.1.Port.6.LinkType" type="astr">WiFi</Record>
   <Record name="dmsb.l2net.1.Port.6.Management" type="astr">FALSE</Record>
   <Record name="dmsb.l2net.1.Port.6.Mode" type="astr">Tagging</Record>
@@ -409,8 +410,8 @@
   <Record name="dmsb.l2net.1.Port.7.PriorityTag" type="astr">FALSE</Record>
   <Record name="dmsb.l2net.1.Port.7.Enable" type="astr">TRUE</Record>
   <Record name="dmsb.l2net.1.Port.7.Alias" type="astr">Port7</Record>
-  <Record name="dmsb.l2net.1.Port.7.Name" type="astr">wifi2</Record>
-  <Record name="dmsb.l2net.1.Port.7.LinkName" type="astr">wifi2</Record>
+  <Record name="dmsb.l2net.1.Port.7.Name" type="astr">wifi1</Record>
+  <Record name="dmsb.l2net.1.Port.7.LinkName" type="astr">wifi1</Record>
   <Record name="dmsb.l2net.1.Port.7.LinkType" type="astr">WiFi</Record>
   <Record name="dmsb.l2net.1.Port.7.Management" type="astr">FALSE</Record>
   <Record name="dmsb.l2net.1.Port.7.Mode" type="astr">Tagging</Record>

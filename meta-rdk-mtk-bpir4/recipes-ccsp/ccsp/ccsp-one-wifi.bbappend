@@ -2,42 +2,10 @@ require ccsp_common_bananapi.inc
 
 FILESEXTRAPATHS_prepend := "${THISDIR}/files:"
 
-SRC_URI_remove = "${CMF_GIT_ROOT}/rdkb/components/opensource/ccsp/OneWifi;protocol=${CMF_GIT_PROTOCOL};branch=${CMF_GIT_BRANCH};name=OneWifi"
-SRC_URI = "git://github.com/rdkcentral/OneWifi.git;protocol=https;branch=develop;name=OneWifi"
-SRCREV_OneWifi = "${@bb.utils.contains('DISTRO_FEATURES', 'BuildFromTip', '${AUTOREV}', '61543dfc644366392caac092e81a3511340701ab', d)}"
-
 SRC_URI_remove += "git://github.com/rdk-gdcs/lan_web.git;protocol=https;branch=main_branch_multiap_update;name=lan_web;destsuffix=lan_web"
+CFLAGS_append = " -DFEATURE_SINGLE_PHY"
 CFLAGS_remove = " -DONEWIFI_MULTIAP_APP_SUPPORT"
 EXTRA_OECONF_remove = " ONEWIFI_MULTIAP_APP_SUPPORT=true"
-SRCREV_FORMAT = "OneWifi"
-
-DEPENDS_append = " mesh-agent "
-DEPENDS_remove = " opensync "
-DEPENDS += " ${@bb.utils.contains('DISTRO_FEATURES', 'EasyMesh', ' rdk-wifi-libhostap ', '', d)}"
-
-CFLAGS_append = " -DWIFI_HAL_VERSION_3 -Wno-unused-function "
-LDFLAGS_append = " -ldl"
-CFLAGS_append_aarch64 = " -Wno-error "
-
-EXTRA_OECONF_append = " ${@bb.utils.contains('DISTRO_FEATURES', 'EasyMesh', ' --enable-em-app ', '', d)}"
-CFLAGS_append = " ${@bb.utils.contains('DISTRO_FEATURES', 'EasyMesh', ' -DEASY_MESH_NODE ', '', d)}"
-CFLAGS_append = " -DFEATURE_SINGLE_PHY"
-
-EXTRA_OECONF_append = " ${@bb.utils.contains('DISTRO_FEATURES', 'sta_manager', 'ONEWIFI_STA_MGR_APP_SUPPORT=true', 'ONEWIFI_STA_MGR_APP_SUPPORT=false', d)}"
-CFLAGS_append = " ${@bb.utils.contains('DISTRO_FEATURES', 'sta_manager', '-DONEWIFI_STA_MGR_APP_SUPPORT', '', d)}"
-
-EXTRA_OECONF_remove = " ${@bb.utils.contains('DISTRO_FEATURES', 'EasyMesh', ' ONEWIFI_CAC_APP_SUPPORT=true ', '', d)}"
-CFLAGS_remove = " ${@bb.utils.contains('DISTRO_FEATURES', 'EasyMesh', ' -DONEWIFI_CAC_APP_SUPPORT -DONEWIFI_DB_SUPPORT  ', '', d)}"
-
-CFLAGS_append = " ${@bb.utils.contains('DISTRO_FEATURES', 'generic_mlo', ' -DCONFIG_GENERIC_MLO ', '', d)}"
-
-EXTRA_OECONF_append = " ONEWIFI_CSI_APP_SUPPORT=true"
-EXTRA_OECONF_append = " ONEWIFI_MOTION_APP_SUPPORT=true"
-EXTRA_OECONF_append = " ONEWIFI_HARVESTER_APP_SUPPORT=true"
-EXTRA_OECONF_append = " ONEWIFI_ANALYTICS_APP_SUPPORT=true"
-EXTRA_OECONF_append = " ONEWIFI_LEVL_APP_SUPPORT=true"
-EXTRA_OECONF_append = " ONEWIFI_WHIX_APP_SUPPORT=true"
-EXTRA_OECONF_append = " ONEWIFI_BLASTER_APP_SUPPORT=true"
 
 SRC_URI += " \
     file://checkwifi.sh \
@@ -48,11 +16,16 @@ SRC_URI += " \
 do_compile_prepend() {
     mkdir -p ${S}/../lan_web/
     touch ${S}/../lan_web/multiap_stub_removed
+    touch ${S}/scripts/mesh_aclmac.sh
+    touch ${S}/scripts/mesh_setip.sh
+    touch ${S}/scripts/meshapcfg.sh
+    touch ${S}/scripts/handle_mesh
+    touch ${S}/scripts/mesh_status.sh
 }
 
 do_install_append(){
-    install -m 777 ${WORKDIR}/checkwifi.sh ${D}/usr/ccsp/wifi/
-    install -m 777 ${WORKDIR}/onewifi_pre_*.sh ${D}/usr/ccsp/wifi/onewifi_pre_start.sh
+    install -m 755 ${WORKDIR}/checkwifi.sh ${D}/usr/ccsp/wifi/
+    install -m 755 ${WORKDIR}/onewifi_pre_*.sh ${D}/usr/ccsp/wifi/onewifi_pre_start.sh 
     install -m 644 ${WORKDIR}/wifi_defaults.txt ${D}/usr/ccsp/wifi/
 }
 

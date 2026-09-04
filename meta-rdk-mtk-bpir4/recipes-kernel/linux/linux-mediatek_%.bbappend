@@ -3,13 +3,13 @@ FILESEXTRAPATHS:prepend := "${THISDIR}/files:"
 SRC_URI += "file://0001-add-support-for-port-triggering.patch"
 SRC_URI += "${@bb.utils.contains('DISTRO_FEATURES','kernel6-12','file://BPI-resolving-port-triggering-errors_6_12.patch',bb.utils.contains('DISTRO_FEATURES','kernel6-6','file://BPI-resolving-port-triggering-errors_6_6.patch','file://BPI-resolving-port-triggering-errors.patch',d), d)}"
 SRC_URI:append = " \
-    file://rdkb_cfg/iptables_nf.cfg \
-    file://rdkb_cfg/bridge_mode.cfg \
+    ${@bb.utils.contains('DISTRO_FEATURES', 'em_extender', ' file://rdkb_cfg/iptables_nf_ext.cfg', ' file://rdkb_cfg/iptables_nf.cfg', d)} \
+    ${@bb.utils.contains('DISTRO_FEATURES', 'em_extender', ' ', ' file://rdkb_cfg/bridge_mode.cfg', d)} \
     file://rdkb_cfg/coredump.cfg \
     file://rdkb_cfg/ip6tables_nf.cfg \
     ${@bb.utils.contains_any('DISTRO_FEATURES','kernel6-12 kernel6-6', ' file://netfilter_v6.cfg', ' file://netfilter.cfg', d)}  \
-    ${@bb.utils.contains('DISTRO_FEATURES','kernel6-12', ' file://rdkb_cfg/kernel_v6.cfg',bb.utils.contains('DISTRO_FEATURES','kernel6-6',' file://rdkb_cfg/kernel_6_6.cfg', '',d), d)}  \
-    file://rdkb_cfg/container.cfg \
+    ${@bb.utils.contains('DISTRO_FEATURES', 'kernel6-12', bb.utils.contains('DISTRO_FEATURES', 'em_extender', ' file://rdkb_cfg/kernel_v6_ext.cfg', ' file://rdkb_cfg/kernel_v6.cfg', d), bb.utils.contains('DISTRO_FEATURES', 'kernel6-6', bb.utils.contains('DISTRO_FEATURES', 'em_extender', ' file://rdkb_cfg/kernel_6_6_ext.cfg', ' file://rdkb_cfg/kernel_6_6.cfg', d), '', d), d)} \
+    ${@bb.utils.contains('DISTRO_FEATURES', 'em_extender', ' file://rdkb_cfg/container_ext.cfg', ' file://rdkb_cfg/container.cfg', d)} \
     ${@bb.utils.contains('DISTRO_FEATURES','sdmmc',bb.utils.contains_any('DISTRO_FEATURES','kernel6-12 kernel6-6', ' file://rdkb_cfg/sdmmc_v6.cfg', ' file://rdkb_cfg/sdmmc.cfg',d), '', d)} \
     file://rdkb_cfg/wps_key.cfg \
     ${@bb.utils.contains('DISTRO_FEATURES','kernel6-6', ' file://enable_sdcard_6_6.patch;apply=no', '', d)} \
@@ -17,8 +17,7 @@ SRC_URI:append = " \
     ${@bb.utils.contains('DISTRO_FEATURES','kernel6-12', ' file://enable_sdcard_v6.patch;apply=no', '', d)} \
     ${@bb.utils.contains('DISTRO_FEATURES','kernel6-12', ' file://bluetooth_v6.patch;apply=no', '', d)} \
 "
-SRC_URI:append:mt7988 = "${@bb.utils.contains('DISTRO_FEATURES', 'cellular_hybrid_support', ' file://rdkb_cfg/rdkb-usb.cfg', '', d)}"
-
+SRC_URI:append:mt7988 = "${@bb.utils.contains('DISTRO_FEATURES', 'cellular_hybrid_support', bb.utils.contains('DISTRO_FEATURES','em_extender', ' ', ' file://rdkb_cfg/rdkb-usb.cfg', d), '', d)}"
 CMDLINE:append = " cgroup_enable=cpuset cgroup_enable=memory cgroup_memory=1 "
 
 do_filogic_patches:append() {
