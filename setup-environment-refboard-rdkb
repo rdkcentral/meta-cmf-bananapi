@@ -85,14 +85,18 @@ echo "DEPENDS += \"rdk-wifi-halif\"" >> ${_TOPDIR}/meta-cmf-broadband/recipes-cc
 touch ${_TOPDIR}/meta-filogic/recipes-wifi/hal/mt76_hal_change
 fi
 
-if [ ! -e ${_TOPDIR}/meta-rdk/recipes-common/rdm-agent/rdm_hal_change ]; then
-sed -i '77 s/^/#/' ${_TOPDIR}/meta-rdk/recipes-common/rdm-agent/rdm-agent.bb
-sed -i '78 s/^/#/' ${_TOPDIR}/meta-rdk/recipes-common/rdm-agent/rdm-agent.bb
-sed -i '79 s/^/#/' ${_TOPDIR}/meta-rdk/recipes-common/rdm-agent/rdm-agent.bb
-sed -i '80 s/^/#/' ${_TOPDIR}/meta-rdk/recipes-common/rdm-agent/rdm-agent.bb
-touch ${_TOPDIR}/meta-rdk/recipes-common/rdm-agent/rdm_hal_change
+if grep -q 'librdmopenssl' ${_TOPDIR}/meta-rdk/recipes-common/rdm-agent/rdm-agent.bb; then
+    sed -i \
+        -e '/downloadUtils\.sh/s/^#//' \
+        -e '/loggerUtils\.sh/s/^#//' \
+        -e '/rdm-manifest\.json/s/^#//' \
+        -e '/rdm_rsa_signature_verify\.h ]; then/,/fi/d' \
+        -e '/librdmopenssl/d' \
+        -e '/rdm_rsa_signature_verify/d' \
+        -e 's/\(rdm\/\*\) \\$/\1"/' \
+        ${_TOPDIR}/meta-rdk/recipes-common/rdm-agent/rdm-agent.bb
+    touch ${_TOPDIR}/meta-rdk/recipes-common/rdm-agent/rdm_hal_change
 fi
-
 
 if [ "X$FEATURE_TYPE" == "XEasyMesh" ]; then
     sed -i '/EasyMesh/s/^#//' ${_TOPDIR}/meta-cmf-bananapi/conf/distro/include/rdk-bpi.inc
