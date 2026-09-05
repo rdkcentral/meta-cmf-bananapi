@@ -1248,32 +1248,32 @@
    <Record name="dmsb.selfheal.rebootstatus"  type="astr">0</Record> 
    <Record name="dmsb.wanmanager.allowremoteinterfaces" type="astr">0</Record> 
    <Record name="dmsb.wanmanager.RestorationDelay" type="astr">45</Record> 
-   <Record name="dmsb.wanmanager.if.1.Name" type="astr">lan0</Record> 
-   <Record name="dmsb.wanmanager.if.1.DisplayName" type="astr">WanOE</Record> 
-   <Record name="dmsb.wanmanager.if.1.Enable" type="astr">TRUE</Record> 
-   <Record name="dmsb.wanmanager.if.1.Type" type="astr">2</Record> 
-   <Record name="dmsb.wanmanager.if.1.Priority" type="astr">0</Record> 
-   <Record name="dmsb.wanmanager.if.1.SelectionTimeout" type="astr">0</Record> 
-   <Record name="dmsb.wanmanager.if.1.DynTriggerEnable" type="astr">FALSE</Record> 
-   <Record name="dmsb.wanmanager.if.1.DynTriggerDelay" type="astr">0</Record> 
-   <Record name="dmsb.wanmanager.if.1.Marking.List" type="astr">DATA</Record> 
-   <Record name="dmsb.wanmanager.if.1.Marking.DATA.Alias" type="astr">DATA</Record> 
-   <Record name="dmsb.wanmanager.if.1.Marking.DATA.SKBPort" type="astr">1</Record> 
-   <Record name="dmsb.wanmanager.if.1.Marking.DATA.SKBMark" type="astr"> </Record> 
-   <Record name="dmsb.wanmanager.if.1.Marking.DATA.EthernetPriorityMark" type="astr"></Record> 
-   <Record name="dmsb.wanmanager.if.1.EnableDHCP" type="astr">TRUE</Record> 
-   <Record name="dmsb.wanmanager.if.1.EnableIPoE" type="astr">TRUE</Record> 
-   <Record name="dmsb.wanmanager.if.1.PPPEnable" type="astr">FALSE</Record> 
-   <Record name="dmsb.wanmanager.if.1.PPPLinkType" type="astr">PPPoE</Record> 
-   <Record name="dmsb.wanmanager.if.1.PPPIPCPEnable" type="astr">TRUE</Record> 
-   <Record name="dmsb.wanmanager.if.1.PPPIPV6CPEnable" type="astr">TRUE</Record> 
-   <Record name="dmsb.wanmanager.if.1.PPPIPCPEnable" type="astr">TRUE</Record> 
-   <Record name="dmsb.wanmanager.if.1.ActiveLink" type="astr">TRUE</Record> 
-   <Record name="dmsb.wanmanager.if.1.EnableMAPT" type="astr">FALSE</Record> 
-   <Record name="dmsb.wanmanager.if.1.EnableDSLite" type="astr">FALSE</Record> 
-   <Record name="dmsb.wanmanager.if.1.EnableIPoEHealthCheck" type="astr">FALSE</Record> 
-   <Record name="dmsb.wanmanager.if.1.RebootOnConfiguration" type="astr">FALSE</Record> 
-  
+
+   <!-- X_RDK_WanManager.CPEInterface.1. -wanmanager -->
+   <Record name="dmsb.wanmanager.if.1.Name" type="astr">lan0</Record>
+   <Record name="dmsb.wanmanager.if.1.DisplayName" type="astr">WanOE</Record>
+   <Record name="dmsb.wanmanager.if.1.AliasName" type="astr">WanOE</Record>
+   <Record name="dmsb.wanmanager.if.1.Enable" type="astr">TRUE</Record>
+   <Record name="dmsb.wanmanager.if.1.ActiveLink" type="astr">FALSE</Record>
+   <Record name="dmsb.wanmanager.if.1.ConnectionType" type="astr">0</Record>
+   <Record name="dmsb.wanmanager.if.1.Priority" type="astr">0</Record>
+   <Record name="dmsb.wanmanager.if.1.SelectionTimeout" type="astr">20</Record>
+   <Record name="dmsb.wanmanager.if.1.EnablePPP" type="astr">FALSE</Record>
+   <Record name="dmsb.wanmanager.if.1.EnableMAPT" type="astr">TRUE</Record>
+   <Record name="dmsb.wanmanager.if.1.EnableDSLite" type="astr">FALSE</Record>
+   <Record name="dmsb.wanmanager.if.1.Marking.List" type="astr">DATA</Record>
+   <Record name="dmsb.wanmanager.if.1.Marking.DATA.Alias" type="astr">DATA</Record>
+   <Record name="dmsb.wanmanager.if.1.Marking.DATA.SKBPort" type="astr">1</Record>
+   <Record name="dmsb.wanmanager.if.1.Marking.DATA.SKBMark" type="astr"> </Record>
+   <Record name="dmsb.wanmanager.if.1.Marking.DATA.EthernetPriorityMark" type="astr"></Record>
+   <Record name="dmsb.wanmanager.if.1.EnableDHCP" type="astr">TRUE</Record>
+   <Record name="dmsb.wanmanager.if.1.PPPEnable" type="astr">FALSE</Record>
+   <Record name="dmsb.wanmanager.if.1.PPPLinkType" type="astr">PPPoE</Record>
+   <Record name="dmsb.wanmanager.if.1.PPPIPCPEnable" type="astr">FALSE</Record>
+   <Record name="dmsb.wanmanager.if.1.PPPIPV6CPEnable" type="astr">FALSE</Record>
+   <Record name="dmsb.wanmanager.if.1.RebootOnConfiguration" type="astr">TRUE</Record>
+   <Record name="dmsb.wanmanager.if.1.Group" type="astr">1</Record>
+
    <!-- X_RDK_WanManager.CPEInterface.2. -wanmanager -->
   <Record name="dmsb.wanmanager.if.2.Name" type="astr">wwan0</Record>
   <Record name="dmsb.wanmanager.if.2.DisplayName" type="astr">LTE</Record>
@@ -1304,7 +1304,9 @@
   <Record name="dmsb.cellularmanager.profile.default.isnoroaming"  type="astr" contentType="bool">FALSE</Record>
   <Record name="dmsb.cellularmanager.profile.default.isapndisabled"  type="astr" contentType="bool">FALSE</Record>
 <!-- rdk-cellularmanager end -->
-	    
+
+   <Record name="Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.IPModeEnable" type="astr">0</Record>
+
    <!-- ccsp-vlanmanager EthLink records --> 
    <Record name="dmsb.ethlink.ifcount" type="astr">1</Record> 
    <Record name="dmsb.ethlink.1.Enable" type="astr">FALSE</Record> 
@@ -1313,16 +1315,16 @@
    <Record name="dmsb.ethlink.1.lowerlayers" type="astr"></Record> 
    <Record name="dmsb.ethlink.1.macoffset" type="astr">3</Record> 
    <Record name="dmsb.ethlink.1.baseiface" type="astr">lan0</Record> 
-   <Record name="dmsb.ethlink.1.path" type="astr">Device.X_RDK_WanManager.Interface.1.VirtualInterface.1</Record> 
+   <Record name="dmsb.ethlink.1.path" type="astr">Device.X_RDK_WanManager.Interface.1.VirtualInterface.1</Record>
    <Record name="dmsb.vlanmanager.ifcount" type="astr">1</Record> 
    <Record name="dmsb.vlanmanager.1.Enable" type="astr">FALSE</Record> 
    <Record name="dmsb.vlanmanager.1.alias" type="astr">WANOE</Record> 
    <Record name="dmsb.vlanmanager.1.name" type="astr">erouter0</Record> 
-   <Record name="dmsb.vlanmanager.1.lowerlayers" type="astr">Device.X_RDK_Ethernet.Link.3</Record> 
+   <Record name="dmsb.vlanmanager.1.lowerlayers" type="astr">Device.X_RDK_Ethernet.Link.1</Record>
    <Record name="dmsb.vlanmanager.1.baseinterface" type="astr">lan0</Record> 
    <Record name="dmsb.vlanmanager.1.vlanid" type="astr">-1</Record> 
    <Record name="dmsb.vlanmanager.1.tpid" type="astr">0</Record> 
-   <Record name="dmsb.vlanmanager.1.path" type="astr">Device.X_RDK_WanManager.Interface.1.VirtualInterface.1</Record> 
+   <Record name="dmsb.vlanmanager.1.path" type="astr">Device.X_RDK_WanManager.Interface.1.VirtualInterface.1</Record>
    <!-- Wanmanger Unified  struct --> 
    <Record name="dmsb.wanmanager.wan.interfacecount" type="astr">2</Record> 
    <Record name="dmsb.wanmanager.group.Count" type="astr">1</Record> 
@@ -1348,9 +1350,10 @@
    <Record name="dmsb.wanmanager.if.1.VirtualInterface.1.IP.DHCPV4Interface" type="astr">Device.DHCPv4.Client.1</Record>
    <Record name="dmsb.wanmanager.if.1.VirtualInterface.1.IP.IPv6Source" type="astr">2</Record> 
    <Record name="dmsb.wanmanager.if.1.VirtualInterface.1.IP.DHCPV6Interface" type="astr">Device.DHCPv6.Client.1</Record>
-   <Record name="dmsb.wanmanager.if.1.VirtualInterface.1.VlanInUse" type="astr"></Record> 
+   <Record name="dmsb.wanmanager.if.1.VirtualInterface.1.VlanInUse" type="astr">Device.X_RDK_Ethernet.VLANTermination.1</Record>
    <Record name="dmsb.wanmanager.if.1.VirtualInterface.1.Timeout" type="astr">20</Record> 
-   <Record name="dmsb.wanmanager.if.1.VirtualInterface.1.VlanCount" type="astr">0</Record> 
+   <Record name="dmsb.wanmanager.if.1.VirtualInterface.1.VlanCount" type="astr">1</Record>
+   <Record name="dmsb.wanmanager.if.1.VirtualInterface.1.VLAN.1.Interface" type="astr">Device.X_RDK_Ethernet.VLANTermination.1</Record>
    <Record name="dmsb.wanmanager.if.1.VirtualInterface.1.MarkingCount" type="astr">0</Record>
 
   <Record name="dmsb.wanmanager.if.2.BaseInterface" type="astr">Device.Cellular.Interface.1</Record>
