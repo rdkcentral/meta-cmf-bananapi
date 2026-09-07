@@ -75,7 +75,8 @@ do_install:append:class-target() {
    sed -i '$a [Install]\nWantedBy=multi-user.target' ${D}${systemd_unitdir}/system/onewifi.service
    fi
    sed -i '/IsErouterRunningStatus/,/fi/ s/^/#/' ${D}/usr/ccsp/ccspPAMCPCheck.sh
-   sed -i '/ExecStart=/i ExecStartPre=/usr/bin/start_cron' ${D}${libdir}/systemd/system/RdkFwUpgradeManager.service
+   sed -i '/ExecStart=/i ExecStartPre=/usr/bin/start_cron' ${D}${lib}/systemd/system/RdkFwUpgradeManager.service
+   sed -i 's/ RdkWanManager.service//g' ${D}${systemd_unitdir}/system/CcspEthAgent.service
 }
 
 
