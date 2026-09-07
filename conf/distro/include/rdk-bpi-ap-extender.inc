@@ -37,7 +37,7 @@ DISTRO_FEATURES:append = " generic_mlo"
 #DISTRO_FEATURES:append = " kernel6-6"
 PREFERRED_VERSION_linux-libc-headers:wrynose = "6.12"
 DISTRO_FEATURES:append = " kernel6-12"
-
+#DISTRO_FEATURES:append = " rdkb_configurable_wan_interface"
 #Disable rdm-agent for reference platform
 #DISTRO_FEATURES:append = "RDM"
 

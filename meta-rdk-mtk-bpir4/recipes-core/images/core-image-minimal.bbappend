@@ -1,8 +1,7 @@
-MACHINE_FEATURES:remove = "efi"
+MACHINE_FEATURES:remove:wrynose = "efi"
 
-IMAGE_INSTALL:remove = "pciutils usbutils"
-IMAGE_INSTALL:remove = "dbus-tools systemd-extra-utils"
-IMAGE_INSTALL:remove = "apparmor apparmor-utils"
+IMAGE_INSTALL:remove:wrynose = "pciutils usbutils"
+IMAGE_INSTALL:remove:wrynose = "dbus-tools systemd-extra-utils"
 
 PACKAGE_EXCLUDE += "systemd-mime"
 ROOTFS_POSTPROCESS_COMMAND += " strip_extra_share; "
