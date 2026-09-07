@@ -28,7 +28,7 @@ fi' ${D}${sbindir}/init-bridge.sh
 #Mounting nvram
    sed -i '/Before=CcspPandMSsp.service/a Requires=mount-nvram.service' ${D}${libdir}/systemd/system/init-Lanbridge.service
    sed -i 's/utopia.service/mount-nvram.service &/' ${D}${libdir}/systemd/system/init-Lanbridge.service
-   sed -i '/After=hostapd.service/d' ${D}/libdir/systemd/system/init-IPv6.service
+   sed -i '/After=hostapd.service/d' ${D}${libdir}/systemd/system/init-IPv6.service
 }
 
 #ESDK support - Avoid conflict file is installed by both systemd and init-filogic in kirkstone
