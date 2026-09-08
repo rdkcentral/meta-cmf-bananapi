@@ -7,7 +7,7 @@ DISTRO_FEATURES:append = " rdkb_wan_manager"
 
 DISTRO_FEATURES:append = " halVersion3"
 
-DISTRO_FEATURES_append = " bridgeUtilsBin"
+DISTRO_FEATURES:append = " bridgeUtilsBin"
 
 #rdk-wifi-libhostap support for broadband
 DISTRO_FEATURES:append = " HOSTAPD_2_11"
@@ -51,7 +51,7 @@ DISTRO_FEATURES:remove = " lan0_as_wan"
 PREFERRED_VERSION_go = "1.24.%"
 
 #Enable below distro to build Easymesh and dependent Wi-Fi components from tip (AUTOREV) during CI validation
-#DISTRO_FEATURES_append = " BuildFromTip"
+#DISTRO_FEATURES:append = " BuildFromTip"
 
 #Enable wps support
 DISTRO_FEATURES:append = " wps_support"
