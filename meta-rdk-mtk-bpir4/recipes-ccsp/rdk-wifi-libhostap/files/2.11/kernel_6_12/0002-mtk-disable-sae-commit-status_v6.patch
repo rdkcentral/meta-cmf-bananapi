@@ -1,0 +1,27 @@
+##########################################
+Date: Apr 29, 2025 9:40 PM
+From:
+Subject: Disable SAE commit status
+Source: Comcast
+Upstream-Status: Pending
+Signed-off-by: Narendra Varma <narendandu@gmail.com>
+##########################################
+diff -Naur git.orig/source/hostap-2.11/src/ap/ieee802_11.c git/source/hostap-2.11/src/ap/ieee802_11.c
+--- git.orig/source/hostap-2.11/src/ap/ieee802_11.c	2026-04-27 12:39:20.778958114 +0100
++++ git/source/hostap-2.11/src/ap/ieee802_11.c	2026-04-27 12:40:27.054798685 +0100
+@@ -1069,6 +1069,7 @@
+ 		status = WLAN_STATUS_SAE_HASH_TO_ELEMENT;
+ 	else
+ 		status = WLAN_STATUS_SUCCESS;
++#if 0
+ #ifdef CONFIG_TESTING_OPTIONS
+ 	if (hapd->conf->sae_commit_status >= 0 &&
+ 	    hapd->conf->sae_commit_status != status) {
+@@ -1078,6 +1079,7 @@
+ 		status = hapd->conf->sae_commit_status;
+ 	}
+ #endif /* CONFIG_TESTING_OPTIONS */
++#endif 
+ 	reply_res = send_auth_reply(hapd, sta, sta->addr,
+ 				    WLAN_AUTH_SAE, 1,
+ 				    status, wpabuf_head(data),

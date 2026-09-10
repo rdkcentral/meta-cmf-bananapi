@@ -1,0 +1,44 @@
+##########################################
+From: NarendraVarma_Dandu@comcast.com
+Date: Jan 10, 2025 1:00 AM
+Source: Comcast
+##########################################
+
+diff -Naur git.orig/source/hostap-2.11/src/ap/ieee802_11.c git/source/hostap-2.11/src/ap/ieee802_11.c
+--- git.orig/source/hostap-2.11/src/ap/ieee802_11.c	2026-04-27 06:59:18.319918123 +0100
++++ git/source/hostap-2.11/src/ap/ieee802_11.c	2026-04-27 07:03:39.507329367 +0100
+@@ -6548,6 +6548,11 @@
+ 		return;
+ 	}
+ 
++        os_free(sta->assoc_req);
++        sta->assoc_req = os_malloc(len);
++        os_memcpy(sta->assoc_req, (u8 *)mgmt, len);
++        sta->assoc_req_len = len;
++
+ 	if ((fc & WLAN_FC_RETRY) &&
+ 	    sta->last_seq_ctrl != WLAN_INVALID_MGMT_SEQ &&
+ 	    sta->last_seq_ctrl == seq_ctrl &&
+diff -Naur git.orig/source/hostap-2.11/src/ap/sta_info.c git/source/hostap-2.11/src/ap/sta_info.c
+--- git.orig/source/hostap-2.11/src/ap/sta_info.c	2026-04-27 06:59:18.319918123 +0100
++++ git/source/hostap-2.11/src/ap/sta_info.c	2026-04-27 07:04:23.491232855 +0100
+@@ -593,6 +593,7 @@
+ 	if (sta->sae_pt)
+ 		sae_deinit_pt(sta->sae_pt);
+ #endif
++        os_free(sta->assoc_req);
+ 
+ 	os_free(sta);
+ }
+diff -Naur git.orig/source/hostap-2.11/src/ap/sta_info.h git/source/hostap-2.11/src/ap/sta_info.h
+--- git.orig/source/hostap-2.11/src/ap/sta_info.h	2026-04-27 06:59:18.319918123 +0100
++++ git/source/hostap-2.11/src/ap/sta_info.h	2026-04-27 07:04:57.759157703 +0100
+@@ -343,6 +343,8 @@
+ 
+ 	u16 max_idle_period; /* if nonzero, the granted BSS max idle period in
+ 			      * units of 1000 TUs */
++        u8 *assoc_req;
++        size_t assoc_req_len;
+ 
+ 	u64 last_known_sta_id_timestamp;
+ 

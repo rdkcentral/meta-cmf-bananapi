@@ -11,9 +11,14 @@ RDEPENDS_packagegroup-rdk-ccsp-broadband_append = " \
            ${@bb.utils.contains('DISTRO_FEATURES', 'cellular_hybrid_support', 'usb-modeswitch', ' ', d)} \
            ${@bb.utils.contains('DISTRO_FEATURES', 'cellular_hybrid_support', 'usb-modeswitch-data', ' ', d)} \
            ${@bb.utils.contains('DISTRO_FEATURES', 'cellular_hybrid_support', 'modemmanager', ' ', d)} \
+           linux-firmware-bcm-bt \
+           linux-firmware-rtl-bt \
+           linux-firmware-brcm \
            "
 GWPROVAPP = "${@bb.utils.contains('DISTRO_FEATURES','rdkb_wan_manager','ccsp-gwprovapp', '' ,d)}"
 
 RDEPENDS_packagegroup-rdk-ccsp-broadband_append = "${@bb.utils.contains('DISTRO_FEATURES', 'rdkb_cellular_manager_mm', ' rdk-cellularmanager-mm', ' ', d)}"
 RDEPENDS_packagegroup-rdk-ccsp-broadband_append = " rdktelcovoicemanager"
 RDEPENDS_packagegroup-rdk-ccsp-broadband_append = " gw-lan-refresh"
+RDEPENDS_packagegroup-rdk-ccsp-broadband_append = " ${@bb.utils.contains('DISTRO_FEATURES', 'nat46', 'nat46', '', d)}"
+RDEPENDS_packagegroup-rdk-ccsp-broadband_append = " mount-nvram"

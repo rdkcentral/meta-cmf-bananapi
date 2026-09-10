@@ -1,0 +1,31 @@
+SOURCE:RDKM
+
+diff --git a/src/ap/drv_callbacks.c b/src/ap/drv_callbacks.c
+index f3aeb2236..659e12f38 100644
+--- a/src/ap/drv_callbacks.c
++++ b/src/ap/drv_callbacks.c
+@@ -974,6 +974,9 @@ static void hostapd_remove_sta(struct hostapd_data *hapd, struct sta_info *sta)
+ 	wpa_auth_sm_event(sta->wpa_sm, WPA_DISASSOC);
+ 	sta->acct_terminate_cause = RADIUS_ACCT_TERMINATE_CAUSE_USER_REQUEST;
+ 	ieee802_1x_notify_port_enabled(sta->eapol_sm, 0);
++#ifdef _PLATFORM_BANANAPI_R4_
++        hostapd_drv_sta_disassoc(hapd, sta->addr, WLAN_REASON_DISASSOC_STA_HAS_LEFT);
++#endif	
+ 	ap_free_sta(hapd, sta);
+ }
+ 
+diff --git a/src/ap/hostapd.c b/src/ap/hostapd.c
+index 049777b0a..d6de6049e 100644
+--- a/src/ap/hostapd.c
++++ b/src/ap/hostapd.c
+@@ -4145,6 +4145,10 @@ void hostapd_new_assoc_sta(struct hostapd_data *hapd, struct sta_info *sta,
+ 			 * the (Re)Association Response frame. */
+ 			hostapd_set_sta_flags(hapd, sta);
+ 		}
++#ifdef _PLATFORM_BANANAPI_R4_
++                /*When Station is connected with OPEN Mode, need to authorize the station */
++                hostapd_set_authorized(hapd, sta, 1);
++#endif		
+ 		os_get_reltime(&sta->connected_time);
+ 		accounting_sta_start(hapd, sta);
+ 	}

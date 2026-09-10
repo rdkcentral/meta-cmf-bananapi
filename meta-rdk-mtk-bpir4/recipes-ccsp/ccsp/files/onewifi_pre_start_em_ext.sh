@@ -1,4 +1,18 @@
 #!/bin/sh
+
+if [ ! -f /nvram/wifi_defaults.txt ]; then
+   cp /usr/ccsp/wifi/wifi_defaults.txt /nvram
+fi
+if [ ! -f /nvram/InterfaceMap.json ]; then
+   cp /usr/ccsp/wifi/InterfaceMap.json /nvram
+fi
+if [ ! -f /nvram/EasymeshCfg.json ]; then
+   cp /usr/ccsp/EasyMesh/EasymeshCfg.json /nvram
+fi
+if [ ! -f /nvram/Data_Elements_JSON_Schema_v3.0.json ]; then
+   cp /usr/ccsp/EasyMesh/Data_Elements_JSON_Schema_v3.0.json /nvram
+fi
+
 sleep 5
 
 iw phy phy0 interface add wifi0 type __ap

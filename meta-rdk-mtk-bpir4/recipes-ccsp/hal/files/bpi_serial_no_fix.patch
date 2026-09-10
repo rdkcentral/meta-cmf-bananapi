@@ -2,12 +2,12 @@ Index: platform/rdkb_hal/src/platform/platform_hal.c
 ===================================================================
 --- platform.orig/rdkb_hal/src/platform/platform_hal.c
 +++ platform/rdkb_hal/src/platform/platform_hal.c
-@@ -106,19 +106,21 @@ INT platform_hal_GetSerialNumber(CHAR* p
+@@ -89,19 +89,17 @@ INT platform_hal_GetSerialNumber(CHAR* pValue)
  	if (pValue != NULL)
  	{
  		INT arr[6] = {0};
 -		const char *path = "/sys/class/net/eth1/address";
-+		const char *path = "/etc/machine-id";
++		const char *path = "/nvram/serial_number.txt";
  		FILE *fp = fopen(path, "r");
  		if (fp != NULL)
  		{
@@ -17,17 +17,16 @@ Index: platform/rdkb_hal/src/platform/platform_hal.c
 +			buf[strcspn(buf, "\n")] = '\0';
  			fclose(fp);
 -			if(6  == sscanf(buf, "%02x:%02x:%02x:%02x:%02x:%02x",&arr[0],&arr[1],&arr[2],&arr[3],&arr[4],&arr[5]))
-+			/*if(6  == sscanf(buf, "%02x:%02x:%02x:%02x:%02x:%02x",&arr[0],&arr[1],&arr[2],&arr[3],&arr[4],&arr[5]))
- 			{
- 				sprintf(pValue,"%02x%02x%02x%02x%02x%02x",arr[0],arr[1],arr[2],arr[3],arr[4],arr[5]);
- 				return RETURN_OK;
+-			{
+-				sprintf(pValue,"%02x%02x%02x%02x%02x%02x",arr[0],arr[1],arr[2],arr[3],arr[4],arr[5]);
+-				return RETURN_OK;
 -			}	
-+			}*/
-+		       sprintf(pValue,"%s",buf);
++			sprintf(pValue,"%s",buf);
++			return RETURN_OK;
  		}
  	}
  	return RETURN_ERR;
-@@ -171,7 +173,7 @@ INT platform_hal_GetBaseMacAddress(CHAR
+@@ -154,7 +152,7 @@ INT platform_hal_GetBaseMacAddress(CHAR *pValue)
  {
  	if (pValue != NULL)
  	{

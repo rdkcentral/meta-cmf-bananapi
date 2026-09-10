@@ -15,6 +15,8 @@ DISTRO_FEATURES_append = " referencepltfm "
 
 MACHINEOVERRIDES_append = "${@bb.utils.contains('DISTRO_FEATURES', 'OneWifi', ':onewifi', '' ,d)}"
 
+MACHINEOVERRIDES_append = "${@bb.utils.contains('DISTRO_FEATURES', 'kernel6-6', ':kernel6-6', bb.utils.contains('DISTRO_FEATURES', 'kernel6-12', ':kernel6-12','',d), d)}"
+
 DISTRO_FEATURES_append = " partner_default_ext"
 
 # Define extender feature
@@ -33,6 +35,10 @@ DISTRO_FEATURES_append = " generic_mlo"
 
 # Kernel 6.6
 DISTRO_FEATURES_append = " kernel6-6"
+#DISTRO_FEATURES_append = " kernel6-12"
 
 #Disable rdm-agent for reference platform
 #DISTRO_FEATURES_append = "RDM"
+
+#Enable below distro to build Easymesh and dependent Wi-Fi components from tip (AUTOREV) during CI validation
+#DISTRO_FEATURES_append = " BuildFromTip"

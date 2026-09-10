@@ -1,0 +1,16 @@
+[Unit]
+Description=OpenThread Border Router service
+#ConditionPathExists=/dev/shm/cpcd/cpcd_0/ctrl.cpcd.sock
+BindsTo=cpcd.service
+Requires=cpcd.service
+After=cpcd.service network.target
+StartLimitIntervalSec=0
+
+[Service]
+Type=simple
+ExecStart=otbr-agent -v -d5 -I wpan0 -B brlan0 'spinel+cpc://cpcd_0?iid=2&iid-list=0' trel://brlan0
+Restart=always
+RestartSec=2
+
+[Install]
+WantedBy=multi-user.target

@@ -2,18 +2,6 @@ Index: platform/rdkb_hal/src/platform/platform_hal.c
 ===================================================================
 --- platform.orig/rdkb_hal/src/platform/platform_hal.c
 +++ platform/rdkb_hal/src/platform/platform_hal.c
-@@ -120,8 +120,10 @@ INT platform_hal_GetSerialNumber(CHAR* p
- 				sprintf(pValue,"%02x%02x%02x%02x%02x%02x",arr[0],arr[1],arr[2],arr[3],arr[4],arr[5]);
- 				return RETURN_OK;
- 			}*/
--		       sprintf(pValue,"%s",buf);
-+		        sprintf(pValue,"%s",buf);
- 		}
-+		///RDKBACCL-920
-+		return RETURN_OK;
- 	}
- 	return RETURN_ERR;
- 
 @@ -144,12 +146,13 @@ INT platform_hal_GetHardware(CHAR *pValu
  	char buf[64] = {0};
  	char cmd[128] = {0};

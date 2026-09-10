@@ -1,0 +1,19 @@
+diff --git a/git/nat46/modules/Makefile b/git/nat46/modules/Makefile
+index 9380882..e119277 100644
+--- a/git/nat46/modules/Makefile
++++ b/git/nat46/modules/Makefile
+@@ -1,9 +1,11 @@
+ obj-m += nat46.o
+ nat46-objs := nat46-netdev.o nat46-module.o nat46-core.o nat46-glue.o
+ CFLAGS_nat46.o := -DDEBUG
++ccflags-y += -Wno-date-time -Wno-implicit-function-declaration
+ 
+ all:
+-	make -C /lib/modules/$(shell uname -r)/build M=$(PWD) modules
+-
++	make -C $(KERNEL_SRC) M=$(PWD) modules
++modules_install:
++	make -C $(KERNEL_SRC) M=$(PWD) modules_install
+ clean:
+-	make -C /lib/modules/$(shell uname -r)/build M=$(PWD) clean
++	make -C $(KERNEL_SRC) M=$(PWD) clean

@@ -1,0 +1,12 @@
+SOURCE:RDKM
+diff -Naur git.orig/source/hostap-2.11/src/ap/ieee802_11_he.c git/source/hostap-2.11/src/ap/ieee802_11_he.c
+--- git.orig/source/hostap-2.11/src/ap/ieee802_11_he.c	2026-04-28 11:57:06.110431980 +0100
++++ git/source/hostap-2.11/src/ap/ieee802_11_he.c	2026-04-28 11:57:41.534395318 +0100
+@@ -94,6 +94,7 @@
+ 	struct ieee80211_he_capabilities *cap;
+ 	struct hostapd_hw_modes *mode = hapd->iface->current_mode;
+ 	const struct he_capabilities *he_capab;
++        u8 he_oper_chwidth = ~HE_PHYCAP_CHANNEL_WIDTH_MASK;
+ 	u8 *pos = eid;
+ 	u8 ie_size = 0, mcs_nss_size, ppet_size;
+ 	u8 *epos;

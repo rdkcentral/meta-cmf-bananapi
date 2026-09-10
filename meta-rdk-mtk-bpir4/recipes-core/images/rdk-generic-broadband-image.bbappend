@@ -1,5 +1,5 @@
 #WebPA Feature
-IMAGE_INSTALL_append = " parodus parodus2ccsp rdktelcovoicemanager asterisk hal-voice-asterisk"
+IMAGE_INSTALL_append = " parodus parodus2ccsp rdktelcovoicemanager asterisk hal-voice-asterisk cpcd otbr-agent bluez5-bluetoothd bt-host-cpc-hci-bridge barton"
 
 #TR069 Feature
 IMAGE_INSTALL_append = " ccsp-tr069-pa"
@@ -7,7 +7,7 @@ IMAGE_INSTALL_append = " bpi-serialnumber"
 IMAGE_INSTALL_append = " bpi-macaddress"
 
 
-IMAGE_INSTALL_append = " rdk-speedtest-cli"
+IMAGE_INSTALL_append = " rdk-speedtest-cli rdm-agent ${@bb.utils.contains('DISTRO_FEATURES', 'rrd', ' remotedebugger', " ", d)}"
 #Enable required linux utils for Fwupgrade
 IMAGE_INSTALL_append = " gptfdisk e2fsprogs-mke2fs util-linux util-linux-losetup coreutils"
 
@@ -40,7 +40,7 @@ do_filogic_gen_image(){
 
                 cp ${DEPLOY_DIR_IMAGE}/fitImage ${IMGDEPLOYDIR}/sysupgrade-${PN}-${MACHINE}/kernel
                 cp ${IMGDEPLOYDIR}/${PN}-${MACHINE}.squashfs-xz ${IMGDEPLOYDIR}/sysupgrade-${PN}-${MACHINE}/root
-                if ${@bb.utils.contains('DISTRO_FEATURES','kernel6-6','true','false',d)}; then
+                if ${@bb.utils.contains_any('DISTRO_FEATURES','kernel6-6 kernel6-12','true','false',d)}; then
                 fit-rootfs-hash-tool ${IMGDEPLOYDIR}/sysupgrade-${PN}-${MACHINE}/kernel ${IMGDEPLOYDIR}/sysupgrade-${PN}-${MACHINE}/root
                 fi
                 cd ${IMGDEPLOYDIR}
@@ -55,7 +55,7 @@ do_filogic_gen_image(){
 
                 cp ${DEPLOY_DIR_IMAGE}/fitImage-sb ${IMGDEPLOYDIR}/sysupgrade-${PN}-${MACHINE}-sb/kernel
                 cp ${IMGDEPLOYDIR}/${PN}-${MACHINE}.squashfs-xz ${IMGDEPLOYDIR}/sysupgrade-${PN}-${MACHINE}-sb/root
-                if ${@bb.utils.contains('DISTRO_FEATURES','kernel6-6','true','false',d)}; then
+                if ${@bb.utils.contains_any('DISTRO_FEATURES','kernel6-6 kernel6-12','true','false',d)}; then
                 fit-rootfs-hash-tool ${IMGDEPLOYDIR}/sysupgrade-${PN}-${MACHINE}-sb/kernel ${IMGDEPLOYDIR}/sysupgrade-${PN}-${MACHINE}-sb/root
                 fi
 
@@ -67,6 +67,4 @@ do_filogic_gen_image(){
 }
 
 IMAGE_INSTALL_remove = "${@bb.utils.contains('DISTRO_FEATURES', 'ppp-enabled', '', 'pptp-linux rp-pppoe xl2tpd', d)}"
-IMAGE_INSTALL_append = "${@bb.utils.contains('DISTRO_FEATURES', 'EasyMesh',' unified-wifi-mesh unified-wifi-mesh-cli socat','',d)}"
-IMAGE_INSTALL_append = "${@bb.utils.contains('DISTRO_FEATURES', 'with_alsap',' ieee1905-em ','',d)}"
 IMAGE_INSTALL_remove_onewifi += " mtkhnat-util"

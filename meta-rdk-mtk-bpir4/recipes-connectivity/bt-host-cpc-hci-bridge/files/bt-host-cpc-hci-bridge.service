@@ -1,0 +1,14 @@
+[Unit]
+Description=Bluetooth CPC HCI Bridge
+After=cpcd.service
+Requires=cpcd.service
+
+[Service]
+Type=simple
+ExecStart=/usr/bin/bt_host_cpc_hci_bridge
+Restart=always
+RestartSec=5
+WorkingDirectory=/tmp
+
+[Install]
+WantedBy=multi-user.target

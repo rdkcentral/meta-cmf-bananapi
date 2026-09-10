@@ -1,0 +1,30 @@
+##########################################
+Date: Jul 8, 2025 11:53 AM
+From:
+Subject: Fixed compilation issues
+Source: Comcast
+Upstream-Status: Pending
+Signed-off-by: Bogdan Bogush <bogdan.bogush@comcast.com>
+##########################################
+diff -Naur git.orig/source/hostap-2.11/hostapd/Makefile git/source/hostap-2.11/hostapd/Makefile
+--- git.orig/source/hostap-2.11/hostapd/Makefile	2026-04-28 08:04:35.063998239 +0100
++++ git/source/hostap-2.11/hostapd/Makefile	2026-04-28 08:05:58.315921088 +0100
+@@ -284,6 +284,7 @@
+ 
+ ifndef CONFIG_NO_CTRL_IFACE
+ CFLAGS += -DCONFIG_CTRL_IFACE
++CFLAGS += -DCONFIG_CTRL_IFACE_MIB
+ endif
+ 
+ ifdef CONFIG_RSN_PREAUTH
+diff -Naur git.orig/source/hostap-2.11/src/ap/ap_config.h git/source/hostap-2.11/src/ap/ap_config.h
+--- git.orig/source/hostap-2.11/src/ap/ap_config.h	2026-04-28 08:04:35.075998228 +0100
++++ git/source/hostap-2.11/src/ap/ap_config.h	2026-04-28 08:07:47.795819651 +0100
+@@ -639,6 +639,7 @@
+ 
+ 	u8 qos_map_set[16 + 2 * 21];
+ 	unsigned int qos_map_set_len;
++        int osen;
+ 
+ 	int proxy_arp;
+ 	int na_mcast_to_ucast;

@@ -1,4 +1,12 @@
 #!/bin/sh
+
+if [ ! -f /nvram/wifi_defaults.txt ]; then
+   cp /usr/ccsp/wifi/wifi_defaults.txt /nvram
+fi
+if [ ! -f /nvram/InterfaceMap.json ]; then
+   cp /usr/ccsp/wifi/InterfaceMap.json /nvram
+fi
+
 sleep 20
 
 #To update al_mac_addr in EasyMeshCfg.json to avoid onewifi restarting during fresh boot-up

@@ -85,9 +85,9 @@ index 0effd53..d644269 100644
      wifi_dbg_printf("\n[%s]: deleting hostapd conf file",__func__);
 -    sprintf(cmd, "rm -rf /nvram/hostapd*");
 -    system(cmd);
--    system("systemctl restart hostapd.service");
 +    system("rm -rf /nvram/hostapd*");
- 
+     system("systemctl restart hostapd.service");
+-
      return RETURN_OK;
  }
 @@ -949,7 +968,10 @@ INT wifi_factoryResetRadio(int radioIndex) 	//RDKB

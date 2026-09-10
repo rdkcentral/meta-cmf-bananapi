@@ -1,0 +1,11 @@
+[Unit]
+Description=Mount nvram partition
+Before=gwprovapp.service
+
+[Service]
+ExecStart=/bin/sh /lib/rdk/mount-nvram.sh
+Restart=on-failure
+RestartSec=2
+
+[Install]
+WantedBy=multi-user.target

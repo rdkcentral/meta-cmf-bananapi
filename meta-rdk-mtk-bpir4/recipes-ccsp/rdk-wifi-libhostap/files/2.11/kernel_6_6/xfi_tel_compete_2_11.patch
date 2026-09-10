@@ -1,0 +1,201 @@
+diff --git a/source/hostap-2.11/src/ap/ap_drv_ops.c b/source/hostap-2.11/src/ap/ap_drv_ops.c
+index e6fd198bc..2b42fb28c 100644
+--- a/source/hostap-2.11/src/ap/ap_drv_ops.c
++++ b/source/hostap-2.11/src/ap/ap_drv_ops.c
+@@ -991,12 +991,12 @@ int hostapd_drv_sta_deauth(struct hostapd_data *hapd,
+ 					reason, link_id);
+ }
+ 
+-int hostapd_drv_radius_eap_failure(struct hostapd_data *hapd,
++int hostapd_drv_radius_eap_failure(struct hostapd_data *hapd, const u8 *addr,
+                            int failure_reason)
+ {
+        if (!hapd->driver || !hapd->driver->radius_eap_failure || !hapd->drv_priv)
+                return 0;
+-       return hapd->driver->radius_eap_failure(hapd->drv_priv, failure_reason);
++       return hapd->driver->radius_eap_failure(hapd->drv_priv, addr, failure_reason);
+ }
+ 
+ int hostapd_drv_radius_fallback_failover(void *ctx, int radius_switch_reason)
+@@ -1448,6 +1448,13 @@ size_t hostapd_drv_eid_rnr_colocation_len(struct hostapd_data *hapd,
+         return hapd->driver->get_rnr_colocation_len(hapd->drv_priv, current_len);
+ }
+ 
++int hostapd_drv_get_handshake_status(struct hostapd_data *hapd, const u8 *addr, int status)
++{
++	if(!hapd->driver || !hapd->driver->get_handshake_status)
++		return -1;
++	return hapd->driver->get_handshake_status(hapd->drv_priv, addr, status);
++}
++
+ int hostapd_drv_get_sta_auth_type(struct hostapd_data *hapd,
+                                         const u8 *addr, const u8 *ies, size_t ies_len, int frame_type)
+ {
+diff --git a/source/hostap-2.11/src/ap/ap_drv_ops.h b/source/hostap-2.11/src/ap/ap_drv_ops.h
+index daa4876a6..c90580974 100644
+--- a/source/hostap-2.11/src/ap/ap_drv_ops.h
++++ b/source/hostap-2.11/src/ap/ap_drv_ops.h
+@@ -119,7 +119,7 @@ int hostapd_drv_send_mlme(struct hostapd_data *hapd,
+ 			  int no_encrypt);
+ int hostapd_drv_sta_deauth(struct hostapd_data *hapd,
+ 			   const u8 *addr, int reason);
+-int hostapd_drv_radius_eap_failure(struct hostapd_data *hapd, int failure_reason);
++int hostapd_drv_radius_eap_failure(struct hostapd_data *hapd, const u8 *addr, int failure_reason);
+ int hostapd_drv_radius_fallback_failover(void *ctx, int radius_switch_reason);
+ int hostapd_drv_sta_notify_deauth(struct hostapd_data *hapd,
+                            const u8 *addr, int reason);
+@@ -216,6 +216,8 @@ int hostapd_drv_set_epcs(struct hostapd_data *hapd, struct epcs_entry *entry,
+ int hostapd_drv_csi_set(struct hostapd_data *hapd, u8 mode, u8 cfg, u8 v1, u32 v2, u8 *mac);
+ int hostapd_drv_csi_dump(struct hostapd_data *hapd, void *dump_buf);
+ 
++int hostapd_drv_get_handshake_status(struct hostapd_data *hapd, const u8 *addr, int status);
++
+ #include "drivers/driver.h"
+ 
+ int hostapd_drv_wnm_oper(struct hostapd_data *hapd,
+diff --git a/source/hostap-2.11/src/ap/ieee802_1x.c b/source/hostap-2.11/src/ap/ieee802_1x.c
+index e60a47e16..280a46e53 100644
+--- a/source/hostap-2.11/src/ap/ieee802_1x.c
++++ b/source/hostap-2.11/src/ap/ieee802_1x.c
+@@ -1697,10 +1697,11 @@ static void ieee802_1x_decapsulate_radius(struct hostapd_data *hapd,
+ 		break;
+ 	case EAP_CODE_SUCCESS:
+ 		os_strlcpy(buf, "EAP Success", sizeof(buf));
++		hostapd_drv_radius_eap_failure(hapd, sm->addr, DRV_EAP_SUCCESS);
+ 		break;
+ 	case EAP_CODE_FAILURE:
+ 		os_strlcpy(buf, "EAP Failure", sizeof(buf));
+-		hostapd_drv_radius_eap_failure(hapd, DRV_EAP_FAILURE);
++		hostapd_drv_radius_eap_failure(hapd, sm->addr, DRV_EAP_FAILURE);
+ 		break;
+ 	default:
+ 		os_strlcpy(buf, "unknown EAP code", sizeof(buf));
+@@ -2262,6 +2263,7 @@ ieee802_1x_receive_auth(struct radius_msg *msg, struct radius_msg *req,
+                 if ((hapd->conf->rdk_greylist  || hapd->conf->connected_building_avp) && !hapd->conf->ieee802_1x)
+                         ieee802_1x_set_sta_authorized(hapd, sta, 1);
+ #endif /* FEATURE_SUPPORT_RADIUSGREYLIST */		
++		hostapd_drv_radius_eap_failure(hapd, sm->addr, DRV_RADIUS_ACCESS_ACCEPT);
+ 		break;
+ 	case RADIUS_CODE_ACCESS_REJECT:
+ 		sm->eap_if->aaaFail = true;
+@@ -2304,6 +2306,7 @@ ieee802_1x_receive_auth(struct radius_msg *msg, struct radius_msg *req,
+                         }
+                 }
+ #endif /* FEATURE_SUPPORT_RADIUSGREYLIST */		
++		hostapd_drv_radius_eap_failure(hapd, sm->addr, DRV_RADIUS_ACCESS_REJECT);
+ 		break;
+ 	case RADIUS_CODE_ACCESS_CHALLENGE:
+ 		sm->eap_if->aaaEapReq = true;
+diff --git a/source/hostap-2.11/src/ap/ieee802_1x.h b/source/hostap-2.11/src/ap/ieee802_1x.h
+index 75df516e6..a134678e0 100644
+--- a/source/hostap-2.11/src/ap/ieee802_1x.h
++++ b/source/hostap-2.11/src/ap/ieee802_1x.h
+@@ -9,8 +9,10 @@
+ #ifndef IEEE802_1X_H
+ #define IEEE802_1X_H
+ 
++#define DRV_RADIUS_ACCESS_ACCEPT 0
+ #define DRV_RADIUS_ACCESS_REJECT 1
+ #define DRV_EAP_FAILURE 2
++#define DRV_EAP_SUCCESS 3
+ 
+ struct hostapd_data;
+ struct sta_info;
+diff --git a/source/hostap-2.11/src/ap/wpa_auth.c b/source/hostap-2.11/src/ap/wpa_auth.c
+index 6ccf7bba7..fc03606da 100644
+--- a/source/hostap-2.11/src/ap/wpa_auth.c
++++ b/source/hostap-2.11/src/ap/wpa_auth.c
+@@ -42,7 +42,7 @@
+ #define STATE_MACHINE_DEBUG_PREFIX "WPA"
+ #define STATE_MACHINE_ADDR wpa_auth_get_spa(sm)
+ #define KDE_ALL_LINKS 0xffff
+-
++#define EAPOL_HS_SUCCESS 1
+ 
+ static void wpa_send_eapol_timeout(void *eloop_ctx, void *timeout_ctx);
+ static int wpa_sm_step(struct wpa_state_machine *sm);
+@@ -307,6 +307,13 @@ static inline int wpa_auth_set_key(struct wpa_authenticator *wpa_auth,
+ 				     key, key_len, key_flag);
+ }
+ 
++static void wpa_get_handshake_status(struct wpa_authenticator *wpa_auth, const u8 *addr, int status)
++{
++	if(!wpa_auth->cb->get_handshake_status)
++		return;
++	wpa_auth->cb->get_handshake_status(wpa_auth->cb_ctx, addr, status);
++}
++
+ static void wpa_auth_get_sta_auth_type(struct wpa_authenticator *wpa_auth, const u8 *addr,
+                                         const u8 *data, size_t data_len, int frame_type)
+ {
+@@ -5367,6 +5374,7 @@ SM_STATE(WPA_PTK, PTKINITDONE)
+ 			 sm->wpa == WPA_VERSION_WPA ? "WPA" : "RSN");
+ 	wpa_msg(sm->wpa_auth->conf.msg_ctx, MSG_INFO, "EAPOL-4WAY-HS-COMPLETED "
+ 		MACSTR, MAC2STR(sm->addr));
++	wpa_get_handshake_status(sm->wpa_auth, sm->addr, EAPOL_HS_SUCCESS);
+ 
+ #ifdef CONFIG_IEEE80211R_AP
+ 	wpa_ft_push_pmk_r1(wpa_get_primary_auth(sm->wpa_auth), wpa_auth_get_spa(sm));
+diff --git a/source/hostap-2.11/src/ap/wpa_auth.h b/source/hostap-2.11/src/ap/wpa_auth.h
+index 33b0959c5..d88b70f4b 100644
+--- a/source/hostap-2.11/src/ap/wpa_auth.h
++++ b/source/hostap-2.11/src/ap/wpa_auth.h
+@@ -452,6 +452,7 @@ void (*get_sta_auth_type)(void *ctx, const u8 *addr,const u8 *ies, size_t ies_le
+ #endif /* CONFIG_IEEE80211BE */
+ 	int (*get_drv_flags)(void *ctx, u64 *drv_flags, u64 *drv_flags2);
+ 	int (*remove_pmkid)(void *ctx, const u8 *sta_addr, const u8 *pmkid);
++	void (*get_handshake_status)(void *ctx, const u8 *addr, int status);
+ };
+ 
+ struct wpa_authenticator * wpa_init(const u8 *addr,
+diff --git a/source/hostap-2.11/src/ap/wpa_auth_glue.c b/source/hostap-2.11/src/ap/wpa_auth_glue.c
+index 6faa393b9..9c9f999b8 100644
+--- a/source/hostap-2.11/src/ap/wpa_auth_glue.c
++++ b/source/hostap-2.11/src/ap/wpa_auth_glue.c
+@@ -1730,6 +1730,17 @@ static void hostapd_request_radius_psk(void *ctx, const u8 *addr, int key_mgmt,
+ }
+ #endif /* CONFIG_NO_RADIUS */
+ 
++static void hostapd_wpa_get_handshake_status(void *ctx, const u8 *addr, int status)
++{
++	struct hostapd_data *hapd = ctx;
++
++	if(!hapd){
++		wpa_printf(MSG_ERROR, "%s hapd is NULL", __func__);
++		return;
++	}
++	hostapd_drv_get_handshake_status(hapd, addr, status);
++}
++
+ static void hostapd_wpa_auth_get_sta_auth_type(void *ctx, const u8 *addr,
+                          const u8 *ies, size_t ies_len, int frame_type)
+ {
+@@ -1913,6 +1924,7 @@ int hostapd_setup_wpa(struct hostapd_data *hapd)
+ #endif /* CONFIG_IEEE80211BE */
+ 		.get_drv_flags = hostapd_wpa_auth_get_drv_flags,
+ 		.remove_pmkid = hostapd_wpa_auth_remove_pmkid,
++		.get_handshake_status = hostapd_wpa_get_handshake_status,
+ 	};
+ 	const u8 *wpa_ie;
+ 	size_t wpa_ie_len;
+diff --git a/source/hostap-2.11/src/drivers/driver.h b/source/hostap-2.11/src/drivers/driver.h
+index 3e660ddf0..a1bc80617 100644
+--- a/source/hostap-2.11/src/drivers/driver.h
++++ b/source/hostap-2.11/src/drivers/driver.h
+@@ -5656,7 +5656,7 @@ struct wpa_driver_ops {
+ 			      const u8 *match, size_t match_len,
+ 			      bool multicast);
+ #endif /* CONFIG_TESTING_OPTIONS */
+-        int (*radius_eap_failure)(void *priv, int failure_reason);
++	int (*radius_eap_failure)(void *priv, const u8 *addr, int failure_reason);
+ 	int (*radius_fallback_failover)(void *priv, int radius_switch_reason);
+ 	/**
+         * get_sta_auth_type - Notify about Auth Type STA sent in Assoc/Reassoc Req
+@@ -5882,6 +5882,7 @@ struct wpa_driver_ops {
+ 	 * @dfs_tx_mode: dfs tx mode
+ 	 */
+ 	int (*dfs_tx_mode)(void *priv, s8 link_id, u8 dfs_tx_mode);
++	int (*get_handshake_status)(void *priv, const u8 *addr, int status);
+ };
+ 
+ /**

@@ -5,9 +5,9 @@ DISTRO_FEATURES_append = " WanManagerUnificationEnable"
 
 DISTRO_FEATURES_append = " rdkb_wan_manager"
 
-CFLAGS_append  = " ${@bb.utils.contains('DISTRO_FEATURES', 'rdkb_wan_manager', '-DFEATURE_RDKB_WAN_MANAGER', '', d)}"
-
 DISTRO_FEATURES_append = " halVersion3"
+
+DISTRO_FEATURES_append = " bridgeUtilsBin"
 
 #rdk-wifi-libhostap support for broadband
 DISTRO_FEATURES_append = " HOSTAPD_2_11"
@@ -15,15 +15,14 @@ DISTRO_FEATURES_append = " HOSTAPD_2_11"
 # OneWifi feature
 DISTRO_FEATURES_append = " OneWifi onewifi_integration"
 
-# MacFilter Feature
-DISTRO_FEATURES_append = " disable_nl80211_acl"
-
 #No Moca Support
 DISTRO_FEATURES_append = " no_moca_support"
 
 DISTRO_FEATURES_append = " referencepltfm "
 
 MACHINEOVERRIDES_append =. "${@bb.utils.contains('DISTRO_FEATURES', 'OneWifi', ':onewifi', '' ,d)}"
+
+MACHINEOVERRIDES_append = "${@bb.utils.contains('DISTRO_FEATURES', 'kernel6-6', ':kernel6-6', bb.utils.contains('DISTRO_FEATURES', 'kernel6-12', ':kernel6-12','',d), d)}"
 
 DISTRO_FEATURES_append = " CPUPROCANALYZER_BROADBAND"
 
@@ -51,6 +50,9 @@ DISTRO_FEATURES_remove = " lan0_as_wan"
 #DISTRO_FEATURES_append = " Em_Unittest"
 PREFERRED_VERSION_go = "1.24.%"
 
+#Enable below distro to build Easymesh and dependent Wi-Fi components from tip (AUTOREV) during CI validation
+#DISTRO_FEATURES_append = " BuildFromTip"
+
 #Enable wps support
 DISTRO_FEATURES_append = " wps_support"
 
@@ -59,8 +61,12 @@ DISTRO_FEATURES_append = " resource_optimization"
 
 #Enable kernel_6_6 support
 DISTRO_FEATURES_append = " kernel6-6"
+#DISTRO_FEATURES_append = " kernel6-12"
 
 DISTRO_FEATURES_append = " CONFIG_IEEE80211BE"
+
+DISTRO_FEATURES_append = " matter"
+PREFERRED_VERSION_barton-matter = "1.4.2"
 
 DISTRO_FEATURES_append = " generic_mlo"
 
@@ -69,3 +75,13 @@ DISTRO_FEATURES_append = " generic_mlo"
 
 #Disable rdm-agent for reference platform
 #DISTRO_FEATURES_append = "RDM"
+
+DISTRO_FEATURES_append = " dhcp_manager "
+DISTRO_FEATURES_append = " rdkb_configurable_wan_interface"
+#Enable remote debugger
+DISTRO_FEATURES_append = " rrd"
+
+#Enable MAP-T
+DISTRO_FEATURES_append = " feature_mapt"
+DISTRO_FEATURES_append = " nat46"
+LINUXLIBCVERSION = "${@bb.utils.contains('DISTRO_FEATURES', 'kernel6-12', '6.12%', bb.utils.contains('DISTRO_FEATURES','kernel6-6', '6.6%', '5.4%',d), d)}"

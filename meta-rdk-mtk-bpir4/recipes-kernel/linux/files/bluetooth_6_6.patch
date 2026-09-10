@@ -1,0 +1,39 @@
+diff --git a/net/bluetooth/hci_sync.c b/net/bluetooth/hci_sync.c
+index 020f1809fc99..6d1a4d87a7c6 100644
+--- a/net/bluetooth/hci_sync.c
++++ b/net/bluetooth/hci_sync.c
+@@ -2975,14 +2975,14 @@ static int hci_le_set_ext_scan_param_sync(struct hci_dev *hdev, u8 type,
+ 		num_phy++;
+ 		phy++;
+ 	}
+-
++/*
+ 	if (scan_coded(hdev)) {
+ 		cp->scanning_phys |= LE_SCAN_PHY_CODED;
+ 		hci_le_scan_phy_params(phy, type, interval * 3, window * 3);
+ 		num_phy++;
+ 		phy++;
+ 	}
+-
++*/
+ done:
+ 	if (!num_phy)
+ 		return -EINVAL;
+@@ -6460,7 +6460,7 @@ static int hci_le_ext_create_conn_sync(struct hci_dev *hdev,
+ 		p++;
+ 		plen += sizeof(*p);
+ 	}
+-
++/*
+ 	if (scan_2m(hdev)) {
+ 		cp->phys |= LE_SCAN_PHY_2M;
+ 		set_ext_conn_params(conn, p);
+@@ -6475,7 +6475,7 @@ static int hci_le_ext_create_conn_sync(struct hci_dev *hdev,
+ 
+ 		plen += sizeof(*p);
+ 	}
+-
++*/
+ 	return __hci_cmd_sync_status_sk(hdev, HCI_OP_LE_EXT_CREATE_CONN,
+ 					plen, data,
+ 					HCI_EV_LE_ENHANCED_CONN_COMPLETE,

@@ -1,0 +1,70 @@
+From: RDKM
+Date: Wed, 29 Oct 2025
+Subject: [PATCH] Fix namespace and constant usage in CPC and vendor spinel
+
+Update OpenThread namespace usage and time constants for compatibility
+with newer OpenThread versions. Moves GetRadioSpinel declaration to
+external linkage.
+
+Source: RDKM
+
+diff --git a/protocol/openthread/platform-abstraction/posix/cpc_interface.cpp b/protocol/openthread/platform-abstraction/posix/cpc_interface.cpp
+index 67799f6aa..8bd809e2b 100644
+--- a/protocol/openthread/platform-abstraction/posix/cpc_interface.cpp
++++ b/protocol/openthread/platform-abstraction/posix/cpc_interface.cpp
+@@ -51,6 +51,8 @@
+ #include <termios.h>
+ #include <unistd.h>
+ 
++#include "common/encoding.hpp"
++#include "common/debug.hpp"
+ #include "common/code_utils.hpp"
+ #include "common/logging.hpp"
+ #include "common/new.hpp"
+@@ -163,8 +165,8 @@ void CpcInterfaceImpl::Read(uint64_t aTimeoutUs)
+     {
+         cpc_timeval_t timeout;
+ 
+-        timeout.seconds      = static_cast<int>(aTimeoutUs / US_PER_S);
+-        timeout.microseconds = static_cast<int>(aTimeoutUs % US_PER_S);
++        timeout.seconds      = static_cast<int>(aTimeoutUs / OT_US_PER_S);
++        timeout.microseconds = static_cast<int>(aTimeoutUs % OT_US_PER_S);
+ 
+         block = true;
+         ret   = cpc_set_endpoint_option(mEndpoint, CPC_OPTION_BLOCKING, &block, sizeof(block));
+@@ -188,7 +190,7 @@ void CpcInterfaceImpl::Read(uint64_t aTimeoutUs)
+             {
+                 break;
+             }
+-            uint16_t bufferLen = Encoding::BigEndian::ReadUint16(ptr);
++            uint16_t bufferLen = BigEndian::ReadUint16(ptr);
+             ptr += 2;
+             bytesRead -= 2;
+             if (bytesRead < bufferLen)
+diff --git a/protocol/openthread/platform-abstraction/posix/posix_vendor_spinel_interface.cpp b/protocol/openthread/platform-abstraction/posix/posix_vendor_spinel_interface.cpp
+index 2c0956631..cf73bd6fd 100644
+--- a/protocol/openthread/platform-abstraction/posix/posix_vendor_spinel_interface.cpp
++++ b/protocol/openthread/platform-abstraction/posix/posix_vendor_spinel_interface.cpp
+@@ -51,6 +51,8 @@ using InterfaceType = ot::Posix::VendorInterface;
+ #error "You must define OT_POSIX_RCP_HDLC_BUS, OT_POSIX_RCP_SPI_BUS or OT_POSIX_RCP_VENDOR_BUS!"
+ #endif
+ 
++extern ot::Spinel::RadioSpinel &GetRadioSpinel(void);
++
+ namespace VendorCmd     = ot::Vendor;
+ namespace AntennaCmd    = VendorCmd::Antenna;
+ namespace CoexCmd       = VendorCmd::Coex;
+@@ -61,11 +63,11 @@ namespace ot {
+ namespace Spinel {
+ namespace Vendor {
+ 
+-Spinel::RadioSpinel &GetRadioSpinel()
++/*Spinel::RadioSpinel &GetRadioSpinel()
+ {
+     return ot::Posix::sRadio.GetRadioSpinel();
+ }
+-
++*/
+ static void LogIfFail(const char *aText, otError aError)
+ {
+     if (aError != OT_ERROR_NONE && aError != OT_ERROR_NO_ACK)

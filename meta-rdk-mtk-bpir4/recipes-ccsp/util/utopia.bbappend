@@ -4,11 +4,14 @@ FILESEXTRAPATHS_prepend := "${THISDIR}/${PN}:"
 
 SRC_URI += "file://service_bridge_bpi.sh"
 
+CFLAGS_append  = " ${@bb.utils.contains('DISTRO_FEATURES', 'matter', ' -DFEATURE_MATTER_ENABLED', '', d)}"
+
 do_install_append() {
 
 install -d ${D}${sysconfdir}/
 install -d ${D}${sysconfdir}/utopia/
 install -d -m 0777 ${D}/minidumps
+install -m 644 ${S}/source/scripts/init/syslog_conf/syslog.conf_default ${D}${sysconfdir}/
 DISTRO_WAN_ENABLED="${@bb.utils.contains('DISTRO_FEATURES','rdkb_wan_manager','true','false',d)}"
 if [ $DISTRO_WAN_ENABLED = 'true' ]; then
 
@@ -85,9 +88,18 @@ echo "#SelfHeal
 #TR069support
 \$EnableTR69Binary=true
 
+#bridgeUtils support
+\$bridge_util_enable=true
+
+#Enablemaptconfig
+\@mapt_config_flag=set
+
 #Custom Data Model
 \$custom_data_model_enabled=0
 \$custom_data_model_file_name=/usr/ccsp/tr069pa/custom_mapper.xml 
+\$FW_LOG_FILE_PATH=/nvram/log/firewall
+\@FW_LOG_FILE_PATH_V2=/nvram/log/firewall
+\$RemoteDebuggerEnabled=true
 \$AutoReboot=true" >> ${D}${sysconfdir}/utopia/system_defaults
 
 #Remote management
@@ -96,6 +108,22 @@ sed -i 's/^\(\$mgmt_wan_httpaccess=\)1/\10/' ${D}${sysconfdir}/utopia/system_def
 sed -i 's/^\(\$mgmt_wan_httpsport=\)443/\18181/' ${D}${sysconfdir}/utopia/system_defaults
 sed -i '/mgmt_wan_httpaccess/i \$mgmt_wan_httpaccess_ert=1' ${D}${sysconfdir}/utopia/system_defaults
 
+
+install -d ${D}${sysconfdir}/utopia/service.d/service_syslog
+install -m 755 ${S}/source/scripts/init/service.d/service_syslog/*.sh ${D}${sysconfdir}/utopia/service.d/service_syslog
+install -m 644 ${S}/source/scripts/init/syslog_conf/syslog.conf_default ${D}${sysconfdir}/
+install -D -m 644 ${S}/source/scripts/init/syslog_conf/syslog.conf_default ${D}/fss/gw/${sysconfdir}/syslog.conf.${BPN}
+install -m 755 ${S}/source/scripts/init/syslog_conf/log_start.sh ${D}${sbindir}/
+install -m 755 ${S}/source/scripts/init/syslog_conf/log_handle.sh ${D}${sbindir}/
+install -m 755 ${S}/source/scripts/init/syslog_conf/syslog_conf_tool.sh ${D}${sbindir}/
+install -m 644 ${S}/source/scripts/init/service.d/event_flags ${D}${sysconfdir}/utopia/service.d/
+install -m 644 ${S}/source/scripts/init/service.d/rt_tables ${D}${sysconfdir}/utopia/service.d/rt_tables
+ln -sf /usr/sbin/log_start.sh ${D}/fss/gw/usr/sbin/log_start.sh
+ln -sf /usr/sbin/log_handle.sh ${D}/fss/gw/usr/sbin/log_handle.sh
+
+
+#Mounting nvram
+sed -i '/Before=CcspPandMSsp.service/a Requires=mount-nvram.service' ${D}/lib/systemd/system/ApplySystemDefaults.service
 }
 
 FILES_${PN} += " \

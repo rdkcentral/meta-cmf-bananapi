@@ -1,0 +1,47 @@
+SOURCE: RDK/Comcast and https://github.com/raspberrypi/linux/tree/rpi-5.15.y
+From: ksaipr036 <kosika_saipriya@comcast.com>
+Date: Date: Thu, 12 Mar 2026 17:16:59 +0530
+
+--- a/net/mac80211/cfg.c	2026-02-23 11:09:05.447445205 +0000
++++ b/net/mac80211/cfg.c	2026-02-23 11:08:31.555433913 +0000
+@@ -5669,6 +5669,11 @@
+ }
+ EXPORT_SYMBOL_GPL(ieee80211_crit_update_notify);
+ 
++static int ieee80211_set_mac_acl(struct wiphy *wiphy, struct net_device *dev, const struct cfg80211_acl_data *acl)
++{
++	return 0;
++}
++
+ const struct cfg80211_ops mac80211_config_ops = {
+ 	.add_virtual_intf = ieee80211_add_iface,
+ 	.del_virtual_intf = ieee80211_del_iface,
+@@ -5789,4 +5796,5 @@
+ 	.assoc_ml_reconf = ieee80211_assoc_ml_reconf,
+ 	.set_epcs = ieee80211_set_epcs,
+ 	.skip_cac = ieee80211_skip_cac,
++	.set_mac_acl = ieee80211_set_mac_acl,
+ };
+--- a/net/mac80211/main.c	2026-02-23 10:59:22.647250346 +0000
++++ b/net/mac80211/main.c	2026-02-23 11:01:06.607285176 +0000
+@@ -850,6 +850,8 @@
+ 
+ 	wiphy = wiphy_new_nm(&mac80211_config_ops, priv_size, requested_name);
+ 
++	wiphy->max_acl_mac_addrs = 10;
++	wiphy->flags |= WIPHY_FLAG_HAVE_AP_SME;
+ 	if (!wiphy)
+ 		return NULL;
+
+--- a/net/wireless/nl80211.c	2026-03-02 11:58:10.212250078 +0000
++++ b/net/wireless/nl80211.c	2026-03-02 11:55:46.795278144 +0000
+@@ -18398,8 +18398,7 @@
+ 		.validate = GENL_DONT_VALIDATE_STRICT | GENL_DONT_VALIDATE_DUMP,
+ 		.doit = nl80211_set_mac_acl,
+ 		.flags = GENL_UNS_ADMIN_PERM,
+-		.internal_flags = IFLAGS(NL80211_FLAG_NEED_NETDEV |
+-					 NL80211_FLAG_MLO_UNSUPPORTED),
++		.internal_flags = IFLAGS(NL80211_FLAG_NEED_NETDEV),
+ 	},
+ 	{
+ 		.cmd = NL80211_CMD_RADAR_DETECT,

@@ -1,4 +1,12 @@
 #!/bin/sh
+
+if [ ! -f /nvram/wifi_defaults.txt ]; then
+   cp /usr/ccsp/wifi/wifi_defaults.txt /nvram
+fi
+if [ ! -f /nvram/InterfaceMap.json ]; then
+   cp /usr/ccsp/wifi/InterfaceMap.json /nvram
+fi
+
 sleep 20
 
 iw phy phy0 interface add wifi0 type __ap

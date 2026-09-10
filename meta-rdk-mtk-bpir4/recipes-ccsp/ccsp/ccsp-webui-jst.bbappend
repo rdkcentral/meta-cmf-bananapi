@@ -14,6 +14,7 @@ do_install_append () {
                    install -m 0755 ${S}/../xb6/jst/wireless_network_configuration_edit.jst ${D}/usr/www2/wireless_network_configuration_edit.jst
                    install -m 0755 ${S}/../xb6/jst/actionHandler/ajaxSet_wireless_network_configuration.jst ${D}/usr/www2/actionHandler/ajaxSet_wireless_network_configuration.jst
                    install -m 0755 ${S}/../xb6/jst/actionHandler/ajaxSet_wireless_network_configuration_edit.jst ${D}/usr/www2/actionHandler/ajaxSet_wireless_network_configuration_edit.jst
+                   sed -i "/^After=/ s/$/ CcspPandMSsp.service/" ${D}${systemd_unitdir}/system/CcspWebUI.service
                 fi
                 install -m 0755 ${S}/../xb6/jst/at_a_glance.jst ${D}/usr/www2/at_a_glance.jst
                 sed -i "s/count(\$IDs)-1/count(\$IDs)-2/g"  ${D}/usr/www2/actionHandler/ajax_managed_devices.jst

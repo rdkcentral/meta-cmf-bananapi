@@ -64,5 +64,8 @@
       </dependencies>
       <event>wan_ready_to_go</event>
     </component>
-    </components>    
+    <component>
+      <name>eRT.com.cisco.spvtg.ccsp.dhcpmgr</name> <version>1</version>
+    </component>	
+	</components>
 </deviceProfile>
