@@ -28,6 +28,7 @@ Co-authored-by: Santosh Nayak <70348540+snayak002c@users.noreply.github.com>
  source-arm/TR-181/board_sbapi/cosa_ip_apis.c          | 11 +++++++++++
  2 files changed, 12 insertions(+), 1 deletion(-)
 
+Upstream-Status: Pending
 diff --git a/custom/comcast/source/TR-181/custom_sbapi/cosa_deviceinfo_apis_custom.c b/custom/comcast/source/TR-181/custom_sbapi/cosa_deviceinfo_apis_custom.c
 index 60a26cb..eb6ef3d 100644
 --- a/custom/comcast/source/TR-181/custom_sbapi/cosa_deviceinfo_apis_custom.c

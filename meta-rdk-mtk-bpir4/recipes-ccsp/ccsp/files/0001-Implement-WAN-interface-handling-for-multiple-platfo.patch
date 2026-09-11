@@ -12,6 +12,7 @@ Co-authored-by: Copilot Autofix powered by AI <175728472+Copilot@users.noreply.g
  .../TR-181/board_sbapi/cosa_ethernet_apis.c   | 66 ++++++++++++++++++-
  1 file changed, 65 insertions(+), 1 deletion(-)
 
+Upstream-Status: Pending
 diff --git a/source/TR-181/board_sbapi/cosa_ethernet_apis.c b/source/TR-181/board_sbapi/cosa_ethernet_apis.c
 index 41683c3..ac6d8c9 100755
 --- a/source/TR-181/board_sbapi/cosa_ethernet_apis.c
