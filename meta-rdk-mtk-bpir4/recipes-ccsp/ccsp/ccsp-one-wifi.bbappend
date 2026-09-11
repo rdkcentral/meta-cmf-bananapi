@@ -7,6 +7,7 @@ CFLAGS_append = " -DFEATURE_SINGLE_PHY"
 CFLAGS_remove = " -DONEWIFI_MULTIAP_APP_SUPPORT"
 EXTRA_OECONF_remove = " ONEWIFI_MULTIAP_APP_SUPPORT=true"
 
+EXTRA_OECONF_append = " ${@bb.utils.contains('DISTRO_FEATURES', 'OneWifi', ' PLATFORM_BANANAPI=true ', '', d)}"
 SRC_URI += " \
     file://checkwifi.sh \
     ${@bb.utils.contains('DISTRO_FEATURES', 'EasyMesh', bb.utils.contains('DISTRO_FEATURES', 'em_extender', 'file://onewifi_pre_start_em_ext.sh ','file://onewifi_pre_start_em_ctrl.sh ', d), 'file://onewifi_pre_start.sh ', d)} \
