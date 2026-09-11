@@ -13,7 +13,7 @@ DISTRO_FEATURES:append = " bridgeUtilsBin"
 DISTRO_FEATURES:append = " HOSTAPD_2_11"
 
 # OneWifi feature
-DISTRO_FEATURES:append = " OneWifi onewifi_integration"
+#DISTRO_FEATURES:append = " OneWifi onewifi_integration"
 
 #No Moca Support
 DISTRO_FEATURES:append = " no_moca_support"

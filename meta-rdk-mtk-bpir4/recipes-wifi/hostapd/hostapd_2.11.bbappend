@@ -9,7 +9,7 @@ SRC_URI += " \
 
 do_bpi_hostapd_patch(){
    if [ ! -f ${S}/hostapd-init-EHT.sh ]; then
-   cp ${WORKDIR}/hostapd-init-EHT.sh ${S}
+   cp ${UNPACKDIR}/hostapd-init-EHT.sh ${S}
    cp ${UNPACKDIR}/hostapd-init-EHT.patch ${S}
    patch -p1 ${S}/hostapd-init-EHT.sh < ${S}/hostapd-init-EHT.patch
    fi

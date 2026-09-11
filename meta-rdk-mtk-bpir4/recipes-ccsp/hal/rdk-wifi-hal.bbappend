@@ -1,14 +1,7 @@
 SRC_URI:remove = "git://github.com/rdkcentral/rdk-wifi-hal.git;protocol=https;branch=main;name=rdk-wifi-hal"
 
 SRC_URI += "git://github.com/rdkcentral/rdk-wifi-hal.git;protocol=https;branch=develop;name=rdk-wifi-hal"
-#SRCREV_rdk-wifi-hal = "${@bb.utils.contains('DISTRO_FEATURES', 'BuildFromTip', '${AUTOREV}', '8a830706ac1d96a285bb13a13f8225ea9382238a', d)}"
-BUILD_FROM_TIP = "${@bb.utils.contains('DISTRO_FEATURES', 'BuildFromTip', '1', '0', d)}"
-SRCREV_FIXED = "8a830706ac1d96a285bb13a13f8225ea9382238a"
-
-SRCREV:rdk-wifi-hal = "${@ \
-    d.getVar('SRCREV_FIXED') if d.getVar('BUILD_FROM_TIP') != '1' \
-    else '${AUTOREV}' \
-}"
+SRCREV_rdk_wifi_hal = "${@d.getVar('AUTOREV') if bb.utils.contains('DISTRO_FEATURES', 'BuildFromTip', True, False, d) else '8a830706ac1d96a285bb13a13f8225ea9382238a'}"
 
 CFLAGS:append = " -D_PLATFORM_BANANAPI_R4_  -DBANANA_PI_PORT  -DFEATURE_SINGLE_PHY -DCONFIG_HW_CAPABILITIES "
 
@@ -17,6 +10,7 @@ CFLAGS:append = "${@bb.utils.contains_any('DISTRO_FEATURES', 'kernel6-12 kernel6
 CFLAGS:append = "${@bb.utils.contains('DISTRO_FEATURES', 'kernel6-12' , ' -DKERNEL_6_12 ','', d)}"
 CFLAGS:append = " ${@bb.utils.contains('DISTRO_FEATURES', 'EasyMesh', ' -DEASY_MESH_NODE  ', '', d)}"
 
+CFLAGS:append:kernel6-12 = " -DKERNEL_6_12 -DHOSTAPD_2_11"
 CFLAGS:append_kirkstone = " -fcommon"
 CFLAGS:append:wrynose = " -fcommon"
 CFLAGS:remove = "-DCONFIG_MBO"
@@ -31,7 +25,7 @@ SRC_URI += " \
   file://0001-RDKBACCL-1975-Observing-build-error-for-Kernel-6.12-.patch;patchdir=../ \
   file://0002-RDKBACCL-2025-Observing-build-issues-in-non-mlo-q2-r.patch;patchdir=../ \
 "
-SRC_URI:append:wrynose = " file://rdk_wifi_hal_Wrynose.patch;patchdir=../"
+#SRC_URI:append:wrynose = " file://rdk_wifi_hal_Wrynose.patch;patchdir=../"
 # Install InterfaceMap.json in /usr/ccsp/wifi
 do_install:append() {
   install -d ${D}/usr/ccsp/wifi

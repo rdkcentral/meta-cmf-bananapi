@@ -18,6 +18,8 @@ Co-authored-by: Copilot Autofix powered by AI <175728472+Copilot@users.noreply.g
  src/wifi_hal_nl80211_utils.c | 10 ++++++++++
  2 files changed, 15 insertions(+)
 
+Upstream-Status: Pending
+
 diff --git a/src/wifi_hal_nl80211.c b/src/wifi_hal_nl80211.c
 index f3dc636..eb4f838 100644
 --- a/src/wifi_hal_nl80211.c

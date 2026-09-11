@@ -3,14 +3,7 @@ FILESEXTRAPATHS:prepend := "${THISDIR}/files:"
 SRC_URI:remove = "${CMF_GIT_ROOT}/rdkb/components/opensource/ccsp/OneWifi;protocol=${CMF_GIT_PROTOCOL};branch=${CMF_GIT_BRANCH};name=libwebconfig"
 
 SRC_URI = "git://github.com/rdkcentral/OneWifi.git;protocol=https;branch=develop;name=libwebconfig"
-#SRCREV_libwebconfig = "${@bb.utils.contains('DISTRO_FEATURES', 'BuildFromTip', '${AUTOREV}', '61543dfc644366392caac092e81a3511340701ab', d)}"
-BUILD_FROM_TIP = "${@bb.utils.contains('DISTRO_FEATURES', 'BuildFromTip', '1', '0', d)}"
-SRCREV_FIXED = "61543dfc644366392caac092e81a3511340701ab"
-
-SRCREV:libwebconfig = "${@ \
-    d.getVar('SRCREV_FIXED') if d.getVar('BUILD_FROM_TIP') != '1' \
-    else '${AUTOREV}' \
-}"
+SRCREV_libwebconfig = "${@d.getVar('AUTOREV') if bb.utils.contains('DISTRO_FEATURES', 'BuildFromTip', True, False, d) else '61543dfc644366392caac092e81a3511340701ab'}"
 
 CFLAGS:remove = " -DONEWIFI_MULTIAP_APP_SUPPORT"
 EXTRA_OECONF:remove = " ONEWIFI_MULTIAP_APP_SUPPORT=true"

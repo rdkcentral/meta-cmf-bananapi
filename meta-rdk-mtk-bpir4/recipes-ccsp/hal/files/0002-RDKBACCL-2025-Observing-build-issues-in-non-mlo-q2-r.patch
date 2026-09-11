@@ -32,6 +32,8 @@ Signed-off-by: keerthana.p <keerthana_pandurangan@comcast.com>
  platform/banana-pi/platform.c | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 
+Upstream-Status: Pending
+
 diff --git a/platform/banana-pi/platform.c b/platform/banana-pi/platform.c
 index 66b4c5c..7295f82 100644
 --- a/platform/banana-pi/platform.c

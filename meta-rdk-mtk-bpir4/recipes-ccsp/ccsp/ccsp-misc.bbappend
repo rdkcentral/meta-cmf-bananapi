@@ -19,3 +19,4 @@ BREAKPAD_BIN:append = "${@bb.utils.contains('DISTRO_FEATURES','bridgeUtilsBin','
 # generating minidumps
 
 PACKAGECONFIG:append = "${@bb.utils.contains('DISTRO_FEATURES','bridgeUtilsBin','breakpad',' ',d)}"
+PACKAGECONFIG:remove:wrynose = "${@bb.utils.contains('DISTRO_FEATURES','bridgeUtilsBin','breakpad',' ',d)}"
