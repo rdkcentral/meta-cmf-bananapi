@@ -20,6 +20,7 @@ iw phy phy0 interface add wifi2 type __ap
 iw phy phy0 interface add wifi2.1 type __ap
 iw phy phy0 interface add wifi2.2 type __ap
 iw phy phy0 interface add mld0 type __ap radios all
+iw phy phy0 interface add mld1 type __ap radios all
 
 #Obtain the wifi mac address
 wifi0_mac=`cat /nvram/mac_addresses.txt | grep -a wifi0 | cut -d " " -f 2 | head -n1`
@@ -67,14 +68,24 @@ ifconfig wifi2 up
 ifconfig wifi2.1 up
 ifconfig wifi2.2 up
 
-# Set MLD interface address as wifi2 MAC address + 1
-prefix="${wifi2_mac%:*}"
-last_byte="${wifi2_mac##*:}"
+# Set MLD interface address as wifi2.2 MAC address + 1
+prefix_mld0="${wifi2_2_mac%:*}"
+last_byte_mld0="${wifi2_2_mac##*:}"
 
-new_byte=$(printf "%02X" $(( (0x$last_byte + 1) & 0xFF )))
-new_mac="$prefix:$new_byte"
+new_byte_mld0=$(printf "%02X" $(( (0x$last_byte_mld0 + 1) & 0xFF )))
+new_mac_mld0="$prefix_mld0:$new_byte_mld0"
 
 ip link set dev "mld0" down
-ip link set dev "mld0" address "$new_mac"
+ip link set dev "mld0" address "$new_mac_mld0"
+
+# Set MLD interface address as mld0 MAC address + 1
+prefix_mld1="${new_mac_mld0%:*}"
+last_byte_mld1="${new_mac_mld0##*:}"
+
+new_byte_mld1=$(printf "%02X" $(( (0x$last_byte_mld1 + 1) & 0xFF )))
+new_mac_mld1="$prefix_mld1:$new_byte_mld1"
+
+ip link set dev "mld1" down
+ip link set dev "mld1" address "$new_mac_mld1"
 
 exit 0
