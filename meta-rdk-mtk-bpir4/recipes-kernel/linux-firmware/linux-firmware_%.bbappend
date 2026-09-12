@@ -38,7 +38,6 @@ do_install:append() {
         -exec rm -rf {} +
 
     rm -rf ${D}${nonarch_base_libdir}/firmware/mediatek/mt7996
-    rm -rf ${D}${nonarch_base_libdir}/firmware/mediatek/mt7988
     rm -rf ${D}${nonarch_base_libdir}/firmware/mediatek/mt7996/mt7996*
     kernel6_12_ENABLED="${@bb.utils.contains('DISTRO_FEATURES','kernel6-12','true','false',d)}"
     if [ $kernel6_12_ENABLED = 'true' ]; then
