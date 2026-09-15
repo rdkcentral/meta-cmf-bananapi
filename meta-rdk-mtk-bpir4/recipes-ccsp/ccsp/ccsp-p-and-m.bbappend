@@ -12,4 +12,4 @@ do_compile:prepend () {
     fi
 }
 
-SRC_URI:append = "${@bb.utils.contains('DISTRO_FEATURES', 'OneWifi', ' ', ' file://wifiagent-bridge-mode-2g-roll-back.patch', d)}"
+#SRC_URI:append = "${@bb.utils.contains('DISTRO_FEATURES', 'OneWifi', ' ', ' file://wifiagent-bridge-mode-2g-roll-back.patch', d)}"
