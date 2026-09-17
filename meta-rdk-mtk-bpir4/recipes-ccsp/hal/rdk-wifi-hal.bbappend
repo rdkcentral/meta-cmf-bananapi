@@ -1,8 +1,8 @@
 SRC_URI:remove = "git://github.com/rdkcentral/rdk-wifi-hal.git;protocol=https;branch=main;name=rdk-wifi-hal"
 
 SRC_URI += "git://github.com/rdkcentral/rdk-wifi-hal.git;protocol=https;branch=develop;name=rdk-wifi-hal"
-#SRCREV_rdk_wifi_hal = "${@d.getVar('AUTOREV') if bb.utils.contains('DISTRO_FEATURES', 'BuildFromTip', True, False, d) else '8a830706ac1d96a285bb13a13f8225ea9382238a'}"
-SRCREV_rdk_wifi_hal = "8a830706ac1d96a285bb13a13f8225ea9382238a"
+SRCREV_rdk-wifi-hal = "${@d.getVar('AUTOREV') if bb.utils.contains('DISTRO_FEATURES', 'BuildFromTip', True, False, d) else '8a830706ac1d96a285bb13a13f8225ea9382238a'}"
+SRCREV_rdk-wifi-hal = "8a830706ac1d96a285bb13a13f8225ea9382238a"
 
 CFLAGS:append = " -D_PLATFORM_BANANAPI_R4_  -DBANANA_PI_PORT  -DFEATURE_SINGLE_PHY -DCONFIG_HW_CAPABILITIES "
 

@@ -7,7 +7,7 @@ SRCREV_rdkb_hal = "31f5afb748ea66ec4f08f6f5b325a22f73223f02"
 SRC_URI:append = " file://Add_ipv6_changes.patch"
 SRC_URI:append = " file://bpi_serial_no_fix.patch"
 SRC_URI:append = " file://hal-function-changes.patch"
-SRC_URI:append = " file://RDKBACCL-954-hal-change.patch"
+#SRC_URI:append = " file://RDKBACCL-954-hal-change.patch"
 SRC_URI:append = " file://configurable-wan-platform.patch"
 
 do_configure:append() {
