@@ -46,7 +46,6 @@ BBMASK .= "|openembedded-core/meta/recipes-connectivity/iw/iw_6.17.bb"
 #IMAGE_CLASSES:remove = 'apparmor_binprofiles'
 BBMASK .= "|meta-rdk-oss-reference/recipes-gplv2/tar/tar_1.17.bb"
 INCOMPATIBLE_LICENSE_EXCEPTIONS += "${MLPREFIX}tar:GPL-3.0-only ${MLPREFIX}tar-native:GPL-3.0-only ${MLPREFIX}elfutils:GPL-3.0-or-later"
-INCOMPATIBLE_LICENSE_EXCEPTIONS += "${MLPREFIX}binutils:GPL-3.0-only ${MLPREFIX}binutils-src:GPL-3.0-only"
 INCOMPATIBLE_LICENSE_EXCEPTIONS += "${MLPREFIX}elfutils-src:GPL-3.0-or-later ${MLPREFIX}elfutils-binutils:GPL-3.0-or-later ${MLPREFIX}elfutils-dbg:GPL-3.0-or-later"
 INCOMPATIBLE_LICENSE_EXCEPTIONS += "${MLPREFIX}elfutils-staticdev:GPL-3.0-or-later ${MLPREFIX}elfutils-dev:GPL-3.0-or-later ${MLPREFIX}elfutils-doc:GPL-3.0-or-later"
 INCOMPATIBLE_LICENSE_EXCEPTIONS += "${MLPREFIX}elfutils-locale:GPL-3.0-or-later"
