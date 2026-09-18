@@ -14,6 +14,8 @@ IMAGE_INSTALL:append = " gptfdisk e2fsprogs-mke2fs util-linux util-linux-losetup
 #Router discovery tool
 IMAGE_INSTALL:append = " ndisc6"
 
+IMAGE_INSTALL:append = " net-tools"
+
 ROOTFS_POSTPROCESS_COMMAND:append = "add_busybox_fixes; "
 
 #Emptying the PRSERV_HOST since builds are local

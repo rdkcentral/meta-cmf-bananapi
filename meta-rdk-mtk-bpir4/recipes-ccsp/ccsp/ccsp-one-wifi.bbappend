@@ -68,3 +68,5 @@ FILES:${PN} += " \
     /usr/ccsp/wifi/wifi_defaults.txt \
     /usr/lib/libwifi* \
 "
+ERROR_QA:remove = "patch-fuzz"
+WARN_QA:append = " patch-fuzz"

@@ -5,3 +5,6 @@ do_install:append() {
 }
 
 FILES:${PN}-syslog:remove = "${sysconfdir}/init.d/syslog"
+
+ERROR_QA:remove = "patch-fuzz"
+WARN_QA:append = " patch-fuzz"

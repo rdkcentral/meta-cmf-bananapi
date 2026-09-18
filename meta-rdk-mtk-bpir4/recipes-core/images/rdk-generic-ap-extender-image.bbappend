@@ -72,6 +72,7 @@ IMAGE_INSTALL += " \
     ${@bb.utils.contains('DISTRO_FEATURES','efuse_tools','mtk-efuse-nl-drv mtk-efuse-nl-tool','',d)} \
     ${@bb.utils.contains('DISTRO_FEATURES','flow_offload','flowtable','',d)} \
     ${@bb.utils.contains('DISTRO_FEATURES','samba','ksmbd ksmbd-tools','',d)} \
+    net-tools \
     "
 #IMAGE_INSTALL += " opensync openvswitch mesh-agent e2fsprogs "
 
