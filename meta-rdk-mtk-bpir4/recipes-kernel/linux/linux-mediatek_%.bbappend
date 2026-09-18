@@ -7,6 +7,8 @@ SRC_URI:append = " \
     ${@bb.utils.contains('DISTRO_FEATURES', 'em_extender', ' ', ' file://rdkb_cfg/bridge_mode.cfg', d)} \
     file://rdkb_cfg/coredump.cfg \
     file://rdkb_cfg/ip6tables_nf.cfg \
+    file://netfilter.cfg  \
+    ${@bb.utils.contains('DISTRO_FEATURES','NFT_Enable', 'file://nftables.cfg', '', d)}  \   
     ${@bb.utils.contains_any('DISTRO_FEATURES','kernel6-12 kernel6-6', ' file://netfilter_v6.cfg', ' file://netfilter.cfg', d)}  \
     ${@bb.utils.contains('DISTRO_FEATURES', 'kernel6-12', bb.utils.contains('DISTRO_FEATURES', 'em_extender', ' file://rdkb_cfg/kernel_v6_ext.cfg', ' file://rdkb_cfg/kernel_v6.cfg', d), bb.utils.contains('DISTRO_FEATURES', 'kernel6-6', bb.utils.contains('DISTRO_FEATURES', 'em_extender', ' file://rdkb_cfg/kernel_6_6_ext.cfg', ' file://rdkb_cfg/kernel_6_6.cfg', d), '', d), d)} \
     ${@bb.utils.contains('DISTRO_FEATURES', 'em_extender', ' file://rdkb_cfg/container_ext.cfg', ' file://rdkb_cfg/container.cfg', d)} \
