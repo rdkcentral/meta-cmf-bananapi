@@ -13,7 +13,6 @@ CFLAGS:append = " ${@bb.utils.contains('DISTRO_FEATURES', 'EasyMesh', ' -DEASY_M
 CFLAGS:append:kernel6-12 = " -DKERNEL_6_12 -DHOSTAPD_2_11"
 CFLAGS:append_kirkstone = " -fcommon"
 CFLAGS:append:wrynose = " -fcommon"
-CFLAGS:remove = "-DCONFIG_MBO"
 EXTRA_OECONF:append = " ${@bb.utils.contains('DISTRO_FEATURES', 'OneWifi', ' ONE_WIFIBUILD=true ', '', d)}"
 EXTRA_OECONF:append = " ${@bb.utils.contains('DISTRO_FEATURES', 'OneWifi', ' BANANA_PI_PORT=true ', '', d)}"
 
