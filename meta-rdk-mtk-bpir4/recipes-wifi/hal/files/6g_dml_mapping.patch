@@ -605,9 +605,9 @@ index 0effd53..d644269 100644
  
 -    snprintf(config_file, sizeof(config_file), "%s%d.conf", CONFIG_PREFIX, radioIndex);
 +    if(radioIndex == 2)
-+           sprintf(config_file, sizeof(config_file), "%s16.conf",CONFIG_PREFIX);
++           snprintf(config_file, sizeof(config_file), "%s16.conf",CONFIG_PREFIX);
 +    else
-+           sprintf(config_file, sizeof(config_file), "%s%d.conf",CONFIG_PREFIX,radioIndex);
++           snprintf(config_file, sizeof(config_file), "%s%d.conf",CONFIG_PREFIX,radioIndex);
      wifi_hostapdRead(config_file, "channel", output, sizeof(output));
  
      /* Reject any non-digit characters to prevent injection */
