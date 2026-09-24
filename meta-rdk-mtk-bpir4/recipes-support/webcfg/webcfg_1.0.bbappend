@@ -11,3 +11,4 @@ CFLAGS += "-DINCLUDE_BREAKPAD"
 
 # generating minidumps
 PACKAGECONFIG:append = "breakpad"
+PACKAGECONFIG:remove:wrynose = "breakpad"
