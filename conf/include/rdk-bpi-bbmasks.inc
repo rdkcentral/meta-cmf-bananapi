@@ -29,9 +29,9 @@ BBMASK .= "|meta-cmf-filogic/recipes-devtools/python/python3-pycparser_2.20.bbap
 BBMASK .= "|meta-cmf-filogic/recipes-support/ecryptfs-utils/ecryptfs-utils_106.bbappend"
 BBMASK .= "${@bb.utils.contains('DISTRO_FEATURES', 'rdkb_extender', '|meta-cmf-bananapi/meta-rdk-mtk-bpir4/recipes-ccsp/ccsp/cpeabs_1.0.bbappend', '', d)}"
 BBMASK .= "|meta-cmf-bananapi/meta-rdk-mtk-bpir4/recipes-extended/iptables/iptables_1.8.7.bbappend"
-BBMASK .= "|meta-cmf-bananapi/meta-rdk-mtk-bpir4/recipes-kernel/nat46/nat46.bbappend"
+BBMASK .= "${@bb.utils.contains('DISTRO_FEATURES', 'rdkb_extender', '|meta-cmf-bananapi/meta-rdk-mtk-bpir4/recipes-kernel/nat46/nat46.bbappend', '', d)}"
 BBMASK .= "|meta-cmf-bananapi/meta-rdk-mtk-bpir4/recipes-opensync/opensync/opensync_%.bbappend"
-BBMASK .= "|meta-cmf-bananapi/meta-rdk-mtk-bpir4/recipes-support/webcfg/webcfg_1.0.bbappend"
+BBMASK .= "${@bb.utils.contains('DISTRO_FEATURES', 'rdkb_extender', '|meta-cmf-bananapi/meta-rdk-mtk-bpir4/recipes-support/webcfg/webcfg_1.0.bbappend', '', d)}"
 
 # Packages to build from filogic layer
 BBMASK .= "|meta-filogic/recipes-wifi/wpa-supplicant/wpa-supplicant_2.10.bb"
