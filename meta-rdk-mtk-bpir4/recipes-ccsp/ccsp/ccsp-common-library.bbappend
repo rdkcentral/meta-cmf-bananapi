@@ -49,7 +49,7 @@ do_install_append_class-target() {
 
    install -D -m 0644 ${S}/systemd_units/notifyComp.service ${D}${systemd_unitdir}/system/notifyComp.service
    install -D -m 0644 ${S}/systemd_units/gwprovapp.service ${D}${systemd_unitdir}/system/gwprovapp.service
-   sed -i "s/After=securemount.service/After=PsmSsp.service/g" ${D}${systemd_unitdir}/system/gwprovapp.service
+   sed -i "s/After=securemount.service/After=init-Lanbridge.service/g" ${D}${systemd_unitdir}/system/gwprovapp.service
    install -D -m 0644 ${WORKDIR}/gwprovapp.conf ${D}${systemd_unitdir}/system/gwprovapp.service.d/gwprovapp.conf
    rm ${D}${systemd_unitdir}/system/utopia.service
 
