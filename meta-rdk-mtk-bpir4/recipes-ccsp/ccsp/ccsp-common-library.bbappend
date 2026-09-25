@@ -76,10 +76,8 @@ do_install_append_class-target() {
    fi
    sed -i '/IsErouterRunningStatus/,/fi/ s/^/#/' ${D}/usr/ccsp/ccspPAMCPCheck.sh
    sed -i '/ExecStart=/i ExecStartPre=/usr/bin/start_cron' ${D}/lib/systemd/system/RdkFwUpgradeManager.service
-   sed -i 's/ RdkWanManager.service//g' ${D}${systemd_unitdir}/system/CcspEthAgent.service
-   sed -i "/^ExecStart=/i ExecStartPre=/bin/sh -c '(/usr/ccsp/utopiaInitCheck.sh)'" ${D}${systemd_unitdir}/system/CcspEthAgent.service
-   sed -i "/^ExecStart=/i ExecStartPre=/bin/sh -c 'for attempt in \$(seq 1 6); do wan_ifname=\"\$(syscfg get wan_physical_ifname)\" && [ -n \"\$wan_ifname\" ] && exit 0; sleep 1; done; exit 1'" ${D}${systemd_unitdir}/system/CcspEthAgent.service
-
+   sed -i 's/ RdkWanManager.service/ CcspPandMSsp.service/g' ${D}${systemd_unitdir}/system/CcspEthAgent.service
+  
 }
 
 
