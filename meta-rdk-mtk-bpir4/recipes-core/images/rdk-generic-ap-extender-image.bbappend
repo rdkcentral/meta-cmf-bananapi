@@ -95,10 +95,7 @@ PRSERV_HOST = "localhost:0"
 INHERIT += "buildhistory"
 BUILDHISTORY_COMMIT = "1"
 
-require ${TOPDIR}/../meta-cmf-filogic/recipes-core/images/image-exclude-files.inc
-
 remove_unused_file() {
-   for i in ${REMOVED_FILE_LIST} ; do rm -rf ${IMAGE_ROOTFS}/$i ; done
    rm -rf ${IMAGE_ROOTFS}${systemd_unitdir}/systemd/system/CcspEthAgent.service
    rm -rf ${IMAGE_ROOTFS}${systemd_unitdir}/systemd/system/PsmSsp.service
    rm -rf ${IMAGE_ROOTFS}${systemd_unitdir}/systemd/system/CcspLMLite.service
