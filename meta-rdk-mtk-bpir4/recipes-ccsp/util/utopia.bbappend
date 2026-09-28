@@ -56,6 +56,14 @@ install -m 755 ${UNPACKDIR}/service_bridge_bpi.sh ${D}${sysconfdir}/utopia/servi
 
 sed -i '/^#TOT_MSG_MAX=\$/s/^#//' ${D}${sysconfdir}/utopia/utopia_init.sh
 
+sed -i '/DEVICETYPE_MIGRATE="$(syscfg get devicetype_migrate)"/i\
+# devicetype_migrate is empty by default, causing DeviceType=DEV on BPI to be overridden to PROD.\
+if [ "$BOX_TYPE" = "bpi" ]; then\
+    syscfg set devicetype_migrate "0"\
+    syscfg commit\
+fi\
+' ${D}${sysconfdir}/utopia/utopia_init.sh
+
 #Adding self heal defaults
 echo "#SelfHeal
 \$ConnTest_PingInterval=60
@@ -101,7 +109,8 @@ echo "#SelfHeal
 \$FW_LOG_FILE_PATH=/nvram/log/firewall
 \@FW_LOG_FILE_PATH_V2=/nvram/log/firewall
 \$RemoteDebuggerEnabled=true
-\$AutoReboot=true" >> ${D}${sysconfdir}/utopia/system_defaults
+\$AutoReboot=true
+\$DeviceType=DEV" >> ${D}${sysconfdir}/utopia/system_defaults
 
 #Remote management
 sed -i 's/^\(\$mgmt_wan_httpsaccess=\)0/\11/' ${D}${sysconfdir}/utopia/system_defaults
