@@ -130,3 +130,5 @@ sed -i '/Before=CcspPandMSsp.service/a Requires=mount-nvram.service' ${D}${libdi
 FILES:${PN} += " \
                 /minidumps/ \
 "
+
+SRC_URI:append:wrynose = " file://wrynose-mapt-v6-masquerade.patch"
