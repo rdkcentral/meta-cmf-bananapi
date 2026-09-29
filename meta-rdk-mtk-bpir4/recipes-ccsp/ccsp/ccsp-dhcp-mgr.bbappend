@@ -8,3 +8,5 @@ CFLAGS:append  += " ${@bb.utils.contains('DISTRO_FEATURES', 'dhcp_manager', '-DF
 #SRC_URI:append = " \
 #    file://0001_CPU_Utilisation_and_RNDIS_changes.patch \
 #"
+
+SRC_URI:append:wrynose = " file://wrynose-mapt-runtime-issue.patch"
