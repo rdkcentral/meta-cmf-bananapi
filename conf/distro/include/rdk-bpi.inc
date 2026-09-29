@@ -72,7 +72,7 @@ PREFERRED_VERSION_barton-matter = "1.4.2"
 DISTRO_FEATURES:append = " generic_mlo"
 
 #Enable the below DISTRO to enable Hybrid Hal(rndis/modem) for cellular devices
-#DISTRO_FEATURES:append_broadband = " cellular_hybrid_support"
+#DISTRO_FEATURES:append = " cellular_hybrid_support"
 
 #Disable rdm-agent for reference platform
 #DISTRO_FEATURES:append = "RDM"
