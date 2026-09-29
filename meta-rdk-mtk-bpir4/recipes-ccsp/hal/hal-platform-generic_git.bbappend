@@ -9,6 +9,7 @@ SRC_URI_append = " file://bpi_serial_no_fix.patch"
 SRC_URI_append = " file://hal-function-changes.patch"
 SRC_URI_append = " file://RDKBACCL-954-hal-change.patch"
 SRC_URI_append = " file://configurable-wan-platform.patch"
+SRC_URI_append = " file://rdkbaccl-2084-firmware-bankinfo.patch"
 
 do_configure_append() {
      #For trimming the spaces
