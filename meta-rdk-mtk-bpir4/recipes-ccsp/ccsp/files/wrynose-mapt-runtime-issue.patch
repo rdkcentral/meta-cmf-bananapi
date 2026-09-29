@@ -1,0 +1,20 @@
+Upstream-Status: Pending
+
+--- a/source/DHCPMgrUtils/dhcpmgr_map_apis.c
++++ b/source/DHCPMgrUtils/dhcpmgr_map_apis.c
+@@ -656,11 +656,11 @@ ANSC_STATUS DhcpMgr_MapParseOptResponse
+      map->iapdPrefixLen = g_stMapData.PdIPv6PrefixLen;
+      map->ratio = g_stMapData.Ratio;
+ 
+-     snprintf (map->pdIPv6Prefix, BUFLEN_40, "%s", g_stMapData.PdIPv6Prefix);
+-     snprintf (map->ruleIPv4Prefix, BUFLEN_40, "%s", g_stMapData.RuleIPv4Prefix);
+-     snprintf (map->ruleIPv6Prefix, BUFLEN_40, "%s/%u", g_stMapData.RuleIPv6Prefix
++     snprintf (map->pdIPv6Prefix, sizeof(map->pdIPv6Prefix), "%s", g_stMapData.PdIPv6Prefix);
++     snprintf (map->ruleIPv4Prefix, sizeof(map->ruleIPv4Prefix), "%s", g_stMapData.RuleIPv4Prefix);
++     snprintf (map->ruleIPv6Prefix, sizeof(map->ruleIPv6Prefix), "%s/%u", g_stMapData.RuleIPv6Prefix
+                                                                       , g_stMapData.RuleIPv6PrefixLen);
+-     snprintf (map->brIPv6Prefix,   BUFLEN_40, "%s/%u", g_stMapData.BrIPv6Prefix
++     snprintf (map->brIPv6Prefix,   sizeof(map->brIPv6Prefix), "%s/%u", g_stMapData.BrIPv6Prefix
+                                                                       , g_stMapData.BrIPv6PrefixLen);
+      
+      MAP_LOG_INFO("MAP Options parsing complete!\n");
