@@ -1,0 +1,7 @@
+diff --git a/include/platform_hal.h b/include/platform_hal.h
+--- a/include/platform_hal.h
++++ b/include/platform_hal.h
+@@ -153,2 +153,2 @@
+-#define FW_NAME_MAX_LEN 64 //!< Firmware Name String Length
++#define FW_NAME_MAX_LEN 128 //!< Firmware Name String Length
+ #define FW_STATE_MAX_LEN 64 //!<Firmware State
