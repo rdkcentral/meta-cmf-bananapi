@@ -1,0 +1,12 @@
+[Unit]
+Description=Validating iPhone for USB Tethering
+After=RdkCellularManager.service
+
+[Service]
+Type=simple
+ExecStart=/bin/bash -c '/usr/rdk/cellularmanager/idevice_validate.sh'
+Restart=always
+RestartSec=120
+
+[Install]
+WantedBy=multi-user.target

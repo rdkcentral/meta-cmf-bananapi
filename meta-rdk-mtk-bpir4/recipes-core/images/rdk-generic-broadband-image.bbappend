@@ -115,6 +115,5 @@ python do_hash_rootfs (){
 }
 
 IMAGE_INSTALL:remove = "${@bb.utils.contains('DISTRO_FEATURES', 'ppp-enabled', '', 'pptp-linux rp-pppoe xl2tpd', d)}"
-IMAGE_INSTALL:append = "${@bb.utils.contains('DISTRO_FEATURES', 'EasyMesh',' unified-wifi-mesh unified-wifi-mesh-cli ','',d)}"
-IMAGE_INSTALL:append = "${@bb.utils.contains('DISTRO_FEATURES', 'with_alsap',' ieee1905-em ','',d)}"
 IMAGE_INSTALL:remove:onewifi = " mtkhnat-util"
+IMAGE_INSTALL:append = " ${@bb.utils.contains('DISTRO_FEATURES', 'cellular_hybrid_support', ' libimobiledevice', '', d)}"

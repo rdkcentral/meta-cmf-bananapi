@@ -6,23 +6,6 @@ fi
 if [ ! -f /nvram/InterfaceMap.json ]; then
    cp /usr/ccsp/wifi/InterfaceMap.json /nvram
 fi
-if [ ! -f /nvram/EasymeshCfg.json ]; then
-   cp /usr/ccsp/EasyMesh/EasymeshCfg.json /nvram
-fi
-if [ ! -f /nvram/Data_Elements_JSON_Schema_v3.0.json ]; then
-   cp /usr/ccsp/EasyMesh/Data_Elements_JSON_Schema_v3.0.json /nvram
-fi
-if [ ! -f /nvram/Reset.json ]; then
-   cp /usr/ccsp/EasyMesh/Reset.json /nvram
-fi
-if [ ! -d /nvram/static ]; then
-   cp -rf /usr/ccsp/EasyMesh/static /nvram
-fi
-if [ ! -f /nvram/test_cert.crt ]; then
-   cp /usr/ccsp/EasyMesh/test_cert.crt /nvram
-   cp /usr/ccsp/EasyMesh/create-cert /nvram
-   cp /usr/ccsp/EasyMesh/test_cert.key /nvram
-fi
 
 sleep 20
 

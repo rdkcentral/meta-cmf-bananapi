@@ -47,3 +47,4 @@ BBMASK .= "|openembedded-core/meta/recipes-connectivity/iw/iw_6.17.bb"
 # Make change for Wrynose build
 BBMASK .= "|meta-rdk-oss-reference/recipes-gplv2/tar/tar_1.17.bb"
 INCOMPATIBLE_LICENSE_EXCEPTIONS += "${MLPREFIX}tar:GPL-3.0-only ${MLPREFIX}tar-native:GPL-3.0-only"
+BBMASK .= "|meta-rdk-ext/recipes-support/usbmuxd/libplist_2.2.0.bbappend"

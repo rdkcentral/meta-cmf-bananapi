@@ -1,32 +1,10 @@
-FILESEXTRAPATHS:prepend := "${THISDIR}/files:"
-
-SRC_URI:remove = "${CMF_GIT_ROOT}/rdkb/components/opensource/ccsp/OneWifi;protocol=${CMF_GIT_PROTOCOL};branch=${CMF_GIT_BRANCH};name=libwebconfig"
-
-SRC_URI = "git://github.com/rdkcentral/OneWifi.git;protocol=https;branch=develop;name=libwebconfig"
-#SRCREV_libwebconfig = "${@d.getVar('AUTOREV') if bb.utils.contains('DISTRO_FEATURES', 'BuildFromTip', True, False, d) else '61543dfc644366392caac092e81a3511340701ab'}"
-SRCREV_libwebconfig = "61543dfc644366392caac092e81a3511340701ab"
-
-CFLAGS:remove = " -DONEWIFI_MULTIAP_APP_SUPPORT"
-EXTRA_OECONF:remove = " ONEWIFI_MULTIAP_APP_SUPPORT=true"
-
-DEPENDS += " ${@bb.utils.contains('DISTRO_FEATURES', 'EasyMesh', ' rdk-wifi-libhostap unified-wifi-mesh-header ', '', d)}"
-EXTRA_OECONF:append = " ${@bb.utils.contains('DISTRO_FEATURES', 'EasyMesh', ' --enable-easymesh ', '', d)}"
-EXTRA_OECONF:append = " ${@bb.utils.contains('DISTRO_FEATURES', 'EasyMesh', ' --enable-em-app ', '', d)}"
-
-EXTRA_OECONF:append = " ${@bb.utils.contains('DISTRO_FEATURES', 'EasyMesh', ' --enable-em-app ', '', d)}"
-
-CFLAGS += " -Wno-enum-conversion "
-CFLAGS += " ${@bb.utils.contains('DISTRO_FEATURES', 'EasyMesh', ' -Wno-error=maybe-uninitialized -Wno-error=unused-variable -Wno-error=unused-but-set-variable -Wno-error=incompatible-pointer-types -Wno-error=sign-compare -Wno-error -DEASY_MESH_NODE  ', '', d)}"
-
 do_compile:append() {
-    oe_runmake -C source/platform
+   oe_runmake -C source/utils/math_utils
 }
+
 do_install:append() {
-      oe_runmake -C source/platform DESTDIR=${D} install
-      install -m 644 ${S}/include/webconfig_external_proto_easymesh.h  ${D}/usr/include/ccsp
+   oe_runmake -C source/utils/math_utils DESTDIR="${D}" install
+   install -d ${D}${includedir}/ccsp/math_utils
+   install -D -m 0644 ${S}/include/run_qmgr.h ${D}${includedir}/ccsp/run_qmgr.h
+   install -m 0644 ${S}/source/utils/math_utils/inc/* ${D}${includedir}/ccsp/math_utils/
 }
-
-FILES:${PN} += " \
-    ${libdir}/libwifi_bus.so* \
-"
-

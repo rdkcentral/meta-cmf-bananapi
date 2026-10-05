@@ -112,7 +112,8 @@ if grep -q 'librdmopenssl' ${_TOPDIR}/meta-rdk/recipes-common/rdm-agent/rdm-agen
         -e '/rdm_rsa_signature_verify\.h ]; then/,/fi/d' \
         -e '/librdmopenssl/d' \
         -e '/rdm_rsa_signature_verify/d' \
-        -e 's/\(rdm\/\*\) \\$/\1"/' \
+        -e '/install -d.*\${D}\${includedir}\/rdm$/d' \
+        -e '/install -d.*\${D}\${libdir}$/d' \
         ${_TOPDIR}/meta-rdk/recipes-common/rdm-agent/rdm-agent.bb
     touch ${_TOPDIR}/meta-rdk/recipes-common/rdm-agent/rdm_hal_change
 fi
