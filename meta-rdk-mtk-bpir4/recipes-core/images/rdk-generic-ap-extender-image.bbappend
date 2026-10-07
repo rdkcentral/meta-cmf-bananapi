@@ -75,8 +75,7 @@ IMAGE_INSTALL += " \
     net-tools \
     "
 #IMAGE_INSTALL += " opensync openvswitch mesh-agent e2fsprogs "
-
-IMAGE_INSTALL:append_mt7988 = " ${@bb.utils.contains('DISTRO_FEATURES','kernel6-12','eth-firmware','marvell-eth-firmware',d)} mediatek-eth-firmware "
+IMAGE_INSTALL:append:mt7988 = " ${@bb.utils.contains('DISTRO_FEATURES','kernel6-12','eth-firmware','marvell-eth-firmware',d)} mediatek-eth-firmware "
 
 BB_HASH_IGNORE_MISMATCH = "1"
 IMAGE_NAME[vardepsexclude] = "DATETIME"

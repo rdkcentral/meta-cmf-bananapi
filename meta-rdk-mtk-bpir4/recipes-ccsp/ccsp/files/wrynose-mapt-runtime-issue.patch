@@ -2,9 +2,9 @@ Upstream-Status: Pending
 
 --- a/source/DHCPMgrUtils/dhcpmgr_map_apis.c
 +++ b/source/DHCPMgrUtils/dhcpmgr_map_apis.c
-@@ -656,11 +656,11 @@ ANSC_STATUS DhcpMgr_MapParseOptResponse
+@@ -461,11 +461,11 @@ ANSC_STATUS DhcpMgr_MapParseOptResponse
+      map->psid = g_stMapData.Psid;
       map->iapdPrefixLen = g_stMapData.PdIPv6PrefixLen;
-      map->ratio = g_stMapData.Ratio;
  
 -     snprintf (map->pdIPv6Prefix, BUFLEN_40, "%s", g_stMapData.PdIPv6Prefix);
 -     snprintf (map->ruleIPv4Prefix, BUFLEN_40, "%s", g_stMapData.RuleIPv4Prefix);
