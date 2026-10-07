@@ -78,6 +78,20 @@ do_configure:append () {
     echo "LIB_HDRS += ../src/ap/ucode.h" >> ${S}/source/hostap-${PV}/hostapd/libhostap.mk
     echo "LIB_HDRS += ../src/utils/ucode.h" >> ${S}/source/hostap-${PV}/hostapd/libhostap.mk
 }
+do_configure:append:wrynose() {
+    if ! grep -q '^#ifndef ARRAY_SIZE$' ${S}/source/hostap-${PV}/src/utils/common.h; then
+        sed -i '/^#define ARRAY_SIZE(a) (sizeof(a) \/ sizeof((a)\[0\]))$/{
+            i#ifndef ARRAY_SIZE
+            a#endif
+        }' ${S}/source/hostap-${PV}/src/utils/common.h
+    fi
+    if ! grep -q '^#ifndef IEEE80211_HDRLEN$' ${S}/source/hostap-${PV}/src/common/ieee802_11_defs.h; then
+        sed -i '/^#define IEEE80211_HDRLEN (sizeof(struct ieee80211_hdr))$/{
+            i#ifndef IEEE80211_HDRLEN
+            a#endif
+        }' ${S}/source/hostap-${PV}/src/common/ieee802_11_defs.h
+    fi
+}
 
 do_compile () {
     oe_runmake -C ${S}/source/hostap-${PV}/hostapd libhostap V=1

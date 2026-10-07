@@ -50,3 +50,4 @@ BBMASK .= "|meta-cmf-bananapi/meta-rdk-mtk-bpir4/recipes-extended/libimobiledevi
 
 INCOMPATIBLE_LICENSE_EXCEPTIONS += "${MLPREFIX}tar:GPL-3.0-only ${MLPREFIX}tar-native:GPL-3.0-only"
 BBMASK .= "|meta-rdk-ext/recipes-support/usbmuxd/libplist_2.2.0.bbappend"
+BBMASK .= "|meta-cmf-bananapi/meta-rdk-mtk-bpir4/recipes-extended/libimobiledevice/libplist_2.2.0.bbappend"

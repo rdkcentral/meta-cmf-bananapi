@@ -106,10 +106,6 @@ fi
 
 if grep -q 'librdmopenssl' ${_TOPDIR}/meta-rdk/recipes-common/rdm-agent/rdm-agent.bb; then
     sed -i \
-        -e '/downloadUtils\.sh/s/^#//' \
-        -e '/loggerUtils\.sh/s/^#//' \
-        -e '/rdm-manifest\.json/s/^#//' \
-        -e '/rdm_rsa_signature_verify\.h ]; then/,/fi/d' \
         -e '/librdmopenssl/d' \
         -e '/rdm_rsa_signature_verify/d' \
         -e '/install -d.*\${D}\${includedir}\/rdm$/d' \

@@ -14,8 +14,6 @@ EXTRA_OECONF:append = " ${@bb.utils.contains('DISTRO_FEATURES', 'OneWifi', ' BAN
 
 SRC_URI += " \
   ${@bb.utils.contains('DISTRO_FEATURES', 'EasyMesh', ' file://InterfaceMap_em.json ', 'file://InterfaceMap.json ', d)} \
-  file://0001-RDKBACCL-1975-Observing-build-error-for-Kernel-6.12-.patch;patchdir=../ \
-  file://0002-RDKBACCL-2025-Observing-build-issues-in-non-mlo-q2-r.patch;patchdir=../ \
 "
 #SRC_URI:append:wrynose = " file://rdk_wifi_hal_Wrynose.patch;patchdir=../"
 # Install InterfaceMap.json in /usr/ccsp/wifi

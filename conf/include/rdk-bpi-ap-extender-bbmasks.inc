@@ -36,3 +36,4 @@ BBMASK .= "|meta-rdk-oss-reference/recipes-connectivity/wpa-supplicant/wpa-suppl
 BBMASK .= "|meta-cmf-bananapi/meta-rdk-mtk-bpir4/recipes-connectivity/wpa-supplicant/wpa-supplicant_%.bbappend"
 BBMASK .= "|meta-cmf-filogic/recipes-ccsp/hal/halinterface.bbappend"
 BBMASK .= "|meta-filogic/recipes-wifi/hal/halinterface.bbappend"
+BBMASK .= "|meta-cmf-bananapi/meta-rdk-mtk-bpir4/recipes-extended/libimobiledevice/libplist_2.2.0.bbappend"
