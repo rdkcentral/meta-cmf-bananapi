@@ -26,7 +26,7 @@
  	}
  
 -	fp = popen("cat /proc/device-tree/model | tr -d ' '","r");
-+	fp = popen("cat /proc/device-tree/model | tr -d ' ' | tr -d ' ' | tr -d ' ' | tr -d ' '","r");
++	fp = popen("cat /proc/device-tree/model | tr -d ' '","r");
  	if(fp == NULL)
  	{
  		return RETURN_ERR;
