@@ -60,7 +60,7 @@ remove_elfutils_libs() {
 
 INCOMPATIBLE_LICENSE_EXCEPTIONS += "${MLPREFIX}tar:GPL-3.0-only ${MLPREFIX}tar-native:GPL-3.0-only"
 INCOMPATIBLE_LICENSE_EXCEPTIONS += "${MLPREFIX}elfutils:GPL-3.0-or-later"
-NCOMPATIBLE_LICENSE_EXCEPTIONS += "${MLPREFIX}elfutils-src:GPL-3.0-or-later ${MLPREFIX}elfutils-binutils:GPL-3.0-or-later ${MLPREFIX}elfutils-dbg:GPL-3.0-or-later"
+INCOMPATIBLE_LICENSE_EXCEPTIONS += "${MLPREFIX}elfutils-src:GPL-3.0-or-later ${MLPREFIX}elfutils-binutils:GPL-3.0-or-later ${MLPREFIX}elfutils-dbg:GPL-3.0-or-later"
 INCOMPATIBLE_LICENSE_EXCEPTIONS += "${MLPREFIX}elfutils-staticdev:GPL-3.0-or-later ${MLPREFIX}elfutils-dev:GPL-3.0-or-later ${MLPREFIX}elfutils-doc:GPL-3.0-or-later"
 INCOMPATIBLE_LICENSE_EXCEPTIONS += "${MLPREFIX}elfutils-locale:GPL-3.0-or-later"
 
