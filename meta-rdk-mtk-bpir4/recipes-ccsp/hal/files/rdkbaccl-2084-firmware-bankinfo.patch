@@ -30,7 +30,7 @@
  	if(fp == NULL)
  	{
  		return RETURN_ERR;
-@@ -1225,12 +1232,256 @@
+@@ -1225,12 +1232,284 @@
  	return RETURN_OK;
  }
  
@@ -73,7 +73,11 @@
 + 
 +if (len == 0) 
 +{
++if (fp != NULL)
++{
 +fclose(fp);
++fp = NULL;
++}
 +return RETURN_ERR;
 +}
 + 
@@ -97,7 +101,7 @@
 +char command[256] = {0};
 +char output[256] = {0};
 +char *newline = NULL;
-+int status;
++int status=-1;
 + 
 +if ((partLabel == NULL) || (partLabel[0] == '\0') || (devicePath == NULL) || (devicePathSize == 0))
 +return RETURN_ERR;
@@ -116,12 +120,20 @@
 + 
 +if (fgets(output, sizeof(output), fp) == NULL)
 +{
++if (fp != NULL)
++{
 +status = pclose(fp);
++fp = NULL;
++}
 +printf("RDKB: PARTLABEL=%s not found status=%d\n", partLabel, status);
 +return RETURN_ERR;
 +}
 + 
++if (fp != NULL)
++{
 +status = pclose(fp);
++fp = NULL;
++}
 +if (status != 0)
 +{
 +printf("RDKB: blkid failed for PARTLABEL=%s status=%d\n", partLabel, status);
@@ -166,10 +178,18 @@
 + 
 +if (fgets(cmdline, sizeof(cmdline), fp) == NULL)
 +{
++if (fp != NULL)
++{
 +fclose(fp);
++fp = NULL;
++}
 +return RETURN_ERR;
 +}
++if (fp != NULL)
++{
 +fclose(fp);
++fp = NULL;
++}
 + 
 +root = strstr(cmdline, "root=");
 +if (root == NULL)
