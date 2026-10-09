@@ -27,7 +27,7 @@ BBMASK .= "|meta-cmf-bananapi/meta-rdk-mtk-bpir4/recipes-extended/iptables/iptab
 BBMASK .= "|meta-cmf-bananapi/meta-rdk-mtk-bpir4/recipes-opensync/opensync/opensync_%.bbappend"
 BBMASK .= "|meta-cmf-bananapi/meta-rdk-mtk-bpir4/recipes-wifi/json-c/json-c_0.15.bbappend"
 BBMASK .= "|meta-rdk-oss-reference/recipes-gplv2/tar/tar_1.17.bb"
-INCOMPATIBLE_LICENSE_EXCEPTIONS += "${MLPREFIX}tar:GPL-3.0-only ${MLPREFIX}tar-native:GPL-3.0-only"
+
 BBMASK .= "|meta-filogic/recipes-wifi/wpa-supplicant/wpa-supplicant_2.10.bb"
 BBMASK .= "|meta-rdk-oss-reference/recipes-connectivity/wpa-supplicant/wpa-supplicant_2.10.bb"
 BBMASK .= "|meta-rdk-oss-reference-bck/recipes-connectivity/wpa-supplicant/wpa-supplicant_2.10.bb"
@@ -37,3 +37,20 @@ BBMASK .= "|meta-cmf-bananapi/meta-rdk-mtk-bpir4/recipes-connectivity/wpa-suppli
 BBMASK .= "|meta-cmf-filogic/recipes-ccsp/hal/halinterface.bbappend"
 BBMASK .= "|meta-filogic/recipes-wifi/hal/halinterface.bbappend"
 BBMASK .= "|meta-cmf-bananapi/meta-rdk-mtk-bpir4/recipes-extended/libimobiledevice/libplist_2.2.0.bbappend"
+
+ROOTFS_POSTPROCESS_COMMAND += "remove_elfutils_libs;"
+
+remove_elfutils_libs() {
+    rm -f ${IMAGE_ROOTFS}${libdir}/libelf.so*
+    rm -f ${IMAGE_ROOTFS}${libdir}/libdw.so*
+    rm -f ${IMAGE_ROOTFS}${libdir}/libasm.so*
+   rm -f ${IMAGE_ROOTFS}${libdir}/libelf-0.194.so*
+    rm -f ${IMAGE_ROOTFS}${libdir}/libdebuginfod.so*
+}
+
+INCOMPATIBLE_LICENSE_EXCEPTIONS += "${MLPREFIX}tar:GPL-3.0-only ${MLPREFIX}tar-native:GPL-3.0-only"
+INCOMPATIBLE_LICENSE_EXCEPTIONS += "${MLPREFIX}elfutils:GPL-3.0-or-later"
+INCOMPATIBLE_LICENSE_EXCEPTIONS += "${MLPREFIX}elfutils-src:GPL-3.0-or-later ${MLPREFIX}elfutils-binutils:GPL-3.0-or-later ${MLPREFIX}elfutils-dbg:GPL-3.0-or-later"
+INCOMPATIBLE_LICENSE_EXCEPTIONS += "${MLPREFIX}elfutils-staticdev:GPL-3.0-or-later ${MLPREFIX}elfutils-dev:GPL-3.0-or-later ${MLPREFIX}elfutils-doc:GPL-3.0-or-later"
+INCOMPATIBLE_LICENSE_EXCEPTIONS += "${MLPREFIX}elfutils-locale:GPL-3.0-or-later"
+
