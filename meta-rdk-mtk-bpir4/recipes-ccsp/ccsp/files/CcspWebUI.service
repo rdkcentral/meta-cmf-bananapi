@@ -1,0 +1,9 @@
+[Unit]
+Description=CcspWebUI service
+After=CcspLMLite.service
+
+[Service]
+Type=simple
+WorkingDirectory=/usr/www2
+ExecStart=/bin/sh -c '/etc/webgui.sh'
+RemainAfterExit=yes
