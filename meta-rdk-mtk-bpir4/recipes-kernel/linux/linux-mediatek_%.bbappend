@@ -16,6 +16,7 @@ SRC_URI:append = " \
     ${@bb.utils.contains('DISTRO_FEATURES','kernel6-6', ' file://bluetooth_6_6.patch;apply=no', '', d)} \
     ${@bb.utils.contains('DISTRO_FEATURES','kernel6-12', ' file://enable_sdcard_v6.patch;apply=no', '', d)} \
     ${@bb.utils.contains('DISTRO_FEATURES','kernel6-12', ' file://bluetooth_v6.patch;apply=no', '', d)} \
+    file://rdkb_cfg/wireguard.cfg \
 "
 SRC_URI:append:mt7988 = "${@bb.utils.contains('DISTRO_FEATURES', 'cellular_hybrid_support', bb.utils.contains('DISTRO_FEATURES','em_extender', ' ', ' file://rdkb_cfg/rdkb-usb.cfg', d), '', d)}"
 CMDLINE:append = " cgroup_enable=cpuset cgroup_enable=memory cgroup_memory=1 "

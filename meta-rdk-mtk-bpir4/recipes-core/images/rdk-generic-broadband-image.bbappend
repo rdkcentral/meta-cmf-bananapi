@@ -14,6 +14,9 @@ IMAGE_INSTALL_append = " gptfdisk e2fsprogs-mke2fs util-linux util-linux-losetup
 #Router discovery tool
 IMAGE_INSTALL_append = " ndisc6"
 
+#wireguard tools
+IMAGE_INSTALL_append = " wireguard-tools wireguard-tools-wg-quick"
+
 ROOTFS_POSTPROCESS_COMMAND_append = "add_busybox_fixes; "
 
 #Emptying the PRSERV_HOST since builds are local
