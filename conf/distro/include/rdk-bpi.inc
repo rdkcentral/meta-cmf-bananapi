@@ -74,7 +74,7 @@ DISTRO_FEATURES:append = " generic_mlo"
 #Enable the below DISTRO to enable Hybrid Hal(rndis/modem) for cellular devices
 #DISTRO_FEATURES:append = " cellular_hybrid_support"
 
-#Disable rdm-agent for reference platform
+#Disable RDM for reference platform
 #DISTRO_FEATURES:append = "RDM"
 
 DISTRO_FEATURES:append = " dhcp_manager "
@@ -95,3 +95,9 @@ PREFERRED_VERSION:bluez5:kirkstone = "${@bb.utils.contains('DISTRO_FEATURES', 'e
 PREFERRED_VERSION_jsonrpc:wrynose = "1.3.0"
 BBMASK .= "|meta-cmf-filogic/recipes-core/images/rdk-generic-broadband-tdk-image.bbappend"
 UNPACKDIR:kirkstone ?= "${WORKDIR}"
+
+#Enable Core RDKB builds
+#CORE_RDKB_ENABLED = "1"
+
+DISTRO_FEATURES:append = "${@bb.utils.contains('CORE_RDKB_ENABLED', '1', ' Core-RDKB', '', d)}"
+DISTRO_FEATURES:remove = "${@bb.utils.contains('CORE_RDKB_ENABLED', '1', ' usppa bridgeUtilsBin matter CPUPROCANALYZER_BROADBAND snmppa bluetooth bluez5', '', d)}"
