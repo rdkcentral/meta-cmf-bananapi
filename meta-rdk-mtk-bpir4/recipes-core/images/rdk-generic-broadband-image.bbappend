@@ -15,7 +15,7 @@ IMAGE_INSTALL_append = " gptfdisk e2fsprogs-mke2fs util-linux util-linux-losetup
 IMAGE_INSTALL_append = " ndisc6"
 
 #wireguard tools
-IMAGE_INSTALL_append = " wireguard-tools wireguard-tools-wg-quick"
+IMAGE_INSTALL_append = " wireguard-tools wireguard-tools-wg-quick kernel-module-wireguard"
 
 ROOTFS_POSTPROCESS_COMMAND_append = "add_busybox_fixes; "
 
