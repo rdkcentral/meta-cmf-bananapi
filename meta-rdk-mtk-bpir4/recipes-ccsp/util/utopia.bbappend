@@ -6,6 +6,8 @@ SRC_URI += "file://service_bridge_bpi.sh"
 
 CFLAGS_append  = " ${@bb.utils.contains('DISTRO_FEATURES', 'matter', ' -DFEATURE_MATTER_ENABLED', '', d)}"
 
+SRC_URI_append = " file://wrynose-mapt-v6-masquerade.patch"
+
 do_install_append() {
 
 install -d ${D}${sysconfdir}/
