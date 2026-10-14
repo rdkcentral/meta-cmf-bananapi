@@ -24,4 +24,14 @@ do_install_append () {
                 sed -i "/getInstanceIDs(\"Device.Hosts.Host.\")/a \$hostIDs=\$hostIDs[count(\$hostIDs)-2];" ${D}/usr/www2/managed_devices_add_computer_blocked.jst
                 sed -i "s/\$clients_RSSI\[strtoupper(\$Host\[\$i.toString()\]\['PhysAddress'\])\]/\$Host\[\$i\]\['X_CISCO_COM_RSSI'\]/g" ${D}/usr/www2/connected_devices_computers.jst
                 sed -i '/<?%if (strpos($partnerId, "sky-") !== false)/ s/sky-/RDKM/' ${D}/usr/www2/wireless_network_configuration_edit.jst
+                rm -f  ${D}/usr/www2/cmn/syndication/device_pause_screen/device_pause_screen_comcast.js
+                for f in moca.jst moca_diagnostics.jst mta_Line_Diagnostics.jst \
+                         mta_Line_Status.jst mta_sip_packet_log.jst qos.jst \
+                         Voip_Debug_GlobalParameter.jst Voip_Debug_ServiceProvider.jst \
+                         Voip_SipAdvanced_ServiceProvider.jst Voip_SipBasic_GlobalParamaters.jst \
+                         Voip_SipBasic_ServiceProvider.jst wizard_step1.jst wizard_step2.jst \
+                         battery.jst callsignallog.jst voice_quality_metrics.jst voip_hidden.jst DPoE.jst DSXlog.jst; do
+                         find ${D} -type f -name "$f" -delete
+                done
+
 }
