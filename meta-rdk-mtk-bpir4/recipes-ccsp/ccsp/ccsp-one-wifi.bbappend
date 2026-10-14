@@ -26,9 +26,6 @@ do_compile:prepend() {
     touch ${S}/scripts/mesh_status.sh
 }
 
-do_configure:prepend:wrynose () {
-         sed -i 's/^SUBDIRS += sampleapps/#SUBDIRS += sampleapps/' ${S}/source/Makefile.am
-}
 do_install:append(){
     install -m 755 ${UNPACKDIR}/checkwifi.sh ${D}/usr/ccsp/wifi/
     install -m 755 ${UNPACKDIR}/onewifi_pre_*.sh ${D}/usr/ccsp/wifi/onewifi_pre_start.sh

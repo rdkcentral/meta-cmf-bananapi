@@ -43,3 +43,9 @@ DISTRO_FEATURES:append = " rdkb_configurable_wan_interface"
 
 #Enable below distro to build Easymesh and dependent Wi-Fi components from tip (AUTOREV) during CI validation
 #DISTRO_FEATURES:append = " BuildFromTip"
+
+#disabling barton from extender builds
+DISTRO_FEATURES:remove = "matter"
+
+BBMASK .= "|meta-rdk-oss-reference/recipes-core/dropbear/dropbear_2020.%.bbappend"
+BBMASK .= "|meta-cmf-bananapi/meta-rdk-mtk-bpir4/recipes-core/dropbear/dropbear_2020.%.bbappend"
