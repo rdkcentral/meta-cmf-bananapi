@@ -95,6 +95,8 @@ do_filogic_gen_image(){
 }
 
 python do_hash_rootfs (){
+    if d.getVar("DISTRO") != "wrynose":
+        return
     deploy_path = d.getVar('IMGDEPLOYDIR', d, 1)
     PN = d.getVar('PN', d, 1)
     MACHINE = d.getVar('MACHINE')
@@ -113,7 +115,6 @@ python do_hash_rootfs (){
     import subprocess
     subprocess.Popen("veritysetup format --data-blocks=%d --hash-offset=%d %s %s > %s" %(DATA_BLOCKS, HASH_OFFSET, SQUASHFS_FILE_PATH, SQUASHFS_FILE_PATH, SUMMARY_FILE), shell=True)
 }
-
 IMAGE_INSTALL:remove = "${@bb.utils.contains('DISTRO_FEATURES', 'ppp-enabled', '', 'pptp-linux rp-pppoe xl2tpd', d)}"
 IMAGE_INSTALL:remove:onewifi = " mtkhnat-util"
 IMAGE_INSTALL:append = " ${@bb.utils.contains('DISTRO_FEATURES', 'cellular_hybrid_support', ' libimobiledevice', '', d)}"
