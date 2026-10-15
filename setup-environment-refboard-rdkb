@@ -108,7 +108,6 @@ if [ ! -e ${_TOPDIR}/meta-rdk/recipes-common/rdm-agent/rdm_hal_change ]; then
         -e '/rdm_rsa_signature_verify/d' \
         -e '/install -d.*\${D}\${includedir}\/rdm$/d' \
         -e '/install -d.*\${D}\${libdir}$/d' \
-        -e 's/\(rdm\/\*\) \\$/\1"/' \
         ${_TOPDIR}/meta-rdk/recipes-common/rdm-agent/rdm-agent.bb
     touch ${_TOPDIR}/meta-rdk/recipes-common/rdm-agent/rdm_hal_change
 fi
@@ -120,6 +119,11 @@ if [ "X$FEATURE_TYPE" == "XEasyMesh" ]; then
     if [ "X$EM_UNITTEST" == "Xyes" ]; then
     	sed -i '/Em_Unittest/s/^#//' ${_TOPDIR}/meta-cmf-bananapi/conf/distro/include/rdk-bpi.inc
     fi	
+fi
+
+if [ "X$ci_Staged_AUTOREV_Validation_Enabled" == "Xyes" ]; then
+    sed -i '/BuildFromTip/s/^#//' ${_TOPDIR}/meta-cmf-bananapi/conf/distro/include/rdk-bpi.inc
+    sed -i '/BuildFromTip/s/^#//' ${_TOPDIR}/meta-cmf-bananapi/conf/distro/include/rdk-bpi-ap-extender.inc
 fi
 
 if [ "X$FEATURE_TYPE" == "XEasyMesh" ] && [ "X$WITHOUT_ALSAP" == "Xyes" ]; then
