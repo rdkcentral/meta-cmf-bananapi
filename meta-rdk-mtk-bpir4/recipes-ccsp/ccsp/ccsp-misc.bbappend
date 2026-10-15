@@ -12,6 +12,8 @@ CFLAGS += " -DDHCPV4_CLIENT_UDHCPC -DDHCPV6_CLIENT_DIBBLER -DUDHCPC_RUN_IN_BACKG
 EXTRA_OECONF += "${@bb.utils.contains('DISTRO_FEATURES', 'bridgeUtilsBin', ' --enable-bridgeUtilsBin=yes ', '', d)}"
 
 CFLAGS_append = " ${@bb.utils.contains('DISTRO_FEATURES', 'OneWifi', '-DRDK_ONEWIFI', '', d)}"
+CFLAGS_append = " ${@bb.utils.contains('DISTRO_FEATURES', 'cellular_hybrid_support', ' -DFEATURE_RNDIS_HAL', '', d)}"
+
 LDFLAGS_append = "${@bb.utils.contains('DISTRO_FEATURES','bridgeUtilsBin',' -lOvsAgentApi ',' ',d)}"
 
 BREAKPAD_BIN_append = "${@bb.utils.contains('DISTRO_FEATURES','bridgeUtilsBin','bridgeUtils','',d)}"
