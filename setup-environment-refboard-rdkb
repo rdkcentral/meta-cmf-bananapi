@@ -108,7 +108,6 @@ if [ ! -e ${_TOPDIR}/meta-rdk/recipes-common/rdm-agent/rdm_hal_change ]; then
         -e '/rdm_rsa_signature_verify/d' \
         -e '/install -d.*\${D}\${includedir}\/rdm$/d' \
         -e '/install -d.*\${D}\${libdir}$/d' \
-        -e 's/\(rdm\/\*\) \\$/\1"/' \
         ${_TOPDIR}/meta-rdk/recipes-common/rdm-agent/rdm-agent.bb
     touch ${_TOPDIR}/meta-rdk/recipes-common/rdm-agent/rdm_hal_change
 fi
