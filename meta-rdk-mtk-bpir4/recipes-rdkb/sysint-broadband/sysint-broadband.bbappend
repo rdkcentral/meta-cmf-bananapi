@@ -4,9 +4,10 @@ SRC_URI:append = "${CMF_GITHUB_ROOT}/bananapi-sysint;protocol=https;nobranch=1;d
 SRCREV_sysintdevicebpi = "4ebc617660feedc84a184243167191ab7347814d"
 SRCREV_FORMAT = "1.0.0"
 
-SRC_URI += "file://bpi_custom_device.properties \
-            file://uploadRDKBLogs.sh \
-"
+SRC_URI:append = " \
+   file://bpi_custom_device.properties \
+   file://uploadRDKBLogs.sh \
+ "
 
 do_install:append () {
    install -m 644 ${UNPACKDIR}/bpi_custom_device.properties ${D}${sysconfdir}/device.properties
@@ -30,13 +31,14 @@ do_install:append () {
    sed -i -e 's|^CLOUDURL=.*$|CLOUDURL="https://xconf.rdkcentral.com/xconf/swu/stb?eStbMac="|' ${D}${sysconfdir}/include.properties
    sed -i -e 's|^DCM_LOG_SERVER_URL=.*$|DCM_LOG_SERVER_URL=https://xconf.rdkcentral.com/loguploader/getSettings|' ${D}${sysconfdir}/dcm.properties
    rm -f ${D}${systemd_unitdir}/system/swupdate.service
-   rm  ${D}${base_libdir}/rdk/bank_image_switch.sh
-   rm  ${D}${base_libdir}/rdk/imageFlasher.sh
-   rm  ${D}${base_libdir}/rdk/rpi_image_Flasher.sh
-   rm  ${D}${base_libdir}/rdk/swupdate_utility.sh
-   rm -f ${D}${base_libdir}/rdk/deviceInitiatedFWDnld.sh
-   rm -f ${D}${base_libdir}/rdk/rpi_sw_install.sh
-   rm -f ${D}${base_libdir}/rdk/rpi_sw_install1.sh
+   ${@bb.utils.contains('DISTRO_FEATURES', 'kernel6-12', ' ', 'rm  ${D}${base_libdir}/rdk/bank_image_switch.sh', d)}
+   ${@bb.utils.contains('DISTRO_FEATURES', 'kernel6-12', ' ', 'rm  ${D}${base_libdir}/rdk/imageFlasher.sh', d)}
+   ${@bb.utils.contains('DISTRO_FEATURES', 'kernel6-12', ' ', 'rm  ${D}${base_libdir}/rdk/rpi_image_Flasher.sh', d)}
+   ${@bb.utils.contains('DISTRO_FEATURES', 'kernel6-12', ' ', 'rm  ${D}${base_libdir}/rdk/swupdate_utility.sh', d)}
+   ${@bb.utils.contains('DISTRO_FEATURES', 'kernel6-12', ' ', 'rm -f ${D}${base_libdir}/rdk/deviceInitiatedFWDnld.sh', d)}
+   ${@bb.utils.contains('DISTRO_FEATURES', 'kernel6-12', ' ', 'rm -f ${D}${base_libdir}/rdk/rpi_sw_install.sh', d)}
+   ${@bb.utils.contains('DISTRO_FEATURES', 'kernel6-12', ' ', 'rm -f ${D}${base_libdir}/rdk/rpi_sw_install1.sh', d)}
 }
 
 SYSTEMD_SERVICE:${PN}:remove = "swupdate.service"
+SYSTEMD_SERVICE:${PN}:remove:broadband:kernel6-12 = "${@bb.utils.contains('DISTRO_FEATURES', 'em_extender', ' ','dropbear.service', d)}"
