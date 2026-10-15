@@ -25,6 +25,41 @@ do_install_append () {
                 sed -i "s/\$clients_RSSI\[strtoupper(\$Host\[\$i.toString()\]\['PhysAddress'\])\]/\$Host\[\$i\]\['X_CISCO_COM_RSSI'\]/g" ${D}/usr/www2/connected_devices_computers.jst
                 sed -i '/<?%if (strpos($partnerId, "sky-") !== false)/ s/sky-/RDKM/' ${D}/usr/www2/wireless_network_configuration_edit.jst
                 rm -f  ${D}/usr/www2/cmn/syndication/device_pause_screen/device_pause_screen_comcast.js
+
+                # Remove navigation entries for the pages being removed.
+                find "${D}" -type f -name 'nav.jst' -exec sed -i \
+                            -e '/moca\.jst/d' \
+                            -e '/moca_diagnostics\.jst/d' \
+                            -e '/mta_Line_Diagnostics\.jst/d' \
+                            -e '/mta_Line_Status\.jst/d' \
+                            -e '/mta_sip_packet_log\.jst/d' \
+                            -e '/qos\.jst/d' \
+                            -e '/Voip_Debug_GlobalParameter\.jst/d' \
+                            -e '/Voip_Debug_ServiceProvider\.jst/d' \
+                            -e '/Voip_SipAdvanced_ServiceProvider\.jst/d' \
+                            -e '/Voip_SipBasic_GlobalParamaters\.jst/d' \
+                            -e '/Voip_SipBasic_ServiceProvider\.jst/d' \
+                            -e '/wizard_step1\.jst/d' \
+                            -e '/wizard_step2\.jst/d' \
+                            -e '/battery\.jst/d' \
+                            -e '/callsignallog\.jst/d' \
+                            -e '/voice_quality_metrics\.jst/d' \
+                            -e '/voip_hidden\.jst/d' {} +
+
+                # Remove MoCA indicators from At a Glance.
+                find "${D}" -type f -name 'at_a_glance.jst' -exec sed -i \
+                   -e '/MoCA On/d' \
+                   -e '/MoCA Off/d' {} +
+
+                # Remove the MoCA Edit link from Connection Status.
+                find "${D}" -type f \( -name 'connection_status.jst' \
+                -o -name 'connection_status_onewifi.jst' \) -exec sed -i \
+                -e '/href="moca\.jst"/d' {} +
+
+
+                find "${D}" -type f -name 'userbar.jst' -exec sed -i \
+                 -e '/id="sta_moca"/d' {} +
+
                 for f in moca.jst moca_diagnostics.jst mta_Line_Diagnostics.jst \
                          mta_Line_Status.jst mta_sip_packet_log.jst qos.jst \
                          Voip_Debug_GlobalParameter.jst Voip_Debug_ServiceProvider.jst \
