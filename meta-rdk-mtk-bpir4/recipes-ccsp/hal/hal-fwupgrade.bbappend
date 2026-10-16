@@ -1,8 +1,12 @@
 DESCRIPTION = "HAL Firmware Upgrade for BPI"
 FILESEXTRAPATHS:prepend := "${THISDIR}/files:"
-SRC_URI:remove = "git://git01.mediatek.com/filogic/rdk-b/rdkb_hal;branch=master;protocol=https;name=fwupgradehal \
-           file://LICENSE;subdir=git \
-          "
+SRC_URI:remove:kernel6-6 = "git://git01.mediatek.com/filogic/rdk-b/rdkb_hal;branch=master;protocol=https;name=fwupgradehal \
+            file://LICENSE;subdir=git \
+           "
+SRC_URI:remove:kernel6-12 = "git://github.com/mediatek/rdkb_hal;branch=main;protocol=https;destsuffix=${BP};name=fwupgradehal  \
+            file://LICENSE;subdir=git \
+           "
+
 SRC_URI:append = "git://github.com/rdkcentral/rdkb-hal-bpi;branch=develop;protocol=https;name=fwupgradehal \
            file://start_cron.sh \
                 "

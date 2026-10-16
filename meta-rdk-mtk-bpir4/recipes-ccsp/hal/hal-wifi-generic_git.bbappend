@@ -1,12 +1,18 @@
-SRC_URI:append = " \
-    ${CMF_GIT_ROOT}/rdkb/devices/raspberrypi/hal;protocol=${CMF_GIT_PROTOCOL};branch=${CMF_GIT_BRANCH};destsuffix=${BP}/source/wifi/devices_bpi;name=wifihal-bananapi \
+SRC_URI:remove:kirkstone:kernel6-12 = "${CMF_GITHUB_ROOT}/hardware-abstraction-layer;protocol=https;${BRANCH_hardware_abstraction_layer};name=wifihal"
+SRC_URI:append:kirkstone:kernel6-12 = "${CMF_GITHUB_ROOT}/hardware-abstraction-layer;protocol=https;${BRANCH_hardware_abstraction_layer};destsuffix=${BP};name=wifihal"
+SRC_URI_append:kernel6-6 = " \
+    ${CMF_GIT_ROOT}/rdkb/devices/raspberrypi/hal;protocol=${CMF_GIT_PROTOCOL};branch=${CMF_GIT_BRANCH};destsuffix=git/source/wifi/devices_bpi;name=wifihal-bananapi \
 "
+SRC_URI_append:kernel6-12 = " \
+${CMF_GIT_ROOT}/rdkb/devices/raspberrypi/hal;protocol=${CMF_GIT_PROTOCOL};branch=${CMF_GIT_BRANCH};destsuffix=${BP}/source/wifi/devices_bpi;name=wifihal-bananapi \
+ "
 
 SRCREV_wifihal-bananapi = "${AUTOREV}"
 
 DEPENDS:append =" libev wpa-supplicant"
 DEPENDS:append = "${@bb.utils.contains('DISTRO_FEATURES', 'OneWifi', ' rdk-wifi-hal', '', d)}"
 LDFLAGS:append = " -lev -lwpa_client -lpthread"
+S:kernel6-12 = "${UNPACKDIR}/${BP}/source/wifi"
 
 do_configure:prepend(){
     rm ${S}/wifi_hal.c
