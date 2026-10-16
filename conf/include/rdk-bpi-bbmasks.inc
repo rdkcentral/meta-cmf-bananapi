@@ -18,6 +18,10 @@ BBMASK .= "|meta-rdk-broadband-apps/recipes-kernel/linux/linux-%.bbappend"
 BBMASK .= "|meta-rdk-iot/recipes-matter/barton-matter/barton-matter_1.5.0.1.bb"
 BBMASK .= "|meta-rdk-ext/recipes-support/usbmuxd/libplist_2.2.0.bbappend"
 
+BBMASK .= "${@bb.utils.contains('DISTRO_FEATURES', 'kirkstone', bb.utils.contains('DISTRO_FEATURES', 'em_extender', '', '|meta-rdk-ext/recipes-connectivity/bluez', d), '', d)}"
+BBMASK .= "${@bb.utils.contains('DISTRO_FEATURES', 'kirkstone', bb.utils.contains('DISTRO_FEATURES', 'em_extender', '', '|meta-rdk-ext/recipes-connectivity/bluez5', d), '', d)}"
+BBMASK .= "${@bb.utils.contains('DISTRO_FEATURES', 'kirkstone', bb.utils.contains('DISTRO_FEATURES', 'em_extender', '', '|openembedded-core/meta/recipes-connectivity/bluez5', d), '', d)}"
+
 # Wrynose Parsing Error
 BBMASK .= "|meta-filogic/recipes-filter/libnfnetlink/libnfnetlink_1.0.1.bbappend"
 BBMASK .= "|meta-filogic/recipes-wifi/openssl/openssl_1.1.1%.bbappend"
@@ -59,7 +63,10 @@ remove_elfutils_libs() {
     rm -f ${IMAGE_ROOTFS}${libdir}/libdebuginfod.so*
 }
 
+# Wrynose tar pkg is GPL-3.0 licensed, but is used for build purposes only. The busybox applet is used in rootfs.
 INCOMPATIBLE_LICENSE_EXCEPTIONS += "${MLPREFIX}tar:GPL-3.0-only ${MLPREFIX}tar-native:GPL-3.0-only"
+
+# pkg elfutils is GPL-3.0 licensed, but is used for build purposes only, and explicitly removed from the root file system
 INCOMPATIBLE_LICENSE_EXCEPTIONS += "${MLPREFIX}elfutils:GPL-3.0-or-later"
 INCOMPATIBLE_LICENSE_EXCEPTIONS += "${MLPREFIX}elfutils-src:GPL-3.0-or-later ${MLPREFIX}elfutils-binutils:GPL-3.0-or-later ${MLPREFIX}elfutils-dbg:GPL-3.0-or-later"
 INCOMPATIBLE_LICENSE_EXCEPTIONS += "${MLPREFIX}elfutils-staticdev:GPL-3.0-or-later ${MLPREFIX}elfutils-dev:GPL-3.0-or-later ${MLPREFIX}elfutils-doc:GPL-3.0-or-later"

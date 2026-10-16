@@ -89,6 +89,8 @@ LINUXLIBCVERSION = "${@bb.utils.contains('DISTRO_FEATURES', 'kernel6-12', '6.12%
 
 SECURITY_FORTIFY:pn-ccsp-xdns = "-Wno-error=unused-result"
 
+PREFERRED_VERSION:bluez5:kirkstone = "${@bb.utils.contains('DISTRO_FEATURES', 'em_extender', '5.66', '5.82',d)}"
+
 #Wrynose build for TDK image
 PREFERRED_VERSION_jsonrpc:wrynose = "1.3.0"
 BBMASK .= "|meta-cmf-filogic/recipes-core/images/rdk-generic-broadband-tdk-image.bbappend"
