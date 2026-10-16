@@ -88,3 +88,7 @@ DISTRO_FEATURES:append = " nat46"
 LINUXLIBCVERSION = "${@bb.utils.contains('DISTRO_FEATURES', 'kernel6-12', '6.12%', bb.utils.contains('DISTRO_FEATURES','kernel6-6', '6.6%', '5.4%',d), d)}"
 
 SECURITY_FORTIFY:pn-ccsp-xdns = "-Wno-error=unused-result"
+
+#Wrynose build for TDK image
+PREFERRED_VERSION_jsonrpc:wrynose = "1.3.0"
+BBMASK .= "|meta-cmf-filogic/recipes-core/images/rdk-generic-broadband-tdk-image.bbappend"
