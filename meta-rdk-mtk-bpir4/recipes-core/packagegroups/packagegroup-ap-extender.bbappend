@@ -14,5 +14,6 @@ RDEPENDS_packagegroup-ap-extender = "\
     bpi-serialnumber \
     mount-nvram \
     e2fsprogs-mke2fs \
+    ${@bb.utils.contains('DISTRO_FEATURES', 'EasyMesh', 'rdk-fwupgrade-manager hal-fwupgrade ccsp-dmcli ccsp-dmcli-ccsp', '', d)} \
 "
 DEPENDS += " ccsp-common-library"
