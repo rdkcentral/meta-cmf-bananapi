@@ -71,7 +71,7 @@
 +
 +			memcpy(fwName, value, len);
 +			fwName[len] = '\0';
-+			ret = RETURN_OK;
++			ret = (len != 0) ? RETURN_OK : RETURN_ERR;
  			break;
  		}
  	}
