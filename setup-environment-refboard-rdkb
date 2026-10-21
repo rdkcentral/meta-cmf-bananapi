@@ -26,25 +26,32 @@ export RDK_BSP_LAYER=none
 if [ "X$MP_version" == "X4.3" ] && [ ! -e ${_TOPDIR}/meta-cmf-filogic/MP4_3_applied ] && [ ! -e ${_TOPDIR}/meta-filogic/MP4_3_applied ];
 then
     cd ${_TOPDIR}/meta-filogic
-    git checkout 77e17792f60279b6e1deb1f1c6abf5705972bc6f
+    git checkout 01f7d0b641fdf230fe1120870afe419ef4a9257b
     cd -
     cd ${_TOPDIR}/meta-cmf-filogic
-    git checkout a68043b58a049ee5a93f3509c1f268fea73cc388
+    git checkout 07212d3b7521be5555f5c8f273bbaa4c52a1a5d5
     cd -
-    sed -i '/^#*DISTRO_FEATURES_append = " kernel6-12"$/s/^#//' \
+    sed -i '/^#*DISTRO_FEATURES:append = " kernel6-12"$/s/^#//' \
     ${_TOPDIR}/meta-cmf-bananapi/conf/distro/include/{rdk-bpi.inc,rdk-bpi-ap-extender.inc}
-    sed -i '/^DISTRO_FEATURES_append = " kernel6-6"$/s/^/#/' \
+    sed -i '/^DISTRO_FEATURES:append = " kernel6-6"$/s/^/#/' \
     ${_TOPDIR}/meta-cmf-bananapi/conf/distro/include/{rdk-bpi.inc,rdk-bpi-ap-extender.inc}
+    sed -i '/^RDEPENDS:packagegroup-rdk-ccsp-broadband:remove = "cpuprocanalyzer"$/s/^/#/' \
+    ${_TOPDIR}/meta-cmf-filogic/recipes-core/packagegroups/packagegroup-rdk-ccsp-broadband.bbappend
     echo 'RDEPENDS:${PN}-dev = ""' >> ${_TOPDIR}/meta-filogic/recipes-kernel/linux6-12-libc-headers/linux-libc-headers.inc
-    #since rdm-agent recipe updated, commented rdm-agent recipe lines from filogic source to avoid build issues
-    sed -i '150,$ s/^/#/' ${_TOPDIR}/meta-cmf-filogic/setup-environment
     touch ${_TOPDIR}/meta-cmf-filogic/MP4_3_applied
     touch ${_TOPDIR}/meta-filogic/MP4_3_applied
 fi
 
-#select filogic880-bpi-r4.conf for BPI R4
-if [ -e "${_TOPDIR}/meta-cmf-filogic/setup-environment-release" ]; then
-	source meta-cmf-filogic/setup-environment-release
+if [ "X$MP_version" == "X4.3" ] ;then
+   if [ -e "${_TOPDIR}/meta-cmf-filogic/setup-environment" ]; then
+       source meta-cmf-filogic/setup-environment
+   fi
+else
+   if [ -e "${_TOPDIR}/meta-cmf-filogic/setup-environment-release" ]; then
+        source meta-cmf-filogic/setup-environment-release
+   fi
+   sed -i 's|SYSTEMD_SERVICE:${PN}:remove_broadband = "dropbear.service"|SYSTEMD_SERVICE:${PN}:remove_broadband = "${@bb.utils.contains('\''DISTRO_FEATURES'\'', '\''em_extender'\'', '\'' '\'','\''dropbear.service'\'', d)}"|' \
+${_TOPDIR}/meta-cmf-filogic/recipes-rdkb/sysint-broadband/sysint-broadband.bbappend
 fi
 
 if [[ -z $(grep 'meta-rdk-broadband-apps' conf/bblayers.conf) ]] && [[ -d  ../meta-rdk-broadband-apps ]]
@@ -64,32 +71,29 @@ fi
 # default BSP layer is meta-cmf-bananapi for B-PI builds
 export RDK_BSP_LAYER=meta-cmf-bananapi
 
-sed -i 's/\buboot-sign\b/uboot-sign_backport/g' ${_TOPDIR}/meta-filogic/classes/kernel_secure_boot-filogic.bbclass
-
 if [ ! -e ${_TOPDIR}/meta-cmf-filogic/recipes-ccsp/util/utopia_changes_applied ]; then
-sed -i '19 s/^/#/' ${_TOPDIR}/meta-cmf-filogic/recipes-ccsp/util/utopia.bbappend
-sed -i '39 s/^/#/' ${_TOPDIR}/meta-cmf-filogic/recipes-ccsp/util/utopia.bbappend
-sed -i '40 s/^/#/' ${_TOPDIR}/meta-cmf-filogic/recipes-ccsp/util/utopia.bbappend
-sed -i '8 s/^/#/' ${_TOPDIR}/meta-cmf-filogic/recipes-ccsp/util/utopia.bbappend
-sed -i '42 s/^/#/' ${_TOPDIR}/meta-cmf-filogic/recipes-ccsp/util/utopia.bbappend
-sed -i '43 s/^/#/' ${_TOPDIR}/meta-cmf-filogic/recipes-ccsp/util/utopia.bbappend
-sed -i '21 s/^/#/' ${_TOPDIR}/meta-cmf-filogic/recipes-ccsp/util/utopia.bbappend
-sed -i '170 s/^/#/' ${_TOPDIR}/meta-cmf-filogic/recipes-ccsp/util/utopia.bbappend
-sed -i '171 s/^/#/' ${_TOPDIR}/meta-cmf-filogic/recipes-ccsp/util/utopia.bbappend
-sed -i '172 s/^/#/' ${_TOPDIR}/meta-cmf-filogic/recipes-ccsp/util/utopia.bbappend
-sed -i '179 s/^/#/' ${_TOPDIR}/meta-cmf-filogic/recipes-ccsp/util/utopia.bbappend
-sed -i '180 s/^/#/' ${_TOPDIR}/meta-cmf-filogic/recipes-ccsp/util/utopia.bbappend
-sed -i '199 s/^/#/' ${_TOPDIR}/meta-cmf-filogic/recipes-ccsp/util/utopia.bbappend
-sed -i '200 s/^/#/' ${_TOPDIR}/meta-cmf-filogic/recipes-ccsp/util/utopia.bbappend
-sed -i '201 s/^/#/' ${_TOPDIR}/meta-cmf-filogic/recipes-ccsp/util/utopia.bbappend
-sed -i '202 s/^/#/' ${_TOPDIR}/meta-cmf-filogic/recipes-ccsp/util/utopia.bbappend
-sed -i '203 s/^/#/' ${_TOPDIR}/meta-cmf-filogic/recipes-ccsp/util/utopia.bbappend
+sed -i '/^EXTRA_OECONF:remove.*bcm/s/^/#/' ${_TOPDIR}/meta-cmf-filogic/recipes-ccsp/util/utopia.bbappend
+sed -i '/posix-gwprovapp\.patch/s/^/#/' ${_TOPDIR}/meta-cmf-filogic/recipes-ccsp/util/utopia.bbappend
+sed -i '/0002-fix-swctl-missing-api\.patch/s/^/#/' ${_TOPDIR}/meta-cmf-filogic/recipes-ccsp/util/utopia.bbappend
+sed -i '/bbnote.*posix-gwprovapp/s/^/#/' ${_TOPDIR}/meta-cmf-filogic/recipes-ccsp/util/utopia.bbappend
+sed -i '/patch.*posix-gwprovapp/s/^/#/' ${_TOPDIR}/meta-cmf-filogic/recipes-ccsp/util/utopia.bbappend
+sed -i '/bbnote.*0002-fix-swctl/s/^/#/' ${_TOPDIR}/meta-cmf-filogic/recipes-ccsp/util/utopia.bbappend
+sed -i '/patch.*0002-fix-swctl/s/^/#/' ${_TOPDIR}/meta-cmf-filogic/recipes-ccsp/util/utopia.bbappend
+sed -i '/sysevent set lan-start 0/s/^/#/' ${_TOPDIR}/meta-cmf-filogic/recipes-ccsp/util/utopia.bbappend
+sed -i '/sysevent set bridge-stop 0/s/^/#/' ${_TOPDIR}/meta-cmf-filogic/recipes-ccsp/util/utopia.bbappend
+sed -i '/sysevent set bridge_mode */s/^/#/' ${_TOPDIR}/meta-cmf-filogic/recipes-ccsp/util/utopia.bbappend
+sed -i '/echo.*sysevent set lan-status started/s/^/#/' ${_TOPDIR}/meta-cmf-filogic/recipes-ccsp/util/utopia.bbappend
+sed -i '/echo.*firewall/s/^/#/' ${_TOPDIR}/meta-cmf-filogic/recipes-ccsp/util/utopia.bbappend
+sed -i '/execute_dir \/etc\/utopia\/post\.d/s/^/#/' ${_TOPDIR}/meta-cmf-filogic/recipes-ccsp/util/utopia.bbappend
+sed -i '/touch \/tmp\/\.postd_started/s/^/#/' ${_TOPDIR}/meta-cmf-filogic/recipes-ccsp/util/utopia.bbappend
+sed -i '/lan-status started*/s/^/#/' ${_TOPDIR}/meta-cmf-filogic/recipes-ccsp/util/utopia.bbappend
+sed -i '/sysevent set wan-status started*/s/^/#/' ${_TOPDIR}/meta-cmf-filogic/recipes-ccsp/util/utopia.bbappend
 touch ${_TOPDIR}/meta-cmf-filogic/recipes-ccsp/util/utopia_changes_applied
 fi
 
 # commenting removing dbus.service from meta-cmf-filogic
 if [ ! -e ${_TOPDIR}/meta-cmf-filogic/recipes-core/dbus/dbus_change ]; then
-sed -i '19 s/^/#/' ${_TOPDIR}/meta-cmf-filogic/recipes-core/dbus/dbus_%.bbappend
+sed -i '/rm.*dbus\.service/s/^/#/' ${_TOPDIR}/meta-cmf-filogic/recipes-core/dbus/dbus_%.bbappend
 touch ${_TOPDIR}/meta-cmf-filogic/recipes-core/dbus/dbus_change
 fi
 
@@ -137,8 +141,6 @@ if [ "X$FEATURE_TYPE" == "XEasyMesh" ] && [ "X$WITHOUT_ALSAP" == "Xyes" ]; then
     fi	
 fi
 
-    sed -i 's|SYSTEMD_SERVICE:${PN}:remove_broadband = "dropbear.service"|SYSTEMD_SERVICE:${PN}:remove:broadband = "${@bb.utils.contains('\''DISTRO_FEATURES'\'', '\''em_extender'\'', '\'' '\'','\''dropbear.service'\'', d)}"|' \
-${_TOPDIR}/meta-cmf-filogic/recipes-rdkb/sysint-broadband/sysint-broadband.bbappend
 
 echo 'RDEPENDS:${PN}-dev = ""' >> ${_TOPDIR}/meta-filogic/recipes-kernel/linux6-6-libc-headers/linux-libc-headers.inc
 

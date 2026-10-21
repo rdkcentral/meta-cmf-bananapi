@@ -133,11 +133,11 @@ ln -sf /usr/sbin/log_handle.sh ${D}/fss/gw/usr/sbin/log_handle.sh
 
 
 #Mounting nvram
-sed -i '/Before=CcspPandMSsp.service/a Requires=mount-nvram.service' ${D}${libdir}/systemd/system/ApplySystemDefaults.service
+sed -i '/Before=CcspPandMSsp.service/a Requires=mount-nvram.service' ${D}${systemd_unitdir}/system/ApplySystemDefaults.service
 }
 
 FILES:${PN} += " \
                 /minidumps/ \
 "
 
-SRC_URI:append:wrynose = " file://wrynose-mapt-v6-masquerade.patch"
+SRC_URI:append = " file://wrynose-mapt-v6-masquerade.patch"

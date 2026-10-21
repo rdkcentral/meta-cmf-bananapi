@@ -28,7 +28,8 @@ do_unpack[network] = "1"
 # Ensure we're using the correct toolchain
 TOOLCHAIN = "gcc"
 INHIBIT_DEFAULT_DEPS = "1"
-DEPENDS += "virtual/cross-cc virtual/cross-c++ virtual/libc"
+DEPENDS:append:wrynose = "virtual/cross-cc virtual/cross-c++ virtual/libc"
+DEPENDS:append:kirkstone = "virtual/${TARGET_PREFIX}gcc virtual/${TARGET_PREFIX}g++ virtual/libc"
 
 # Basic compilation flags
 CFLAGS = "${TARGET_CFLAGS} -D_DEFAULT_SOURCE -D_BSD_SOURCE -DHOST_TOOLCHAIN -DPOSIX -DSL_CATALOG_APP_LOG_PRESENT"
