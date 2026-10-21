@@ -60,8 +60,8 @@ DISTRO_FEATURES:append = " wps_support"
 DISTRO_FEATURES:append = " resource_optimization"
 
 #Enable kernel_6_6 support
-#DISTRO_FEATURES:append = " kernel6-6"
-DISTRO_FEATURES:append = " kernel6-12"
+DISTRO_FEATURES:append = " kernel6-6"
+#DISTRO_FEATURES:append = " kernel6-12"
 PREFERRED_VERSION_linux-libc-headers:wrynose = "6.12"
 
 DISTRO_FEATURES:append = " CONFIG_IEEE80211BE"
@@ -94,3 +94,4 @@ PREFERRED_VERSION:bluez5:kirkstone = "${@bb.utils.contains('DISTRO_FEATURES', 'e
 #Wrynose build for TDK image
 PREFERRED_VERSION_jsonrpc:wrynose = "1.3.0"
 BBMASK .= "|meta-cmf-filogic/recipes-core/images/rdk-generic-broadband-tdk-image.bbappend"
+UNPACKDIR:kirkstone ?= "${WORKDIR}"

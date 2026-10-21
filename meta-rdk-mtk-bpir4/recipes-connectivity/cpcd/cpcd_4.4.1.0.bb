@@ -2,7 +2,7 @@
 DESCRIPTION = "Co-Processor Communication Daemon"
 LICENSE = "Proprietary"
 LIC_FILES_CHKSUM = "file://LICENSE;md5=5e588136d392e8e0e36bd310e9ca0ab3"
-SRC_URI = "git://github.com/SiliconLabs/cpc_daemon;protocol=https;name=cpc-daemon;branch=main"
+SRC_URI = "git://github.com/SiliconLabs/cpc_daemon;protocol=https;name=cpc-daemon;branch=main;destsuffix=${BPN}-${PV}"
 PR = "r0"
 # Tag v4.4.1
 SRCREV_cpc-daemon = "283b31aef4f32df23596b8cff1a646dd1dc442c6"

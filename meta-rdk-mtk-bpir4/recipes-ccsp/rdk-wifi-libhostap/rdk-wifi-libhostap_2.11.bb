@@ -116,3 +116,4 @@ do_install:append () {
     install -d ${D}${includedir}/rdk-wifi-libhostap/wpa_supplicant/
     install -m 0755 ${S}/source/hostap-${PV}/wpa_supplicant/*.h ${D}${includedir}/rdk-wifi-libhostap/wpa_supplicant
 }
+ERROR_QA:remove = "patch-status"

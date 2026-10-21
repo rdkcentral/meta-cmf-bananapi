@@ -35,8 +35,3 @@ do_filogic_patches:append() {
          touch patch_applied_v6
     fi
 }
-do_install:append() {
-    # Remove any empty directories under /etc in ${D}
-    find ${D}${sysconfdir} -type d -empty -delete
-}
-
