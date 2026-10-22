@@ -1,0 +1,342 @@
+From: Somanath Bulusu <bsomanath@plume.com>
+Date: Thu, 24 Sep 2026 13:03:14 +0000
+Subject: [PATCH] wps-monitor: manage dedicated onboarding VAP window
+
+Signed-off-by: Somanath Bulusu <bsomanath@plume.com>
+
+diff --git a/rdk-wps-monitor/include/button_callback.h b/rdk-wps-monitor/include/button_callback.h
+index 7777bda..0f42a1f 100644
+--- a/rdk-wps-monitor/include/button_callback.h
++++ b/rdk-wps-monitor/include/button_callback.h
+@@ -62,4 +62,18 @@ void register_button_callback(button_callback callback);
+  */
+ button_callback get_button_callback(void);
+ 
++/**
++ * @brief Start fail-closed cleanup without delaying event monitoring.
++ *
++ * This is a no-op on extender builds.
++ */
++void start_onboarding_cleanup(void);
++
++/**
++ * @brief Force dedicated gateway onboarding VAPs into their disabled state.
++ *
++ * This is a no-op on extender builds.
++ */
++void cleanup_onboarding_vaps(void);
++
+ #endif /* BUTTON_CALLBACK_H */
+diff --git a/rdk-wps-monitor/source/button_callback.c b/rdk-wps-monitor/source/button_callback.c
+index 4d3dec3..ab96682 100644
+--- a/rdk-wps-monitor/source/button_callback.c
++++ b/rdk-wps-monitor/source/button_callback.c
+@@ -24,6 +24,9 @@
+ 
+ #include <stdio.h>
+ #include <stdlib.h>
++#include <stdbool.h>
++#include <errno.h>
++#include <time.h>
+ #include <syslog.h>
+ #include "../include/button_callback.h"
+ #include "../include/utils.h"
+@@ -34,19 +37,212 @@
+ 
+ pthread_mutex_t wps_mutex = PTHREAD_MUTEX_INITIALIZER;
+ 
+-#define WPS_DELAY 60 // 60 seconds delay between presses
++static bool set_bool(rbusHandle_t handle, const char *param, bool value)
++{
++    rbusError_t err;
+ 
+-void set_wps_push_button(rbusHandle_t handle, const char* param) {
+     pthread_mutex_lock(&wps_mutex);
+-
+-    rbusError_t err = rbus_setBoolean(handle, param, true);
++    err = rbus_setBoolean(handle, param, value);
++    pthread_mutex_unlock(&wps_mutex);
+     if (err != RBUS_ERROR_SUCCESS) {
+-        printf("Failed to set %s: %d\n", param, err);
++        log_message(LOG_ERR, "Failed to set %s=%s: %d", param,
++            value ? "true" : "false", err);
++        return false;
++    }
++
++    return true;
++}
++
++void set_wps_push_button(rbusHandle_t handle, const char* param)
++{
++    (void)set_bool(handle, param, true);
++}
++
++#ifndef CONFIG_EXTENDER
++#define ONBOARDING_WINDOW_SECONDS 120
++
++static pthread_mutex_t onboarding_mutex = PTHREAD_MUTEX_INITIALIZER;
++static pthread_cond_t onboarding_cond;
++static pthread_once_t onboarding_once = PTHREAD_ONCE_INIT;
++static bool onboarding_armed;
++static bool onboarding_timer_ready;
++static struct timespec onboarding_deadline;
++
++static bool close_onboarding_vaps(rbusHandle_t handle)
++{
++    bool ok = true;
++
++    /* Cancel is best-effort: HAL rejects it when no PBC session is active. */
++    (void)set_bool(handle,
++        "Device.WiFi.AccessPoint.5.WPS.X_CISCO_COM_CancelSession", true);
++    (void)set_bool(handle,
++        "Device.WiFi.AccessPoint.6.WPS.X_CISCO_COM_CancelSession", true);
++    ok &= set_bool(handle, "Device.WiFi.AccessPoint.5.WPS.Enable", false);
++    ok &= set_bool(handle, "Device.WiFi.AccessPoint.6.WPS.Enable", false);
++    ok &= set_bool(handle, "Device.WiFi.AccessPoint.5.Enable", false);
++    ok &= set_bool(handle, "Device.WiFi.AccessPoint.6.Enable", false);
++    ok &= set_bool(handle, "Device.WiFi.SSID.5.Enable", false);
++    ok &= set_bool(handle, "Device.WiFi.SSID.6.Enable", false);
++    ok &= set_bool(handle, "Device.WiFi.ApplyAccessPointSettings", true);
++    return ok;
++}
++
++static void *onboarding_timer(void *unused)
++{
++    (void)unused;
++
++    pthread_mutex_lock(&onboarding_mutex);
++    for (;;) {
++        int rc;
++        rbusHandle_t handle = NULL;
++
++        while (!onboarding_armed) {
++            pthread_cond_wait(&onboarding_cond, &onboarding_mutex);
++        }
++
++        rc = pthread_cond_timedwait(&onboarding_cond, &onboarding_mutex,
++            &onboarding_deadline);
++        if (rc == 0) {
++            /* A repeated press supplied a new deadline. */
++            continue;
++        }
++        if (rc != ETIMEDOUT) {
++            log_message(LOG_ERR, "Onboarding timer wait failed: %d", rc);
++            continue;
++        }
++
++        /*
++         * Keep the lock while closing the old window. A concurrent press
++         * waits, then opens a fresh window after teardown, so an expired
++         * timer can never disable a newly started session.
++         */
++        onboarding_armed = false;
++        log_message(LOG_INFO, "WPS onboarding window expired");
++        do {
++            while (rbus_open(&handle, "wps_onboarding_timer") !=
++                    RBUS_ERROR_SUCCESS) {
++                log_message(LOG_ERR,
++                    "Unable to open RBus for onboarding teardown; retrying");
++                sleep(1);
++            }
++            rc = close_onboarding_vaps(handle);
++            rbus_close(handle);
++            handle = NULL;
++            if (!rc) {
++                log_message(LOG_ERR,
++                    "Onboarding teardown incomplete; retrying");
++                sleep(1);
++            }
++        } while (!rc);
++    }
++    /* NOTREACHED */
++    pthread_mutex_unlock(&onboarding_mutex);
++    return NULL;
++}
++
++static void init_onboarding_timer(void)
++{
++    pthread_condattr_t attr;
++    pthread_t thread;
++
++    pthread_condattr_init(&attr);
++    pthread_condattr_setclock(&attr, CLOCK_MONOTONIC);
++    pthread_cond_init(&onboarding_cond, &attr);
++    pthread_condattr_destroy(&attr);
++
++    if (pthread_create(&thread, NULL, onboarding_timer, NULL) == 0) {
++        pthread_detach(thread);
++        onboarding_timer_ready = true;
+     } else {
+-        printf("Successfully set %s.\n", param);
++        log_message(LOG_ERR, "Unable to create WPS onboarding timer");
+     }
++}
+ 
+-    pthread_mutex_unlock(&wps_mutex);
++static bool arm_onboarding_timer(void)
++{
++    pthread_once(&onboarding_once, init_onboarding_timer);
++    if (!onboarding_timer_ready) {
++        return false;
++    }
++    pthread_mutex_lock(&onboarding_mutex);
++    clock_gettime(CLOCK_MONOTONIC, &onboarding_deadline);
++    onboarding_deadline.tv_sec += ONBOARDING_WINDOW_SECONDS;
++    onboarding_armed = true;
++    pthread_cond_signal(&onboarding_cond);
++    pthread_mutex_unlock(&onboarding_mutex);
++    return true;
++}
++
++static bool open_onboarding_vaps(rbusHandle_t handle)
++{
++    bool ok = true;
++
++    ok &= set_bool(handle, "Device.WiFi.AccessPoint.5.WPS.Enable", true);
++    ok &= set_bool(handle, "Device.WiFi.SSID.5.Enable", true);
++    ok &= set_bool(handle, "Device.WiFi.AccessPoint.5.Enable", true);
++    ok &= set_bool(handle,
++        "Device.WiFi.AccessPoint.5.WPS.X_CISCO_COM_ActivatePushButton", true);
++    ok &= set_bool(handle, "Device.WiFi.AccessPoint.6.WPS.Enable", true);
++    ok &= set_bool(handle, "Device.WiFi.SSID.6.Enable", true);
++    ok &= set_bool(handle, "Device.WiFi.AccessPoint.6.Enable", true);
++    ok &= set_bool(handle,
++        "Device.WiFi.AccessPoint.6.WPS.X_CISCO_COM_ActivatePushButton", true);
++    ok &= set_bool(handle, "Device.WiFi.ApplyAccessPointSettings", true);
++
++    if (!ok) {
++        close_onboarding_vaps(handle);
++    }
++    return ok;
++}
++#endif
++
++static void *onboarding_startup_cleanup(void *unused)
++{
++#ifndef CONFIG_EXTENDER
++    rbusHandle_t handle = NULL;
++    bool cleaned = false;
++
++    (void)unused;
++    do {
++        if (rbus_open(&handle, "wps_onboarding_cleanup") ==
++                RBUS_ERROR_SUCCESS) {
++            cleaned = close_onboarding_vaps(handle);
++            rbus_close(handle);
++            handle = NULL;
++        }
++        if (!cleaned) {
++            log_message(LOG_ERR,
++                "Onboarding cleanup incomplete; retrying");
++            sleep(1);
++        }
++    } while (!cleaned);
++#endif
++    return NULL;
++}
++
++void start_onboarding_cleanup(void)
++{
++#ifndef CONFIG_EXTENDER
++    pthread_t thread;
++
++    if (pthread_create(&thread, NULL, onboarding_startup_cleanup, NULL) == 0) {
++        pthread_detach(thread);
++    } else {
++        log_message(LOG_ERR, "Unable to start onboarding cleanup thread");
++    }
++#endif
++}
++
++void cleanup_onboarding_vaps(void)
++{
++#ifndef CONFIG_EXTENDER
++    rbusHandle_t handle = NULL;
++
++    if (rbus_open(&handle, "wps_onboarding_cleanup") == RBUS_ERROR_SUCCESS) {
++        (void)close_onboarding_vaps(handle);
++        rbus_close(handle);
++    }
++#endif
+ }
+ 
+ // The active callback function
+@@ -58,28 +254,42 @@ void default_button_callback(const char *device, int button_code, int value) {
+     log_message(LOG_INFO, "Device: %s, Button %d %s", 
+            device, button_code, action);
+ 
+-    rbusHandle_t handle;
++    rbusHandle_t handle = NULL;
+     rbusError_t err;
+     char button_name[32];
++
++    /*
++     * Ignore release and autorepeat events. The keycode is board specific:
++     * Filogic gpio-keys labels the button "WPS" but assigns KEY_RESTART, so
++     * the code itself is not used to identify the button.
++     */
++    if (value != 1) {
++        return;
++    }
++
+     snprintf(button_name, sizeof(button_name), "wps_button_%d", button_code);
+ 
+-    // Initialize RBus
+-    //err = rbus_open(&handle, "wps_push_button");
+     err = rbus_open(&handle, button_name);
+     if (err != RBUS_ERROR_SUCCESS) {
+-        printf("Failed to initialize RBus: %d\n", err);
++        log_message(LOG_ERR, "Failed to initialize RBus: %d", err);
++        return;
+     }
+ 
+-    // Set WPS Push Button for Access Point 1
+-    log_message(LOG_INFO, "WPS button pressed on device %s - triggering WPS action for 2G", device);
+-    set_wps_push_button(handle, "Device.WiFi.AccessPoint.1.WPS.X_CISCO_COM_ActivatePushButton");
+-
+-    // Set WPS Push Button for Access Point 2
+-    log_message(LOG_INFO, "WPS button pressed on device %s - triggering WPS action for 5G", device);
+-    set_wps_push_button(handle, "Device.WiFi.AccessPoint.2.WPS.X_CISCO_COM_ActivatePushButton");
+-    sleep(WPS_DELAY);
++#ifdef CONFIG_EXTENDER
++    log_message(LOG_INFO,
++        "WPS button pressed on %s - triggering extender station WPS", device);
++    set_wps_push_button(handle,
++        "Device.WiFi.AccessPoint.16.WPS.X_CISCO_COM_ActivatePushButton");
++#else
++    log_message(LOG_INFO,
++        "WPS button pressed on %s - opening dedicated onboarding VAPs", device);
++    if (open_onboarding_vaps(handle)) {
++        if (!arm_onboarding_timer()) {
++            close_onboarding_vaps(handle);
++        }
++    }
++#endif
+ 
+-    // Close RBus
+     rbus_close(handle);
+ }
+ 
+diff --git a/rdk-wps-monitor/source/main.c b/rdk-wps-monitor/source/main.c
+index fd9111b..5be2b33 100644
+--- a/rdk-wps-monitor/source/main.c
++++ b/rdk-wps-monitor/source/main.c
+@@ -89,6 +89,9 @@ int main(int argc, char *argv[]) {
+     }
+     
+     log_message(LOG_NOTICE, "Netlink button monitor daemon starting up");
++
++    /* Fail closed if a previous daemon instance ended during an open window. */
++    start_onboarding_cleanup();
+     
+     // Initialize device monitoring subsystem
+     if (device_monitor_init() < 0) {
+@@ -139,6 +142,8 @@ int main(int argc, char *argv[]) {
+     
+     // Cleanup
+     log_message(LOG_NOTICE, "Netlink button monitor daemon shutting down");
++
++    cleanup_onboarding_vaps();
+     
+     // Close the netlink socket
+     close_netlink_socket();

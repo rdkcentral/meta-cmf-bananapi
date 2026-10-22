@@ -4,6 +4,9 @@ FILESEXTRAPATHS_prepend := "${THISDIR}/files:"
 
 SRC_URI_remove += "git://github.com/rdk-gdcs/lan_web.git;protocol=https;branch=main_branch_multiap_update;name=lan_web;destsuffix=lan_web"
 CFLAGS_append = " -DFEATURE_SINGLE_PHY"
+# Extender WPS onboarding. Gateway builds get the controller macro instead.
+CFLAGS_append = " ${@bb.utils.contains('DISTRO_FEATURES', 'em_extender', bb.utils.contains('DISTRO_FEATURES', 'em_wps_support', ' -DUWM_EXT_WPS_SUPPORT ', '', d), '', d)}"
+CFLAGS_append = " ${@bb.utils.contains('DISTRO_FEATURES', 'em_extender', '', bb.utils.contains('DISTRO_FEATURES', 'em_wps_support', ' -DUWM_CTRL_WPS_SUPPORT ', '', d), d)}"
 CFLAGS_remove = " -DONEWIFI_MULTIAP_APP_SUPPORT"
 EXTRA_OECONF_remove = " ONEWIFI_MULTIAP_APP_SUPPORT=true"
 
