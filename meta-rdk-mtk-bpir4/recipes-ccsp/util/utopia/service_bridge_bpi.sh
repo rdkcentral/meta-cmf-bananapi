@@ -476,15 +476,16 @@ virtual_interface_ebtables_rules ()
 {
     CMDIAG_IF=`syscfg get cmdiag_ifname`
     CMDIAG_MAC=`cat /sys/class/net/"${CMDIAG_IF}"/address`   
-    for iface in lan0 erouter0; do
-        if [ -e /sys/class/net/$iface/address ]; then
-            EROUTER_MAC=$(cat /sys/class/net/$iface/address)
-            [ -n "$EROUTER_MAC" ] && break
+    for iface in lan0 erouter0 usb0 eth0; do
+        if [ -e /sys/class/net/$iface/address ] && [ -e /sys/class/net/$iface/carrier ] && [ "$(cat /sys/class/net/$iface/carrier)" = "1" ]; then
+            WAN_IF="$iface"
+            WAN_MAC=$(cat /sys/class/net/$iface/address)
+            [ -n "$WAN_MAC" ] && break
         fi
     done
     # Optional: handle the case where no MAC address was found
-    if [ -z "$EROUTER_MAC" ]; then
-        echo "No valid MAC address found for lan0, or erouter0."
+    if [ -z "$WAN_MAC" ]; then
+        echo "No valid MAC address found for lan0, erouter0, usb0 or eth0"
     fi
     BRIDGE_NAME=`syscfg get lan_ifname`
     LAN_IP=`syscfg get lan_ipaddr`
@@ -498,8 +499,8 @@ virtual_interface_ebtables_rules ()
         ebtables -F BRIDGE_FORWARD_FILTER 2> /dev/null
         ebtables -I FORWARD -j BRIDGE_FORWARD_FILTER
 
-        echo "ebtables -A BRIDGE_FORWARD_FILTER -s $CMDIAG_MAC -o erouter0 -j DROP"
-        ebtables -A BRIDGE_FORWARD_FILTER -s "$CMDIAG_MAC" -o erouter0 -j DROP
+        echo "ebtables -A BRIDGE_FORWARD_FILTER -s $CMDIAG_MAC -o $WAN_IF -j DROP"
+        ebtables -A BRIDGE_FORWARD_FILTER -s "$CMDIAG_MAC" -o "$WAN_IF" -j DROP
 
         echo "ebtables -A BRIDGE_FORWARD_FILTER -j RETURN"
         ebtables -A BRIDGE_FORWARD_FILTER -j RETURN
@@ -527,8 +528,8 @@ virtual_interface_ebtables_rules ()
          #--------------------------------------------------------------------------------------
          #DROP target in this BROUTING chain actually broutes the frame(frame has to be routed)
          #--------------------------------------------------------------------------------------
-        echo "ebtables -t broute -A BROUTING -i erouter0 -d $EROUTER_MAC -j redirect --redirect-target DROP"
-        ebtables -t broute -A BROUTING -i erouter0 -d "$EROUTER_MAC" -j redirect --redirect-target DROP 
+        echo "ebtables -t broute -A BROUTING -i $WAN_IF -d $WAN_MAC -j redirect --redirect-target DROP"
+        ebtables -t broute -A BROUTING -i "$WAN_IF" -d "$WAN_MAC" -j redirect --redirect-target DROP
 
    else
         echo "ebtables -D FORWARD -j BRIDGE_FORWARD_FILTER"
@@ -663,8 +664,8 @@ filter_local_traffic()
 
         echo "ebtables -A BRIDGE_OUTPUT_FILTER --logical-out $BRIDGE_NAME -j DROP"
         ebtables -A BRIDGE_OUTPUT_FILTER --logical-out "$BRIDGE_NAME" -j DROP
-        echo "ebtables -A BRIDGE_OUTPUT_FILTER -o erouter0 -j DROP"
-        ebtables -A BRIDGE_OUTPUT_FILTER -o erouter0 -j DROP
+        echo "ebtables -A BRIDGE_OUTPUT_FILTER -o $WAN_IF -j DROP"
+        ebtables -A BRIDGE_OUTPUT_FILTER -o $WAN_IF -j DROP
 
         #Return from filter chain
         echo "ebtables -A BRIDGE_OUTPUT_FILTER -j RETURN"
