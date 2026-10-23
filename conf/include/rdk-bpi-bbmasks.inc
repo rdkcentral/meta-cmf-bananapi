@@ -23,7 +23,7 @@ BBMASK .= "${@bb.utils.contains('DISTRO_FEATURES', 'kirkstone', bb.utils.contain
 BBMASK .= "${@bb.utils.contains('DISTRO_FEATURES', 'kirkstone', bb.utils.contains('DISTRO_FEATURES', 'em_extender', '', '|openembedded-core/meta/recipes-connectivity/bluez5', d), '', d)}"
 
 # Wrynose Parsing Error
-BBMASK .= "|meta-filogic/recipes-filter/libnfnetlink/libnfnetlink_1.0.1.bbappend"
+BBMASK .= "${@bb.utils.contains('DISTRO_FEATURES', 'kernel6-12', '|meta-filogic/recipes-filter/libnfnetlink/libnfnetlink_1.0.1.bbappend', '',d)}"
 BBMASK .= "|meta-filogic/recipes-wifi/openssl/openssl_1.1.1%.bbappend"
 BBMASK .= "|meta-cmf-filogic/recipes-common/heaptrack/heaptrack_1.0.0.bbappend"
 BBMASK .= "|meta-cmf-filogic/recipes-connectivity/opensync/opensync_%.bbappend"
