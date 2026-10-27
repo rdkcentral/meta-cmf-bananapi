@@ -6,7 +6,7 @@ export PLATFORM_BANANAPI = "true"
 
 SRC_URI_remove = "${CMF_GIT_ROOT}/rdkb/components/opensource/ccsp/OneWifi;protocol=${CMF_GIT_PROTOCOL};branch=${CMF_GIT_BRANCH};name=OneWifi"
 SRC_URI += "git://github.com/bsomanath/OneWifi.git;protocol=https;branch=RDKBWIFI-388-wps;name=OneWifi"
-SRCREV_OneWifi = "bba271bcaaba68cc471303382b544f070b271fb9"
+SRCREV_OneWifi = "d4f4e1cc8b1334248de0951c7ae5e9f4b43e9cd1"
 
 SRC_URI_remove += "git://github.com/rdk-gdcs/lan_web.git;protocol=https;branch=main_branch_multiap_update;name=lan_web;destsuffix=lan_web"
 CFLAGS_append = " -DFEATURE_SINGLE_PHY"

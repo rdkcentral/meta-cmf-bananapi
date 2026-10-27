@@ -2,7 +2,7 @@ FILESEXTRAPATHS_prepend := "${THISDIR}/files:"
 
 SRC_URI_remove = "git://github.com/rdkcentral/rdk-wifi-hal.git;protocol=https;branch=main;name=rdk-wifi-hal"
 SRC_URI += "git://github.com/bsomanath/rdk-wifi-hal.git;protocol=https;branch=RDKBWIFI-388-wps;name=rdk-wifi-hal"
-SRCREV_rdk-wifi-hal = "d9592a44d3e078f58b29281bd4a5934645304c55"
+SRCREV_rdk-wifi-hal = "c9da674813b9e406ea3cff51e875997c4830a681"
 
 CFLAGS_append = " -D_PLATFORM_BANANAPI_R4_  -DBANANA_PI_PORT  -DFEATURE_SINGLE_PHY -DCONFIG_HW_CAPABILITIES "
 CFLAGS_append = "${@bb.utils.contains('DISTRO_FEATURES', 'em_extender', bb.utils.contains('DISTRO_FEATURES', 'em_wps_support', ' -DUWM_EXT_WPS_SUPPORT', '', d), '', d)}"
