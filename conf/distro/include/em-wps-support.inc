@@ -9,11 +9,9 @@
 # machine that consumes this layer.
 #
 # Toggling: comment out the line below (or remove this require from layer.conf)
-# to globally disable the EasyMesh + WPS InterfaceMap variant. Recipes such as
-# rdk-wifi-hal.bbappend key off this feature to install InterfaceMap_em_wps.json
-# (which omits the MldName=mld0 entries that interfere with WPS) in place of
-# InterfaceMap_em.json on EasyMesh builds. It also enables the WPS hostap build
-# flags (UWM_EXT_WPS_SUPPORT and WPS_NOTIFY_DISABLE) in rdk-wifi-libhostap and
+# to globally disable EasyMesh WPS. Onboarding VAPs live in InterfaceMap_em.json.
+# This feature enables the WPS hostap build flags
+# (UWM_EXT_WPS_SUPPORT and WPS_NOTIFY_DISABLE) in rdk-wifi-libhostap and
 # ccsp-one-wifi when both 'em_extender' and 'em_wps_support' are in DISTRO_FEATURES.
 # On the gateway (no 'em_extender'), em_wps_support also defines
 # UWM_CTRL_WPS_SUPPORT for OneWifi and libwebconfig so the controller-side

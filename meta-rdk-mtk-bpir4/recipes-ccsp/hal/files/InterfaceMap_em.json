@@ -36,6 +36,13 @@
                     "RadioName": "wifi1",
                     "InterfaceList": [
                         {
+                            "InterfaceName": "wifi1.4",
+                            "Bridge": "brlan0",
+                            "vlanId": 0,
+                            "vapIndex": 5,
+                            "vapName": "onboarding_ssid_5g"
+                        },
+                        {
                             "InterfaceName": "wifi1.3",
                             "Bridge": "brlan0",
                             "vlanId": 0,
@@ -71,6 +78,13 @@
                     "Index": 0,
                     "RadioName": "wifi0",
                     "InterfaceList": [
+                        {
+                            "InterfaceName": "wifi0.4",
+                            "Bridge": "brlan0",
+                            "vlanId": 0,
+                            "vapIndex": 4,
+                            "vapName": "onboarding_ssid_2g"
+                        },
                         {
                             "InterfaceName": "wifi0.2",
                             "Bridge": "brlan0",
