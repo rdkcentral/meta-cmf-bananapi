@@ -37,7 +37,7 @@
                     "InterfaceList": [
                         {
                             "InterfaceName": "wifi1.4",
-                            "Bridge": "brlan0",
+                            "Bridge": "bronboard",
                             "vlanId": 0,
                             "vapIndex": 5,
                             "vapName": "onboarding_ssid_5g"
@@ -80,7 +80,7 @@
                     "InterfaceList": [
                         {
                             "InterfaceName": "wifi0.4",
-                            "Bridge": "brlan0",
+                            "Bridge": "bronboard",
                             "vlanId": 0,
                             "vapIndex": 4,
                             "vapName": "onboarding_ssid_2g"

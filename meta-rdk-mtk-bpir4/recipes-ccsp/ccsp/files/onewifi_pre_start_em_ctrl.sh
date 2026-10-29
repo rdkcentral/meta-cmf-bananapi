@@ -26,6 +26,14 @@ fi
 
 sleep 20
 
+# Isolated bridge for dedicated onboarding VAPs (wifi0.4 / wifi1.4).
+# Do not enslave to brlan0 or assign an IP — enrollment traffic must not
+# reach the LAN during the WPS button window.
+if ! brctl show | grep -q '^bronboard'; then
+    brctl addbr bronboard
+fi
+ip link set bronboard up
+
 iw phy phy0 interface add wifi0 type __ap
 iw phy phy0 interface add wifi0.1 type __ap
 iw phy phy0 interface add wifi0.2 type __ap

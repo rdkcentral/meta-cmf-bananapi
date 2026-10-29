@@ -2,13 +2,15 @@ From: Somanath Bulusu <bsomanath@plume.com>
 Date: Thu, 24 Sep 2026 13:03:14 +0000
 Subject: [PATCH] wps-monitor: manage dedicated onboarding VAP window
 
+Isolate open/arm under one lock, gate presses on startup cleanup,
+and retry teardown until onboarding VAPs are confirmed disabled.
+
 Signed-off-by: Somanath Bulusu <bsomanath@plume.com>
 
 diff --git a/rdk-wps-monitor/include/button_callback.h b/rdk-wps-monitor/include/button_callback.h
-index 7777bda..0f42a1f 100644
---- a/rdk-wps-monitor/include/button_callback.h
-+++ b/rdk-wps-monitor/include/button_callback.h
-@@ -62,4 +62,18 @@ void register_button_callback(button_callback callback);
+--- a/rdk-wps-monitor/include/button_callback.h	2026-10-29 12:16:27.229142390 +0000
++++ b/rdk-wps-monitor/include/button_callback.h	2026-10-29 12:16:47.831645947 +0000
+@@ -62,4 +62,18 @@
   */
  button_callback get_button_callback(void);
  
@@ -28,9 +30,8 @@ index 7777bda..0f42a1f 100644
 +
  #endif /* BUTTON_CALLBACK_H */
 diff --git a/rdk-wps-monitor/source/button_callback.c b/rdk-wps-monitor/source/button_callback.c
-index 4d3dec3..ab96682 100644
---- a/rdk-wps-monitor/source/button_callback.c
-+++ b/rdk-wps-monitor/source/button_callback.c
+--- a/rdk-wps-monitor/source/button_callback.c	2026-10-29 12:16:27.230142366 +0000
++++ b/rdk-wps-monitor/source/button_callback.c	2026-10-29 12:17:19.456889911 +0000
 @@ -24,6 +24,9 @@
  
  #include <stdio.h>
@@ -41,7 +42,7 @@ index 4d3dec3..ab96682 100644
  #include <syslog.h>
  #include "../include/button_callback.h"
  #include "../include/utils.h"
-@@ -34,19 +37,212 @@
+@@ -34,22 +37,249 @@
  
  pthread_mutex_t wps_mutex = PTHREAD_MUTEX_INITIALIZER;
  
@@ -79,6 +80,7 @@ index 4d3dec3..ab96682 100644
 +static pthread_once_t onboarding_once = PTHREAD_ONCE_INIT;
 +static bool onboarding_armed;
 +static bool onboarding_timer_ready;
++static bool startup_cleanup_done;
 +static struct timespec onboarding_deadline;
 +
 +static bool close_onboarding_vaps(rbusHandle_t handle)
@@ -100,6 +102,61 @@ index 4d3dec3..ab96682 100644
 +    return ok;
 +}
 +
++/*
++ * Retry until every onboarding VAP is disabled. Caller may already hold
++ * onboarding_mutex; RBus work is independent of that lock's waiters.
++ */
++static bool close_onboarding_vaps_until_done(rbusHandle_t handle)
++{
++    rbusHandle_t local = NULL;
++    rbusHandle_t active = handle;
++    bool ok;
++
++    do {
++        if (active == NULL) {
++            if (rbus_open(&local, "wps_onboarding_teardown") !=
++                    RBUS_ERROR_SUCCESS) {
++                log_message(LOG_ERR,
++                    "Unable to open RBus for onboarding teardown; retrying");
++                sleep(1);
++                continue;
++            }
++            active = local;
++        }
++
++        ok = close_onboarding_vaps(active);
++        if (local != NULL) {
++            rbus_close(local);
++            local = NULL;
++            active = handle;
++        }
++        if (!ok) {
++            log_message(LOG_ERR, "Onboarding teardown incomplete; retrying");
++            sleep(1);
++        }
++    } while (!ok);
++
++    return true;
++}
++
++static bool open_onboarding_vaps(rbusHandle_t handle)
++{
++    bool ok = true;
++
++    ok &= set_bool(handle, "Device.WiFi.AccessPoint.5.WPS.Enable", true);
++    ok &= set_bool(handle, "Device.WiFi.SSID.5.Enable", true);
++    ok &= set_bool(handle, "Device.WiFi.AccessPoint.5.Enable", true);
++    ok &= set_bool(handle,
++        "Device.WiFi.AccessPoint.5.WPS.X_CISCO_COM_ActivatePushButton", true);
++    ok &= set_bool(handle, "Device.WiFi.AccessPoint.6.WPS.Enable", true);
++    ok &= set_bool(handle, "Device.WiFi.SSID.6.Enable", true);
++    ok &= set_bool(handle, "Device.WiFi.AccessPoint.6.Enable", true);
++    ok &= set_bool(handle,
++        "Device.WiFi.AccessPoint.6.WPS.X_CISCO_COM_ActivatePushButton", true);
++    ok &= set_bool(handle, "Device.WiFi.ApplyAccessPointSettings", true);
++    return ok;
++}
++
 +static void *onboarding_timer(void *unused)
 +{
 +    (void)unused;
@@ -107,7 +164,6 @@ index 4d3dec3..ab96682 100644
 +    pthread_mutex_lock(&onboarding_mutex);
 +    for (;;) {
 +        int rc;
-+        rbusHandle_t handle = NULL;
 +
 +        while (!onboarding_armed) {
 +            pthread_cond_wait(&onboarding_cond, &onboarding_mutex);
@@ -125,28 +181,13 @@ index 4d3dec3..ab96682 100644
 +        }
 +
 +        /*
-+         * Keep the lock while closing the old window. A concurrent press
-+         * waits, then opens a fresh window after teardown, so an expired
-+         * timer can never disable a newly started session.
++         * Hold the lock for the whole teardown. Button handling opens and
++         * arms under the same lock, so an expired timer cannot disable a
++         * window that was started after this deadline fired.
 +         */
 +        onboarding_armed = false;
 +        log_message(LOG_INFO, "WPS onboarding window expired");
-+        do {
-+            while (rbus_open(&handle, "wps_onboarding_timer") !=
-+                    RBUS_ERROR_SUCCESS) {
-+                log_message(LOG_ERR,
-+                    "Unable to open RBus for onboarding teardown; retrying");
-+                sleep(1);
-+            }
-+            rc = close_onboarding_vaps(handle);
-+            rbus_close(handle);
-+            handle = NULL;
-+            if (!rc) {
-+                log_message(LOG_ERR,
-+                    "Onboarding teardown incomplete; retrying");
-+                sleep(1);
-+            }
-+        } while (!rc);
++        (void)close_onboarding_vaps_until_done(NULL);
 +    }
 +    /* NOTREACHED */
 +    pthread_mutex_unlock(&onboarding_mutex);
@@ -173,13 +214,40 @@ index 4d3dec3..ab96682 100644
 +}
  
 -    pthread_mutex_unlock(&wps_mutex);
-+static bool arm_onboarding_timer(void)
++/*
++ * Open the dedicated VAPs and arm the window under one critical section so
++ * timer expiry cannot interleave with a new press.
++ */
++static bool open_and_arm_onboarding_window(rbusHandle_t handle)
 +{
++    bool ok;
++
 +    pthread_once(&onboarding_once, init_onboarding_timer);
++
++    pthread_mutex_lock(&onboarding_mutex);
++    while (!startup_cleanup_done) {
++        log_message(LOG_INFO,
++            "Waiting for startup onboarding cleanup before opening a window");
++        pthread_cond_wait(&onboarding_cond, &onboarding_mutex);
++    }
++
 +    if (!onboarding_timer_ready) {
++        log_message(LOG_ERR,
++            "Onboarding timer unavailable; refusing to open a window");
++        (void)close_onboarding_vaps_until_done(handle);
++        pthread_mutex_unlock(&onboarding_mutex);
 +        return false;
 +    }
-+    pthread_mutex_lock(&onboarding_mutex);
++
++    ok = open_onboarding_vaps(handle);
++    if (!ok) {
++        log_message(LOG_ERR,
++            "Failed to open onboarding VAPs; tearing down until disabled");
++        (void)close_onboarding_vaps_until_done(handle);
++        pthread_mutex_unlock(&onboarding_mutex);
++        return false;
++    }
++
 +    clock_gettime(CLOCK_MONOTONIC, &onboarding_deadline);
 +    onboarding_deadline.tv_sec += ONBOARDING_WINDOW_SECONDS;
 +    onboarding_armed = true;
@@ -188,58 +256,28 @@ index 4d3dec3..ab96682 100644
 +    return true;
 +}
 +
-+static bool open_onboarding_vaps(rbusHandle_t handle)
-+{
-+    bool ok = true;
-+
-+    ok &= set_bool(handle, "Device.WiFi.AccessPoint.5.WPS.Enable", true);
-+    ok &= set_bool(handle, "Device.WiFi.SSID.5.Enable", true);
-+    ok &= set_bool(handle, "Device.WiFi.AccessPoint.5.Enable", true);
-+    ok &= set_bool(handle,
-+        "Device.WiFi.AccessPoint.5.WPS.X_CISCO_COM_ActivatePushButton", true);
-+    ok &= set_bool(handle, "Device.WiFi.AccessPoint.6.WPS.Enable", true);
-+    ok &= set_bool(handle, "Device.WiFi.SSID.6.Enable", true);
-+    ok &= set_bool(handle, "Device.WiFi.AccessPoint.6.Enable", true);
-+    ok &= set_bool(handle,
-+        "Device.WiFi.AccessPoint.6.WPS.X_CISCO_COM_ActivatePushButton", true);
-+    ok &= set_bool(handle, "Device.WiFi.ApplyAccessPointSettings", true);
-+
-+    if (!ok) {
-+        close_onboarding_vaps(handle);
-+    }
-+    return ok;
-+}
-+#endif
-+
 +static void *onboarding_startup_cleanup(void *unused)
 +{
-+#ifndef CONFIG_EXTENDER
-+    rbusHandle_t handle = NULL;
-+    bool cleaned = false;
-+
 +    (void)unused;
-+    do {
-+        if (rbus_open(&handle, "wps_onboarding_cleanup") ==
-+                RBUS_ERROR_SUCCESS) {
-+            cleaned = close_onboarding_vaps(handle);
-+            rbus_close(handle);
-+            handle = NULL;
-+        }
-+        if (!cleaned) {
-+            log_message(LOG_ERR,
-+                "Onboarding cleanup incomplete; retrying");
-+            sleep(1);
-+        }
-+    } while (!cleaned);
-+#endif
++
++    (void)close_onboarding_vaps_until_done(NULL);
++
++    pthread_once(&onboarding_once, init_onboarding_timer);
++    pthread_mutex_lock(&onboarding_mutex);
++    startup_cleanup_done = true;
++    pthread_cond_broadcast(&onboarding_cond);
++    pthread_mutex_unlock(&onboarding_mutex);
++    log_message(LOG_INFO, "Startup onboarding cleanup complete");
 +    return NULL;
-+}
+ }
++#endif
 +
 +void start_onboarding_cleanup(void)
 +{
 +#ifndef CONFIG_EXTENDER
 +    pthread_t thread;
-+
+ 
+-// The active callback function
 +    if (pthread_create(&thread, NULL, onboarding_startup_cleanup, NULL) == 0) {
 +        pthread_detach(thread);
 +    } else {
@@ -251,17 +289,18 @@ index 4d3dec3..ab96682 100644
 +void cleanup_onboarding_vaps(void)
 +{
 +#ifndef CONFIG_EXTENDER
-+    rbusHandle_t handle = NULL;
-+
-+    if (rbus_open(&handle, "wps_onboarding_cleanup") == RBUS_ERROR_SUCCESS) {
-+        (void)close_onboarding_vaps(handle);
-+        rbus_close(handle);
-+    }
++    pthread_mutex_lock(&onboarding_mutex);
++    onboarding_armed = false;
++    (void)close_onboarding_vaps_until_done(NULL);
++    pthread_mutex_unlock(&onboarding_mutex);
 +#endif
- }
++}
++
++/* The active callback function */
+ static button_callback event_callback = default_button_callback;
  
- // The active callback function
-@@ -58,28 +254,42 @@ void default_button_callback(const char *device, int button_code, int value) {
+ void default_button_callback(const char *device, int button_code, int value) {
+@@ -58,43 +288,55 @@
      log_message(LOG_INFO, "Device: %s, Button %d %s", 
             device, button_code, action);
  
@@ -306,10 +345,8 @@ index 4d3dec3..ab96682 100644
 +#else
 +    log_message(LOG_INFO,
 +        "WPS button pressed on %s - opening dedicated onboarding VAPs", device);
-+    if (open_onboarding_vaps(handle)) {
-+        if (!arm_onboarding_timer()) {
-+            close_onboarding_vaps(handle);
-+        }
++    if (!open_and_arm_onboarding_window(handle)) {
++        log_message(LOG_ERR, "Unable to open a usable onboarding window");
 +    }
 +#endif
  
@@ -317,11 +354,30 @@ index 4d3dec3..ab96682 100644
      rbus_close(handle);
  }
  
+ void custom_wps_button_callback(const char *device, int button_code, int value) {
+-    // Check if the button code matches what we're looking for
+-    // Button codes: KEY_WPS_BUTTON (0x211) or BTN_0 (0x100)
++    /* Check if the button code matches what we're looking for */
++    /* Button codes: KEY_WPS_BUTTON (0x211) or BTN_0 (0x100) */
+     if (button_code == 0x211 || button_code == 0x100) {
+-        if (value == 1) { // Button pressed
++        if (value == 1) { /* Button pressed */
+             log_message(LOG_INFO, "WPS button pressed on device %s - triggering WPS action", device);
+             
+-            // Here you would add code to trigger the actual WPS functionality
++            /* Here you would add code to trigger the actual WPS functionality */
+             system("echo 'WPS button pressed' >> /tmp/wps_events.log");
+         }
+     } else {
+-        // For other buttons, use the default behavior
++        /* For other buttons, use the default behavior */
+         default_button_callback(device, button_code, value);
+     }
+ }
 diff --git a/rdk-wps-monitor/source/main.c b/rdk-wps-monitor/source/main.c
-index fd9111b..5be2b33 100644
---- a/rdk-wps-monitor/source/main.c
-+++ b/rdk-wps-monitor/source/main.c
-@@ -89,6 +89,9 @@ int main(int argc, char *argv[]) {
+--- a/rdk-wps-monitor/source/main.c	2026-10-29 12:16:35.655938951 +0000
++++ b/rdk-wps-monitor/source/main.c	2026-10-29 12:17:30.854619148 +0000
+@@ -89,6 +89,9 @@
      }
      
      log_message(LOG_NOTICE, "Netlink button monitor daemon starting up");
@@ -331,7 +387,7 @@ index fd9111b..5be2b33 100644
      
      // Initialize device monitoring subsystem
      if (device_monitor_init() < 0) {
-@@ -139,6 +142,8 @@ int main(int argc, char *argv[]) {
+@@ -139,6 +142,8 @@
      
      // Cleanup
      log_message(LOG_NOTICE, "Netlink button monitor daemon shutting down");
