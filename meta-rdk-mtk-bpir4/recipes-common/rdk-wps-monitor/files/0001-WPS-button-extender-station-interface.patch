@@ -111,7 +111,7 @@ diff --git a/rdk-wps-monitor/source/button_callback.c b/rdk-wps-monitor/source/b
 +{
 +    rbusHandle_t local = NULL;
 +    rbusHandle_t active = handle;
-+    bool ok;
++    bool ok = false;
 +
 +    do {
 +        if (active == NULL) {
