@@ -196,7 +196,7 @@
 +		printf("RDKB: cleanup umount %s failed errno=%d\n", RDKB_INACTIVE_MOUNT_POINT, errno);
 +	}
 +
-+	mountRet = mount(inactiveRootfs, RDKB_INACTIVE_MOUNT_POINT, "ext4", MS_RDONLY, NULL);
++	mountRet = mount(inactiveRootfs, RDKB_INACTIVE_MOUNT_POINT, "ext4", MS_RDONLY, "noload");
 +	if (mountRet != 0)
 +	{
 +		printf("RDKB: mount %s failed errno=%d\n", inactiveRootfs, errno);
