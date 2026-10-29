@@ -3,7 +3,8 @@ Date: Thu, 24 Sep 2026 13:03:14 +0000
 Subject: [PATCH] wps-monitor: manage dedicated onboarding VAP window
 
 Isolate open/arm under one lock, gate presses on startup cleanup,
-and retry teardown until onboarding VAPs are confirmed disabled.
+retry teardown until disabled, and avoid holding the lock during
+blocking teardown so a new press cannot deadlock the monitor.
 
 Signed-off-by: Somanath Bulusu <bsomanath@plume.com>
 
@@ -31,7 +32,7 @@ diff --git a/rdk-wps-monitor/include/button_callback.h b/rdk-wps-monitor/include
  #endif /* BUTTON_CALLBACK_H */
 diff --git a/rdk-wps-monitor/source/button_callback.c b/rdk-wps-monitor/source/button_callback.c
 --- a/rdk-wps-monitor/source/button_callback.c	2026-10-29 12:16:27.230142366 +0000
-+++ b/rdk-wps-monitor/source/button_callback.c	2026-10-29 12:17:19.456889911 +0000
++++ b/rdk-wps-monitor/source/button_callback.c	2026-10-29 13:15:19.383562692 +0000
 @@ -24,6 +24,9 @@
  
  #include <stdio.h>
@@ -42,7 +43,7 @@ diff --git a/rdk-wps-monitor/source/button_callback.c b/rdk-wps-monitor/source/b
  #include <syslog.h>
  #include "../include/button_callback.h"
  #include "../include/utils.h"
-@@ -34,22 +37,249 @@
+@@ -34,22 +37,255 @@
  
  pthread_mutex_t wps_mutex = PTHREAD_MUTEX_INITIALIZER;
  
@@ -187,7 +188,11 @@ diff --git a/rdk-wps-monitor/source/button_callback.c b/rdk-wps-monitor/source/b
 +         */
 +        onboarding_armed = false;
 +        log_message(LOG_INFO, "WPS onboarding window expired");
++        /* Drop the lock for teardown so a new press can open+arm without
++         * deadlocking against close_onboarding_vaps_until_done retries. */
++        pthread_mutex_unlock(&onboarding_mutex);
 +        (void)close_onboarding_vaps_until_done(NULL);
++        pthread_mutex_lock(&onboarding_mutex);
 +    }
 +    /* NOTREACHED */
 +    pthread_mutex_unlock(&onboarding_mutex);
@@ -234,8 +239,8 @@ diff --git a/rdk-wps-monitor/source/button_callback.c b/rdk-wps-monitor/source/b
 +    if (!onboarding_timer_ready) {
 +        log_message(LOG_ERR,
 +            "Onboarding timer unavailable; refusing to open a window");
-+        (void)close_onboarding_vaps_until_done(handle);
 +        pthread_mutex_unlock(&onboarding_mutex);
++        (void)close_onboarding_vaps_until_done(handle);
 +        return false;
 +    }
 +
@@ -243,8 +248,8 @@ diff --git a/rdk-wps-monitor/source/button_callback.c b/rdk-wps-monitor/source/b
 +    if (!ok) {
 +        log_message(LOG_ERR,
 +            "Failed to open onboarding VAPs; tearing down until disabled");
-+        (void)close_onboarding_vaps_until_done(handle);
 +        pthread_mutex_unlock(&onboarding_mutex);
++        (void)close_onboarding_vaps_until_done(handle);
 +        return false;
 +    }
 +
@@ -253,6 +258,8 @@ diff --git a/rdk-wps-monitor/source/button_callback.c b/rdk-wps-monitor/source/b
 +    onboarding_armed = true;
 +    pthread_cond_signal(&onboarding_cond);
 +    pthread_mutex_unlock(&onboarding_mutex);
++    log_message(LOG_INFO, "Onboarding VAPs opened; window armed for %d seconds",
++        ONBOARDING_WINDOW_SECONDS);
 +    return true;
 +}
 +
@@ -300,7 +307,7 @@ diff --git a/rdk-wps-monitor/source/button_callback.c b/rdk-wps-monitor/source/b
  static button_callback event_callback = default_button_callback;
  
  void default_button_callback(const char *device, int button_code, int value) {
-@@ -58,43 +288,55 @@
+@@ -58,43 +294,55 @@
      log_message(LOG_INFO, "Device: %s, Button %d %s", 
             device, button_code, action);
  

@@ -4,7 +4,7 @@ FILESEXTRAPATHS_prepend := "${THISDIR}/files:"
 
 SRC_URI_remove = "${CMF_GIT_ROOT}/rdkb/components/opensource/ccsp/OneWifi;protocol=${CMF_GIT_PROTOCOL};branch=${CMF_GIT_BRANCH};name=OneWifi"
 SRC_URI += "git://github.com/bsomanath/OneWifi.git;protocol=https;branch=RDKBWIFI-388-wps;name=OneWifi"
-SRCREV_OneWifi = "d4f4e1cc8b1334248de0951c7ae5e9f4b43e9cd1"
+SRCREV_OneWifi = "03ccd39d4a144b525aafad3dac2493b156199f96"
 
 SRC_URI_remove += "git://github.com/rdk-gdcs/lan_web.git;protocol=https;branch=main_branch_multiap_update;name=lan_web;destsuffix=lan_web"
 CFLAGS_append = " -DFEATURE_SINGLE_PHY"
