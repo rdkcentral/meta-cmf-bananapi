@@ -2,8 +2,6 @@ require ccsp_common_bananapi.inc
 
 FILESEXTRAPATHS_prepend := "${THISDIR}/files:"
 
-export PLATFORM_BANANAPI = "true"
-
 SRC_URI_remove = "${CMF_GIT_ROOT}/rdkb/components/opensource/ccsp/OneWifi;protocol=${CMF_GIT_PROTOCOL};branch=${CMF_GIT_BRANCH};name=OneWifi"
 SRC_URI += "git://github.com/bsomanath/OneWifi.git;protocol=https;branch=RDKBWIFI-388-wps;name=OneWifi"
 SRCREV_OneWifi = "d4f4e1cc8b1334248de0951c7ae5e9f4b43e9cd1"
