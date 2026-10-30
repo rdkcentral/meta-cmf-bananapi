@@ -72,10 +72,11 @@ IMAGE_INSTALL += " \
     ${@bb.utils.contains('DISTRO_FEATURES','efuse_tools','mtk-efuse-nl-drv mtk-efuse-nl-tool','',d)} \
     ${@bb.utils.contains('DISTRO_FEATURES','flow_offload','flowtable','',d)} \
     ${@bb.utils.contains('DISTRO_FEATURES','samba','ksmbd ksmbd-tools','',d)} \
-    net-tools \
     "
 #IMAGE_INSTALL += " opensync openvswitch mesh-agent e2fsprogs "
 IMAGE_INSTALL:append:mt7988 = " ${@bb.utils.contains('DISTRO_FEATURES','kernel6-12','eth-firmware','marvell-eth-firmware',d)} mediatek-eth-firmware "
+
+IMAGE_INSTALL:append:wrynose = " net-tools"
 
 BB_HASH_IGNORE_MISMATCH = "1"
 IMAGE_NAME[vardepsexclude] = "DATETIME"
@@ -174,6 +175,8 @@ do_filogic_gen_image(){
 addtask filogic_gen_image after do_image_complete before do_populate_lic_deploy
 
 python do_hash_rootfs (){
+    if d.getVar("DISTRO") != "wrynose":
+        return
     deploy_path = d.getVar('IMGDEPLOYDIR', d, 1)
     PN = d.getVar('PN', d, 1)
     MACHINE = d.getVar('MACHINE')
