@@ -69,3 +69,6 @@ do_filogic_gen_image(){
 IMAGE_INSTALL_remove = "${@bb.utils.contains('DISTRO_FEATURES', 'ppp-enabled', '', 'pptp-linux rp-pppoe xl2tpd', d)}"
 IMAGE_INSTALL_remove_onewifi += " mtkhnat-util"
 IMAGE_INSTALL:append = " ${@bb.utils.contains('DISTRO_FEATURES', 'cellular_hybrid_support', ' libimobiledevice', '', d)}"
+
+IMAGE_INSTALL:remove = " ${@bb.utils.contains('DISTRO_FEATURES', 'Core-RDKB', ' packagegroup-rdk-ccsp-broadband usp-pa fw-upgrade crun dsm dobby parodus parodus2ccsp rdktelcovoicemanager asterisk hal-voice-asterisk cpcd otbr-agent bluez5-bluetoothd bt-host-cpc-hci-bridge barton ccsp-tr069-pa rdk-speedtest-cli rdm-agent', '', d)}"
+IMAGE_INSTALL:append = " ${@bb.utils.contains('DISTRO_FEATURES', 'Core-RDKB', ' packagegroup-rdk-core-required-broadband', '', d)}"
