@@ -26,6 +26,17 @@ do_install_append () {
                 sed -i '/<?%if (strpos($partnerId, "sky-") !== false)/ s/sky-/RDKM/' ${D}/usr/www2/wireless_network_configuration_edit.jst
                 rm -f  ${D}/usr/www2/cmn/syndication/device_pause_screen/device_pause_screen_comcast.js
 
+                sed -i \
+                    -e 's/class="module div_down netFlow"/class="module div_down netFlow" style="display:none"/' \
+                    -e 's/class="module div_up netFlow"/class="module div_up netFlow" style="display:none"/' \
+                    -e 's/class="module div_code netFlow"/class="module div_code netFlow" style="display:none"/' \
+                    -e 's/class="module netFlow"/class="module netFlow" style="display:none"/g' \
+                     "${D}/usr/www2/network_setup.jst"
+
+                find "${D}" -type f \( -name 'connection_status.jst' \
+                          -o -name 'connection_status_onewifi.jst' \) -exec sed -i \
+                          -e '/moca_section connection_moca/,/end \.module MoCA -->/d' {} +
+
                 # Remove navigation entries for the pages being removed.
                 find "${D}" -type f -name 'nav.jst' -exec sed -i \
                             -e '/moca\.jst/d' \
