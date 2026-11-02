@@ -1,5 +1,5 @@
 FILESEXTRAPATHS:prepend := "${THISDIR}/files:"
-FILESEXTRAPATHS:prepend := "${@bb.utils.contains('DISTRO_FEATURES', 'kernel6-12', '${TOPDIR}/../meta-filogic/recipes-kernel/linux/linux-mediatek-6.12/mediatek/files-6.12/drivers/base/firmware_loader/builtin:', '', d)}"
+FILESEXTRAPATHS:prepend := "${@bb.utils.contains('DISTRO_FEATURES', 'kernel6-12', '${RDK_ROOT_PATH}/meta-filogic/recipes-kernel/linux/linux-mediatek-6.12/mediatek/files-6.12/drivers/base/firmware_loader/builtin:', '', d)}"
 
 SRC_URI:append:kernel6-12 = " \
     file://airoha/EthMD32.dm.bin \
