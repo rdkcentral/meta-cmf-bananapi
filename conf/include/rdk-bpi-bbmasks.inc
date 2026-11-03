@@ -17,6 +17,7 @@ BBMASK .= "|meta-rdk-ext/recipes-telephony/asterisk/asterisk_18.5.0.bb"
 BBMASK .= "|meta-rdk-broadband-apps/recipes-kernel/linux/linux-%.bbappend"
 BBMASK .= "|meta-rdk-iot/recipes-matter/barton-matter/barton-matter_1.5.0.1.bb"
 BBMASK .= "|meta-rdk-ext/recipes-support/usbmuxd/libplist_2.2.0.bbappend"
+BBMASK .= "|meta-rdk-oss-reference/recipes-gplv2/findutils/findutils_4.2.31.bb"
 
 BBMASK .= "${@bb.utils.contains('DISTRO_FEATURES', 'kirkstone', bb.utils.contains('DISTRO_FEATURES', 'em_extender', '', '|meta-rdk-ext/recipes-connectivity/bluez', d), '', d)}"
 BBMASK .= "${@bb.utils.contains('DISTRO_FEATURES', 'kirkstone', bb.utils.contains('DISTRO_FEATURES', 'em_extender', '', '|meta-rdk-ext/recipes-connectivity/bluez5', d), '', d)}"
