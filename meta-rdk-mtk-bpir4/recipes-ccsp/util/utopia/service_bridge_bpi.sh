@@ -464,7 +464,6 @@ virtual_interface()
         if [ "$LAN_IP" != "$dst_ip" ]; then
                 ifconfig "$CMDIAG_IF" $dst_ip netmask "$LAN_NETMASK" up
         fi
-        sysevent set ipv4_4-status down
     else
         ifconfig "$CMDIAG_IF" down
         ifconfig l"$CMDIAG_IF" down
@@ -605,18 +604,10 @@ add_to_group()
   fi
 
   echo "brctl delif $bridge_name wifi0 wifi1 wifi2"
-  wifi_wifi0=`iwconfig wifi0|grep IEEE\ 802.11 | wc -l`
-  wifi_wifi1=`iwconfig wifi1|grep IEEE\ 802.11 | wc -l`
-  wifi_wifi2=`iwconfig wifi2|grep IEEE\ 802.11 | wc -l`
-  if [ $wifi_wifi0 == "1" ] ; then
-        brctl delif "$bridge_name" wifi0
-  fi
-  if [ $wifi_wifi1 == "1" ]; then
-        brctl delif "$bridge_name" wifi1
-  fi
-  if [ $wifi_wifi2 == "1" ]; then
-        brctl delif "$bridge_name" wifi2
-  fi
+  brctl delif "$bridge_name" wifi0
+  brctl delif "$bridge_name" wifi1
+  brctl delif "$bridge_name" wifi2
+  brctl delif "$bridge_name" mld0
   
   bridge_curr_status=`ifconfig -a brlan0 | grep "inet addr" | cut -d ':' -f2 | cut -d ' ' -f1`
   if [ "$bridge_curr_status" != " " ]; then
@@ -638,19 +629,10 @@ del_from_group()
 {
   bridge_name=`syscfg get lan_ifname`
   echo "brctl addif $bridge_name wifi0 wifi1 wifi2"
-  wifi_wifi0=`iwconfig wifi0|grep IEEE\ 802.11 | wc -l`
-  wifi_wifi1=`iwconfig wifi1|grep IEEE\ 802.11 | wc -l`
-  wifi_wifi2=`iwconfig wifi2|grep IEEE\ 802.11 | wc -l`
-
-  if [ $wifi_wifi0 == "1" ] ; then
-        brctl addif "$bridge_name" wifi0
-  fi
-  if [ $wifi_wifi1 == "1" ]; then
-        brctl addif "$bridge_name" wifi1
-  fi
-  if [ $wifi_wifi2 == "1" ]; then
-        brctl addif "$bridge_name" wifi2
-  fi
+  brctl addif "$bridge_name" wifi0
+  brctl addif "$bridge_name" wifi1
+  brctl addif "$bridge_name" wifi2
+  brctl addif "$bridge_name" mld0
 
   cmdiag_if=`syscfg get cmdiag_ifname`
 
