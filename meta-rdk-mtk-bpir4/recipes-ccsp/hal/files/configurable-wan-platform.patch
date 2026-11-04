@@ -1,3 +1,5 @@
+Upstream-Status: Pending
+
 --- platform/rdkb_hal/src/platform/platform_hal.c_orig
 +++ platform/rdkb_hal/src/platform/platform_hal.c
 @@ -167,9 +167,24 @@

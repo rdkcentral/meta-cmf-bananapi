@@ -1,1 +1,1 @@
-FILES_${PN} += " ${bindir}/rdisc6"
+FILES:${PN} += " ${bindir}/rdisc6"

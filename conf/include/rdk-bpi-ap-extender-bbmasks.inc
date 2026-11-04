@@ -4,9 +4,57 @@ BBMASK .= "${@bb.utils.contains('DISTRO_FEATURES', 'OneWifi', '|meta-filogic/rec
 BBMASK .= "${@bb.utils.contains('DISTRO_FEATURES', 'OneWifi', '|meta-filogic/recipes-wifi/hal/halinterface.bbappend', '', d)}"
 BBMASK .= "${@bb.utils.contains('DISTRO_FEATURES', 'OneWifi', '|meta-cmf-filogic/recipes-common/mesh-agent/mesh-agent.bbappend', '', d)}"
 BBMASK .= "${@bb.utils.contains('DISTRO_FEATURES', 'OneWifi', '|meta-filogic/recipes-wifi/hal/hal-wifi-mt76.bb', '', d)}"
+BBMASK .= "${@bb.utils.contains('DISTRO_FEATURES', 'kernel6-6','|meta-cmf-filogic/recipes-ccsp/util/utopia-headers.bb','', d)}"
 
 BBMASK .= "|meta-rdk-opensync/"
 BBMASK .= "|meta-cmf/recipes-core/images/rdk-ipstb-oss-image.bb"
 BBMASK .= "|meta-cmf/recipes-core/images/rdk-ipstb-oss-tdk-image.bb"
-BBMASK .= "|openembedded-core/meta/recipes-devtools/rust/"
 BBMASK .= "|meta-cmf-filogic/recipes-ccsp/ccsp/ccsp-one-wifi.bbappend"
+BBMASK .= "|meta-cmf-bananapi/meta-rdk-mtk-bpir4/recipes-core/barton-core/barton_%.bbappend"
+BBMASK .= "|meta-cmf-bananapi/meta-rdk-mtk-bpir4/recipes-matter/barton-matter/barton-matter_1.%.%.bbappend"
+
+BBMASK .= "${@bb.utils.contains('DISTRO_FEATURES', 'kernel6-12', '|meta-filogic/recipes-filter/libnfnetlink/libnfnetlink_1.0.1.bbappend', '',d)}"
+BBMASK .= "|meta-filogic/recipes-wifi/openssl/openssl_1.1.1%.bbappend"
+BBMASK .= "|meta-cmf-filogic/recipes-common/heaptrack/heaptrack_1.0.0.bbappend"
+BBMASK .= "|meta-cmf-filogic/recipes-connectivity/opensync/opensync_%.bbappend"
+BBMASK .= "|meta-cmf-filogic/recipes-connectivity/opensync/opensync_git.bbappend"
+BBMASK .= "|meta-cmf-filogic/recipes-connectivity/ppp/ppp_2.4.8.bbappend"
+BBMASK .= "|meta-cmf-filogic/recipes-core/glibc/glibc_2.31.bbappend"
+BBMASK .= "|meta-cmf-filogic/recipes-core/systemd/systemd_244.%.bbappend"
+BBMASK .= "|meta-cmf-filogic/recipes-devtools/php/php_7.%.bbappend"
+BBMASK .= "|meta-cmf-filogic/recipes-devtools/python/python3-pycparser_2.20.bbappend"
+BBMASK .= "|meta-cmf-bananapi/meta-rdk-mtk-bpir4/recipes-ccsp/ccsp/cpeabs_1.0.bbappend"
+BBMASK .= "|meta-cmf-bananapi/meta-rdk-mtk-bpir4/recipes-extended/iptables/iptables_1.8.7.bbappend"
+BBMASK .= "|meta-cmf-bananapi/meta-rdk-mtk-bpir4/recipes-opensync/opensync/opensync_%.bbappend"
+BBMASK .= "|meta-cmf-bananapi/meta-rdk-mtk-bpir4/recipes-wifi/json-c/json-c_0.15.bbappend"
+BBMASK .= "|meta-rdk-oss-reference/recipes-gplv2/tar/tar_1.17.bb"
+
+BBMASK .= "|meta-filogic/recipes-wifi/wpa-supplicant/wpa-supplicant_2.10.bb"
+BBMASK .= "|meta-rdk-oss-reference/recipes-connectivity/wpa-supplicant/wpa-supplicant_2.10.bb"
+BBMASK .= "|meta-rdk-oss-reference-bck/recipes-connectivity/wpa-supplicant/wpa-supplicant_2.10.bb"
+BBMASK .= "|openembedded-core/meta/recipes-connectivity/wpa-supplicant/wpa-supplicant_2.11.bb"
+BBMASK .= "|meta-rdk-oss-reference/recipes-connectivity/wpa-supplicant/wpa-supplicant_%.bbappend"
+BBMASK .= "|meta-cmf-bananapi/meta-rdk-mtk-bpir4/recipes-connectivity/wpa-supplicant/wpa-supplicant_%.bbappend"
+BBMASK .= "|meta-cmf-filogic/recipes-ccsp/hal/halinterface.bbappend"
+BBMASK .= "|meta-filogic/recipes-wifi/hal/halinterface.bbappend"
+BBMASK .= "${@bb.utils.contains('DISTRO_FEATURES', 'wrynose', '|meta-cmf-bananapi/meta-rdk-mtk-bpir4/recipes-extended/libimobiledevice/libplist_2.2.0.bbappend', '', d)}"
+
+ROOTFS_POSTPROCESS_COMMAND += "remove_elfutils_libs;"
+
+remove_elfutils_libs() {
+    rm -f ${IMAGE_ROOTFS}${libdir}/libelf.so*
+    rm -f ${IMAGE_ROOTFS}${libdir}/libdw.so*
+    rm -f ${IMAGE_ROOTFS}${libdir}/libasm.so*
+   rm -f ${IMAGE_ROOTFS}${libdir}/libelf-0.194.so*
+    rm -f ${IMAGE_ROOTFS}${libdir}/libdebuginfod.so*
+}
+
+#Wrynose tar pkg is GPL-3.0 licensed, but is used for build purposes only. The busybox applet is used in rootfs.
+INCOMPATIBLE_LICENSE_EXCEPTIONS += "${MLPREFIX}tar:GPL-3.0-only ${MLPREFIX}tar-native:GPL-3.0-only"
+
+#pkg elfutils is GPL-3.0 licensed, but is used for build purposes only, and explicitly removed from the root file system
+INCOMPATIBLE_LICENSE_EXCEPTIONS += "${MLPREFIX}elfutils:GPL-3.0-or-later"
+INCOMPATIBLE_LICENSE_EXCEPTIONS += "${MLPREFIX}elfutils-src:GPL-3.0-or-later ${MLPREFIX}elfutils-binutils:GPL-3.0-or-later ${MLPREFIX}elfutils-dbg:GPL-3.0-or-later"
+INCOMPATIBLE_LICENSE_EXCEPTIONS += "${MLPREFIX}elfutils-staticdev:GPL-3.0-or-later ${MLPREFIX}elfutils-dev:GPL-3.0-or-later ${MLPREFIX}elfutils-doc:GPL-3.0-or-later"
+INCOMPATIBLE_LICENSE_EXCEPTIONS += "${MLPREFIX}elfutils-locale:GPL-3.0-or-later"
+

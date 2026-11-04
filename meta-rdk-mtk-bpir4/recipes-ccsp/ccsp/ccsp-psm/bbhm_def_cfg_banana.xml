@@ -322,7 +322,7 @@
   <Record name="dmsb.l2net.1.Members.Gre" type="astr"> </Record>
   <Record name="dmsb.l2net.1.Members.WiFi" type="astr">wifi0 wifi1 wifi16</Record>
   <Record name="dmsb.l2net.1.Members.OneWiFi" type="astr">mld0 wifi0 wifi1 wifi2</Record>
-  <Record name="dmsb.l2net.1.Members.Link" type="astr"> </Record>
+  <Record name="dmsb.l2net.1.Members.Link" type="astr">l2sd0-t</Record>
 
   <Record name="dmsb.l2net.1.Vlan.1.Alias" type="astr">CPE-VLAN1</Record>
   <Record name="dmsb.l2net.1.Vlan.1.InstanceNum" type="astr">1</Record>

@@ -4,13 +4,13 @@ HOMEPAGE = "http://github.com/belvedere-yocto/Utopia"
 LICENSE = "Apache-2.0 & BSD-3-Clause"
 LIC_FILES_CHKSUM = "file://LICENSE;md5=baa21dec03307f641a150889224a157f"
 
-SRC_URI = "${CMF_GITHUB_ROOT}/utopia;protocol=https;nobranch=1"
+SRC_URI = "${CMF_GITHUB_ROOT}/utopia;protocol=https;nobranch=1;destsuffix=${BPN}-${PV}"
 
 SRCREV = "${SRCREV:pn-utopia}"
 PV = "${PV:pn-utopia}"
 PR = "${PR:pn-utopia}"
 
-S = "${WORKDIR}/git"
+S = "${UNPACKDIR}/${PN}-${PV}"
 
 # this is a header package only, nothing to build
 do_compile[noexec] = "1"
@@ -18,7 +18,7 @@ do_configure[noexec] = "1"
 
 # also get rid of the default dependency added in bitbake.conf
 # since there is no 'main' package generated (empty)
-RDEPENDS_${PN}-dev = ""
+RDEPENDS:${PN}-dev = ""
 
 do_install() {
     install -D -m 0644 ${S}/source/include/autoconf.h ${D}${includedir}/utctx/autoconf.h

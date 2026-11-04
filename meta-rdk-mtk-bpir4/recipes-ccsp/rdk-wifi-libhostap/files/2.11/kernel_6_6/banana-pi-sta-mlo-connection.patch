@@ -1,3 +1,5 @@
+Source: RDKM
+Upstream-Status: Pending
 diff --git git.orig/source/hostap-2.11/src/rsn_supp/wpa.c git/source/hostap-2.11/src/rsn_supp/wpa.c
 index e127093ca..3c61ef6be 100644
 --- git.orig/source/hostap-2.11/src/rsn_supp/wpa.c
