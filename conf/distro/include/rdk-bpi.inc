@@ -73,7 +73,7 @@ DISTRO_FEATURES_append = " generic_mlo"
 #Enable the below DISTRO to enable Hybrid Hal(rndis/modem) for cellular devices
 #DISTRO_FEATURES_append_broadband = " cellular_hybrid_support"
 
-#Disable rdm-agent for reference platform
+#Disable RDM for reference platform
 #DISTRO_FEATURES_append = "RDM"
 
 DISTRO_FEATURES_append = " dhcp_manager "
