@@ -1,3 +1,5 @@
+Upstream-Status: Pending
+
 --- a/source/firewall/firewall_ipv6.c
 +++ b/source/firewall/firewall_ipv6.c
 @@ -2366,6 +2366,9 @@ void do_ipv6_nat_table(FILE* fp)
@@ -9,4 +11,4 @@
 +#endif
     fprintf(fp, "-A POSTROUTING -o %s -j MASQUERADE\n", current_wan_ifname);
  #endif
-
+ 

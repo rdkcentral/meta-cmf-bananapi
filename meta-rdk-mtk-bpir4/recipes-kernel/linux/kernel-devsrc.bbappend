@@ -1,1 +1,1 @@
-RDEPENDS:${PN}_remove = " gcc-plugins libmpc-dev"
+RDEPENDS:${PN}:remove = " gcc-plugins libmpc-dev"
