@@ -36,6 +36,23 @@ do_install_append () {
                 find "${D}" -type f \( -name 'connection_status.jst' \
                           -o -name 'connection_status_onewifi.jst' \) -exec sed -i \
                           -e '/moca_section connection_moca/,/end \.module MoCA -->/d' {} +
+                sed -i \
+                   -e 's/<?% }}}else{ ?>/<?% }}}else if($BackendSoftwareVersion != "eMTA \& DOCSIS"){ ?>/' \
+                   -e 's/if(is_voice_supported()) {/if(false) {/' \
+                   "${D}/usr/www2/software.jst"
+
+                find "${D}" -type f -name 'network_setup.jst' -exec sed -i \
+                   -e 's/class="module forms div_init"/class="module forms div_init" style="display:none"/' \
+                   -e 's/class="module forms div_cm"/class="module forms div_cm" style="display:none"/g' {} +
+
+                find "${D}" -type f -name 'network_setup.jst' -exec sed -i \
+                   -e '/<div class="form-row div_mta_mac">/,/<\/div>/d' \
+                   -e '/<div class="form-row odd div_cm_mac">/,/<\/div>/d' {} +
+
+                sed -i '/content_network.*inline-block/i\
+                     $("#netsetmess22").closest(".module").remove();' \
+                     "${D}/usr/www2/network_setup.jst"
+
 
                 # Remove navigation entries for the pages being removed.
                 find "${D}" -type f -name 'nav.jst' -exec sed -i \
