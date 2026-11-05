@@ -1,5 +1,6 @@
 Source: Prabhudas Gannavarapu <prabhudas_gannavarapu@comcast.com>
 Subject: Adding HAL changes for gw_lan_refresh application for Banana Pi R4
+Upstream-Status: Pending
 
 Index: ethsw/rdkb_hal/src/ethsw/ccsp_hal_ethsw.c
 ===================================================================
