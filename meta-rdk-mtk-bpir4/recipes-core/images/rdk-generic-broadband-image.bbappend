@@ -66,6 +66,9 @@ do_filogic_gen_image(){
     fi
 }
 
+# 2.5G PHY firmware delivered under linux-firmware-mt7988
+IMAGE_INSTALL:remove:bananapi4-rdk-broadband = " mediatek-eth-firmware "
+
 IMAGE_INSTALL_remove = "${@bb.utils.contains('DISTRO_FEATURES', 'ppp-enabled', '', 'pptp-linux rp-pppoe xl2tpd', d)}"
 IMAGE_INSTALL_remove_onewifi += " mtkhnat-util"
 IMAGE_INSTALL:append = " ${@bb.utils.contains('DISTRO_FEATURES', 'cellular_hybrid_support', ' libimobiledevice', '', d)}"
