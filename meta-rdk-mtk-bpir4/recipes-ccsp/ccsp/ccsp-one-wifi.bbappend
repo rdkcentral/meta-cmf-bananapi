@@ -30,6 +30,11 @@ do_install:append(){
     install -m 755 ${UNPACKDIR}/checkwifi.sh ${D}/usr/ccsp/wifi/
     install -m 755 ${UNPACKDIR}/onewifi_pre_*.sh ${D}/usr/ccsp/wifi/onewifi_pre_start.sh
     install -m 644 ${UNPACKDIR}/wifi_defaults.txt ${D}/usr/ccsp/wifi/
+
+    DISTRO_BFT_ENABLED="${@bb.utils.contains('DISTRO_FEATURES','BuildFromTip','true','false',d)}"
+    if [ $DISTRO_BFT_ENABLED = 'true' ]; then
+       rm -r ${D}/usr/lib/libwifi_math_util*
+    fi
 }
 
 FILES:${PN} += " \
