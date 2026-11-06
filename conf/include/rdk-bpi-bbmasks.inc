@@ -1,4 +1,5 @@
 BBMASK .= "|meta-cmf-filogic/recipes-extended/tdkb/"
+BBMASK .= "|meta-rdk-broadband/recipes-rdkb/tdkb/"
 
 BBMASK .= "${@bb.utils.contains('DISTRO_FEATURES', 'OneWifi', '|meta-filogic/recipes-wifi/hostapd/', '', d)}"
 BBMASK .= "${@bb.utils.contains('DISTRO_FEATURES', 'OneWifi', '|meta-cmf-filogic/recipes-common/mesh-agent/mesh-agent.bbappend', '', d)}"
