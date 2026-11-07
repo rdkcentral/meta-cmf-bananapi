@@ -35,6 +35,8 @@ do_install_append(){
     fi
 }
 
+EXTRA_OECONF_append = " --disable-webconfig-framework"
+
 FILES_${PN} += " \
     ${prefix}/ccsp/wifi/checkwifi.sh \
     ${prefix}/ccsp/wifi/onewifi_pre_start.sh \
