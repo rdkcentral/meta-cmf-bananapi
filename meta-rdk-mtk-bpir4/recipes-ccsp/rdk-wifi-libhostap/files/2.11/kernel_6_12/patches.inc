@@ -298,4 +298,7 @@ SRC_URI:append = " \
     file://host_kernel_v6.patch \
     file://BPI_ssid_broad_v6.patch \
     file://Bpi_runtime_issues.patch \
+    file://rdk-wifi-libhostap-wps-support_v6.patch \
+    file://wps_crash_fix_v6.patch \
+    file://fix-auth-timeout-completed-guard_v6.patch;patchdir=source/hostap-2.11/ \
 "
