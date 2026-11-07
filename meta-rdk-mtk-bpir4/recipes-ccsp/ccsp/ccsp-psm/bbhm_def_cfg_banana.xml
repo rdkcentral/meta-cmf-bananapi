@@ -303,6 +303,9 @@
 
  <!-- Ethernet interfaces of BananaPi Pi -->
   <Record name="dmsb.ethagent.ethifcount" type="astr">4</Record>
+  <Record name="dmsb.ethagent.config.wan" type="astr">lan</Record>
+  <Record name="dmsb.ethagent.config.wan.num" type="astr">0</Record>
+
 
   <Record name="dmsb.BridgeNamePrefix" type="astr">brlan</Record>
   <Record name="dmsb.bridgeVlanRange" type="astr">164...512</Record>
@@ -1337,7 +1340,7 @@
    <Record name="dmsb.wanmanager.if.1.VirtualInterfaceifcount" type="astr">1</Record> 
    <Record name="dmsb.wanmanager.if.1.VirtualInterface.1.Enable" type="astr">TRUE</Record> 
    <Record name="dmsb.wanmanager.if.1.VirtualInterface.1.Alias" type="astr">WANOE</Record> 
-   <Record name="dmsb.wanmanager.if.1.VirtualInterface.1.Name" type="astr">erouter0</Record> 
+   <Record name="dmsb.wanmanager.if.1.VirtualInterface.1.Name" type="astr">lan0</Record> 
    <Record name="dmsb.wanmanager.if.1.VirtualInterface.1.EnableMAPT" type="astr">TRUE</Record> 
    <Record name="dmsb.wanmanager.if.1.VirtualInterface.1.EnableDSLite" type="astr">FALSE</Record> 
    <Record name="dmsb.wanmanager.if.1.VirtualInterface.1.EnableIPoE" type="astr">TRUE</Record> 
