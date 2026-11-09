@@ -13,6 +13,7 @@ IMAGE_INSTALL_append = " gptfdisk e2fsprogs-mke2fs util-linux util-linux-losetup
 
 #Router discovery tool
 IMAGE_INSTALL_append = " ndisc6"
+IMAGE_INSTALL_append = " meminsight"
 
 ROOTFS_POSTPROCESS_COMMAND_append = "add_busybox_fixes; "
 
