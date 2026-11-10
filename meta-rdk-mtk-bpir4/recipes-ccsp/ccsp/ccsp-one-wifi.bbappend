@@ -7,6 +7,8 @@ CFLAGS_append = " -DFEATURE_SINGLE_PHY"
 CFLAGS_remove = " -DONEWIFI_MULTIAP_APP_SUPPORT"
 EXTRA_OECONF_remove = " ONEWIFI_MULTIAP_APP_SUPPORT=true"
 
+DEPENDS_remove = "${@bb.utils.contains('DISTRO_FEATURES', 'Core-RDKB', ' mesh-agent', '', d)}"
+
 EXTRA_OECONF_append = " ${@bb.utils.contains('DISTRO_FEATURES', 'OneWifi', ' PLATFORM_BANANAPI=true ', '', d)}"
 SRC_URI += " \
     file://checkwifi.sh \
