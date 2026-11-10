@@ -1,4 +1,5 @@
 Source: Comcast/RDK
+Upstream-Status: Pending
 subject:patch for fixing compilation issues after apply the Dynamic_NAS_IP_Update_2_11.patch
 diff -Naur git.orig/source/hostap-2.11/src/ap/ieee802_1x.c git/source/hostap-2.11/src/ap/ieee802_1x.c
 --- git.orig/source/hostap-2.11/src/ap/ieee802_1x.c	2026-04-27 09:21:37.576148268 +0100

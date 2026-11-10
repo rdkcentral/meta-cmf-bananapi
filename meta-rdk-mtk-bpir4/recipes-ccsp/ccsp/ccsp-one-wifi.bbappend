@@ -1,22 +1,22 @@
 require ccsp_common_bananapi.inc
 
-FILESEXTRAPATHS_prepend := "${THISDIR}/files:"
+FILESEXTRAPATHS:prepend := "${THISDIR}/files:"
 
-SRC_URI_remove += "git://github.com/rdk-gdcs/lan_web.git;protocol=https;branch=main_branch_multiap_update;name=lan_web;destsuffix=lan_web"
-CFLAGS_append = " -DFEATURE_SINGLE_PHY"
-CFLAGS_remove = " -DONEWIFI_MULTIAP_APP_SUPPORT"
-EXTRA_OECONF_remove = " ONEWIFI_MULTIAP_APP_SUPPORT=true"
+SRC_URI:remove += "git://github.com/rdk-gdcs/lan_web.git;protocol=https;branch=main_branch_multiap_update;name=lan_web;destsuffix=lan_web"
+CFLAGS:append = " -DFEATURE_SINGLE_PHY"
+CFLAGS:remove = " -DONEWIFI_MULTIAP_APP_SUPPORT"
+EXTRA_OECONF:remove = " ONEWIFI_MULTIAP_APP_SUPPORT=true"
 
-DEPENDS_remove = "${@bb.utils.contains('DISTRO_FEATURES', 'Core-RDKB', ' mesh-agent', '', d)}"
+DEPENDS:remove = "${@bb.utils.contains('DISTRO_FEATURES', 'Core-RDKB', ' mesh-agent', '', d)}"
 
-EXTRA_OECONF_append = " ${@bb.utils.contains('DISTRO_FEATURES', 'OneWifi', ' PLATFORM_BANANAPI=true ', '', d)}"
+EXTRA_OECONF:append = " ${@bb.utils.contains('DISTRO_FEATURES', 'OneWifi', ' PLATFORM_BANANAPI=true ', '', d)}"
 SRC_URI += " \
     file://checkwifi.sh \
     ${@bb.utils.contains('DISTRO_FEATURES', 'EasyMesh', bb.utils.contains('DISTRO_FEATURES', 'em_extender', 'file://onewifi_pre_start_em_ext.sh ','file://onewifi_pre_start_em_ctrl.sh ', d), 'file://onewifi_pre_start.sh ', d)} \
     file://wifi_defaults.txt \
 "
 
-do_compile_prepend() {
+do_compile:prepend() {
     mkdir -p ${S}/../lan_web/
     touch ${S}/../lan_web/multiap_stub_removed
     touch ${S}/scripts/mesh_aclmac.sh
@@ -26,16 +26,24 @@ do_compile_prepend() {
     touch ${S}/scripts/mesh_status.sh
 }
 
-do_install_append(){
-    install -m 755 ${WORKDIR}/checkwifi.sh ${D}/usr/ccsp/wifi/
-    install -m 755 ${WORKDIR}/onewifi_pre_*.sh ${D}/usr/ccsp/wifi/onewifi_pre_start.sh 
-    install -m 644 ${WORKDIR}/wifi_defaults.txt ${D}/usr/ccsp/wifi/
+
+do_install:append(){
+    install -m 755 ${UNPACKDIR}/checkwifi.sh ${D}/usr/ccsp/wifi/
+    install -m 755 ${UNPACKDIR}/onewifi_pre_*.sh ${D}/usr/ccsp/wifi/onewifi_pre_start.sh
+    install -m 644 ${UNPACKDIR}/wifi_defaults.txt ${D}/usr/ccsp/wifi/
+
+    DISTRO_BFT_ENABLED="${@bb.utils.contains('DISTRO_FEATURES','BuildFromTip','true','false',d)}"
+    if [ $DISTRO_BFT_ENABLED = 'true' ]; then
+       rm -r ${D}/usr/lib/libwifi_math_util*
+    fi
 }
 
-FILES_${PN} += " \
+FILES:${PN} += " \
     ${prefix}/ccsp/wifi/checkwifi.sh \
     ${prefix}/ccsp/wifi/onewifi_pre_start.sh \
     /usr/bin/wifi_events_consumer \
     /usr/ccsp/wifi/wifi_defaults.txt \
     /usr/lib/libwifi* \
 "
+ERROR_QA:remove = "patch-fuzz"
+WARN_QA:append = " patch-fuzz"
