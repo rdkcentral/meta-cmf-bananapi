@@ -27,6 +27,9 @@ EXTRA_OEMAKE_append = " \
     'PN=rdk-wifi-libhostap' \
     'MACHINE_IMAGE_NAME=${MACHINE_IMAGE_NAME}' \
     ${@bb.utils.contains('DISTRO_FEATURES', 'OneWifi', 'ONE_WIFI=y', '', d)} \
+    ${@bb.utils.contains('DISTRO_FEATURES', 'em_extender', bb.utils.contains('DISTRO_FEATURES', 'em_wps_support', ' UWM_EXT_WPS_SUPPORT=y', '', d), '', d)} \
+    ${@bb.utils.contains('DISTRO_FEATURES', 'em_wps_support', 'WPS_NOTIFY_DISABLE=y', '', d)} \
+    ${@bb.utils.contains('DISTRO_FEATURES', 'em_wps_support', 'CONFIG_EAP_WSC=y', '', d)} \
     ${@bb.utils.contains('DISTRO_FEATURES', 'CONFIG_IEEE80211BE', 'CONFIG_IEEE80211BE=y', '', d)} \
 "
 CFLAGS_append = " \
@@ -68,6 +71,9 @@ do_configure_append () {
     oe_runmake -C ${S}/source/hostap-${PV}/hostapd clean_libhostap
 
     echo "CONFIG_TESTING_OPTIONS=y" >> ${S}/source/hostap-${PV}/hostapd/.config
+    if ${@bb.utils.contains('DISTRO_FEATURES', 'em_wps_support', 'true', 'false', d)}; then
+       echo "CONFIG_EAP_WSC=y" >> ${S}/source/hostap-${PV}/hostapd/.config
+    fi
     if ${@bb.utils.contains('DISTRO_FEATURES', 'kernel6-12', 'true', 'false', d)}; then
        echo "LIB_HDRS += ../src/common/nan_defs.h" >> ${S}/source/hostap-${PV}/hostapd/libhostap.mk
     fi

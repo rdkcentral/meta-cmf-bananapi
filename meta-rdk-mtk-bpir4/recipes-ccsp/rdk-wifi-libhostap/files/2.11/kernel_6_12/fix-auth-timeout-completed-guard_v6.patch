@@ -1,0 +1,39 @@
+From: RDK <rdk@rdkcentral.com>
+Date: Thu, 24 Apr 2026 00:00:00 +0000
+Subject: [PATCH] fix: skip auth timeout registration when already in COMPLETED state
+
+Block wpa_supplicant_req_auth_timeout from arming the authentication
+timeout when the interface is already in WPA_COMPLETED state.
+
+A spurious timeout registration while COMPLETED causes the 10-second
+timer to fire and tear down an established mesh backhaul connection by
+calling wpa_supplicant_deauthenticate() and clearing
+NL80211_STA_FLAG_AUTHORIZED.
+
+Root cause: after a successful SAE handshake on the mesh backhaul STA,
+an unknown caller re-invokes wpa_supplicant_req_auth_timeout with a
+10-second value while the interface is already COMPLETED.  The SAE
+extended-timeout path does not override this because it only runs
+during initial association, so the 10-second timer goes un-cancelled
+and fires, tearing down the link.
+
+---
+ wpa_supplicant/wpa_supplicant.c | 7 +++++++
+ 1 file changed, 7 insertions(+)
+
+--- a/wpa_supplicant/wpa_supplicant.c
++++ b/wpa_supplicant/wpa_supplicant.c
+@@ -258,6 +258,13 @@
+ 	if (wpa_s->conf->ap_scan == 0 &&
+ 	    (wpa_s->drv_flags & WPA_DRIVER_FLAGS_WIRED))
+ 		return;
++	if (wpa_s->wpa_state == WPA_COMPLETED) {
++		wpa_printf(MSG_DEBUG, "Skip auth timeout registration (%d sec) "
++			   "- already in COMPLETED state on %s",
++			   sec, wpa_s->ifname);
++		return;
++	}
++
+ 
+ 	wpa_dbg(wpa_s, MSG_DEBUG, "Setting authentication timeout: %d sec "
+ 		"%d usec", sec, usec);

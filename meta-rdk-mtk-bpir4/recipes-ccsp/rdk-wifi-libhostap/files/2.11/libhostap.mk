@@ -112,6 +112,26 @@ LIB_OBJS += ../src/eap_peer/mschapv2.o
 CONFIG_IEEE8021X_EAPOL=y
 endif
 
+ifdef CONFIG_EAP_WSC
+# EAP-WSC
+CFLAGS += -DCONFIG_WPS -DEAP_WSC
+LIB_OBJS += ../src/utils/uuid.o
+LIB_OBJS += ../src/eap_peer/eap_wsc.o ../src/eap_common/eap_wsc_common.o
+LIB_OBJS += ../src/wps/wps.o
+LIB_OBJS += ../src/wps/wps_common.o
+LIB_OBJS += ../src/wps/wps_attr_parse.o
+LIB_OBJS += ../src/wps/wps_attr_build.o
+LIB_OBJS += ../src/wps/wps_attr_process.o
+LIB_OBJS += ../src/wps/wps_dev_attr.o
+LIB_OBJS += ../src/wps/wps_enrollee.o
+LIB_OBJS += ../src/wps/wps_registrar.o
+CONFIG_IEEE8021X_EAPOL=y
+NEED_DH_GROUPS=y
+NEED_BASE64=y
+NEED_AES_CBC=y
+NEED_MODEXP=y
+endif
+
 ifdef CONFIG_EAP_GTC
 # EAP-GTC
 CFLAGS += -DEAP_GTC
@@ -243,6 +263,14 @@ endif
 ifdef FEATURE_SUPPORT_RADIUSGREYLIST
 CFLAGS += -DFEATURE_SUPPORT_RADIUSGREYLIST
 LIB_OBJS += ../src/ap/greylist.o
+endif
+
+ifdef UWM_EXT_WPS_SUPPORT
+CFLAGS += -DUWM_EXT_WPS_SUPPORT
+endif
+
+ifdef WPS_NOTIFY_DISABLE
+CFLAGS += -DWPS_NOTIFY_DISABLE
 endif
 
 EXPORT_COMPILE_DEFINITIONS := $(filter -D%, $(CFLAGS)) -DHOSTAPD_$(subst .,_,$(LIB_VERSION))
