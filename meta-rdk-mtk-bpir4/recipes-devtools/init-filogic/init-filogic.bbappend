@@ -1,4 +1,4 @@
-do_install_append(){
+do_install:append(){
 
    install -d ${D}${sbindir}
    DISTRO_EM_EXT_ENABLED="${@bb.utils.contains('DISTRO_FEATURES','em_extender','true','false',d)}"
@@ -26,13 +26,13 @@ if [ $? -eq 0 ];then \
 fi' ${D}${sbindir}/init-bridge.sh
 
 #Mounting nvram
-   sed -i '/Before=CcspPandMSsp.service/a Requires=mount-nvram.service' ${D}/lib/systemd/system/init-Lanbridge.service
-   sed -i 's/utopia.service/mount-nvram.service &/' ${D}/lib/systemd/system/init-Lanbridge.service
-   sed -i '/After=hostapd.service/d' ${D}/lib/systemd/system/init-IPv6.service
+   sed -i '/Before=CcspPandMSsp.service/a Requires=mount-nvram.service' ${D}${systemd_unitdir}/system/init-Lanbridge.service
+   sed -i 's/utopia.service/mount-nvram.service &/' ${D}${systemd_unitdir}/system/init-Lanbridge.service
+   sed -i '/After=hostapd.service/d' ${D}${systemd_unitdir}/system/init-IPv6.service
 }
 
 #ESDK support - Avoid conflict file is installed by both systemd and init-filogic in kirkstone
-SYSTEMD_SERVICE:${PN}_remove = "usb-mount@.service"
-do_install_append_broadband () {
+SYSTEMD_SERVICE:${PN}:remove = "usb-mount@.service"
+do_install:append:broadband () {
    rm ${D}${systemd_unitdir}/system/usb-mount@.service
 }

@@ -1,3 +1,3 @@
-FILESEXTRAPATHS_prepend := "${THISDIR}/files:"
+FILESEXTRAPATHS:prepend := "${THISDIR}/files:"
 
-SRC_URI_append = " file://rdkbaccl-2084-firmware-name-length.patch"
+SRC_URI:append = " file://rdkbaccl-2084-firmware-name-length.patch"

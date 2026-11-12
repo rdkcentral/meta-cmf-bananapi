@@ -1,4 +1,4 @@
-EXTRA_OECONF_remove = " --disable-proxy \
+EXTRA_OECONF:remove = " --disable-proxy \
                 --disable-tun \
                 --disable-stdio \
                 --disable-sctp \
