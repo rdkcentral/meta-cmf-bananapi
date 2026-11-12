@@ -90,6 +90,9 @@ PREFERRED_VERSION_bluez5_kirkstone = "${@bb.utils.contains('DISTRO_FEATURES', 'e
 
 #Enable Core RDKB builds
 #CORE_RDKB_ENABLED = "1"
+#CORE_RDKB_TIER-1_ENABLED = "1"
+#CORE_RDKB_TIER-2_ENABLED = "1"
+#CORE_RDKB_TIER-3_ENABLED = "1"
 
 DISTRO_FEATURES_append = "${@bb.utils.contains('CORE_RDKB_ENABLED', '1', ' Core-RDKB', '', d)}"
 DISTRO_FEATURES_remove = "${@bb.utils.contains('CORE_RDKB_ENABLED', '1', ' usppa bridgeUtilsBin matter CPUPROCANALYZER_BROADBAND snmppa bluetooth bluez5', '', d)}"
