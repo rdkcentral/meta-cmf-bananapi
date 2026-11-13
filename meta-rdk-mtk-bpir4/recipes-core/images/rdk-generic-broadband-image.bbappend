@@ -13,6 +13,7 @@ IMAGE_INSTALL:append = " gptfdisk e2fsprogs-mke2fs util-linux util-linux-losetup
 
 #Router discovery tool
 IMAGE_INSTALL:append = " ndisc6"
+IMAGE_INSTALL:append = " meminsight"
 
 IMAGE_INSTALL:append:wrynose = " net-tools"
 
@@ -118,3 +119,6 @@ python do_hash_rootfs (){
 IMAGE_INSTALL:remove = "${@bb.utils.contains('DISTRO_FEATURES', 'ppp-enabled', '', 'pptp-linux rp-pppoe xl2tpd', d)}"
 IMAGE_INSTALL:remove:onewifi = " mtkhnat-util"
 IMAGE_INSTALL:append = " ${@bb.utils.contains('DISTRO_FEATURES', 'cellular_hybrid_support', ' libimobiledevice', '', d)}"
+
+IMAGE_INSTALL:remove = " ${@bb.utils.contains('DISTRO_FEATURES', 'Core-RDKB', ' packagegroup-rdk-ccsp-broadband usp-pa fw-upgrade crun dsm dobby parodus parodus2ccsp rdktelcovoicemanager asterisk hal-voice-asterisk cpcd otbr-agent bluez5-bluetoothd bt-host-cpc-hci-bridge barton ccsp-tr069-pa rdk-speedtest-cli rdm-agent', '', d)}"
+IMAGE_INSTALL:append = " ${@bb.utils.contains('DISTRO_FEATURES', 'Core-RDKB', ' packagegroup-rdk-core-required-broadband', '', d)}"
