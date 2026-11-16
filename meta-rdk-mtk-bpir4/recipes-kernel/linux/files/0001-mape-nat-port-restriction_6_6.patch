@@ -1,0 +1,327 @@
+diff --git a/net/netfilter/nf_nat_core.c b/net/netfilter/nf_nat_core.c
+index 9df883d79acc..bf4e1be74e39 100644
+--- a/net/netfilter/nf_nat_core.c
++++ b/net/netfilter/nf_nat_core.c
+@@ -15,6 +15,7 @@
+ #include <net/xfrm.h>
+ #include <linux/siphash.h>
+ #include <linux/rtnetlink.h>
++#include <linux/proc_fs.h>
+ 
+ #include <net/netfilter/nf_conntrack_bpf.h>
+ #include <net/netfilter/nf_conntrack_core.h>
+@@ -54,6 +55,147 @@ struct nat_net {
+ 	struct nf_nat_hooks_net nat_proto_net[NFPROTO_NUMPROTO];
+ };
+ 
++#define __MAPE_NAT_PORTS__ 1
++
++#ifdef __MAPE_NAT_PORTS__
++static struct proc_dir_entry *nat_port_file = NULL;
++
++static unsigned short mape_port_range[65535] = {0};
++static int port_num = 0;
++static int psid_offset = 0, psid_len = 0, psid_val = 0;
++
++void create_port_range_by_psid(int offset, int psid_len, unsigned short psid)
++{
++	unsigned m_len = 0, i = 0;
++	int j = 0;
++	unsigned short port = 0, m_val = 0, m_offset = 0;
++
++	memset(mape_port_range, 0, sizeof(mape_port_range));
++	port_num = 0;
++	m_len = 16 - offset - psid_len;
++	for (i = 0; i < m_len; i++)
++		m_val |= 1 << i;
++	for (i = 0; i < offset; i++)
++		m_offset |= 1 << i;
++	if (m_offset) {
++		for (i = 1; i <= m_offset; i++) {
++			port = 0;
++			port |= i << (16 - offset);
++			port |= psid << m_len;
++			for (j = 0; j <= m_val; j++)
++				mape_port_range[port_num++] = port | j;
++		}
++	} else {
++		port = 0;
++		port |= psid << m_len;
++		for (j = 0; j <= m_val; j++)
++			mape_port_range[port_num++] = port | j;
++	}
++}
++
++int search_value(unsigned short int key, int low, int high)
++{
++	int mid;
++
++	if (low > high)
++		return -1;
++	mid = (low + high) / 2;
++	if (mape_port_range[mid] == key)
++		return mid;
++	else if (mape_port_range[mid] > key)
++		return search_value(key, low, mid - 1);
++	else
++		return search_value(key, mid + 1, high);
++}
++
++static void print_port_range_by_psid(int offset, int psid_len, unsigned short psid)
++{
++	unsigned m_len = 0, i = 0;
++	int j = 0;
++	short port = 0, m_val = 0, m_offset = 0;
++
++	memset(mape_port_range, 0, sizeof(mape_port_range));
++	port_num = 0;
++	m_len = 16 - offset - psid_len;
++	for (i = 0; i < m_len; i++)
++		m_val |= 1 << i;
++	for (i = 0; i < offset; i++)
++		m_offset |= 1 << i;
++	if (m_offset) {
++		for (i = 1; i <= m_offset; i++) {
++			port = 0;
++			port |= i << (16 - offset);
++			port |= psid << m_len;
++			for (j = 0; j <= m_val; j++) {
++				printk(" %hu", port | j);
++				mape_port_range[port_num++] = port | j;
++			}
++			printk("\n");
++		}
++	} else {
++		port = 0;
++		port |= psid << m_len;
++		for (j = 0; j <= m_val; j++) {
++			printk(" %hu", port | j);
++			mape_port_range[port_num++] = port | j;
++		}
++		printk("\n");
++	}
++}
++
++static ssize_t nat_port_read_proc(struct file *file, char __user *buffer,
++				  size_t count, loff_t *data)
++{
++	if (psid_val) {
++		printk("Port Ranges:\n");
++		print_port_range_by_psid(psid_offset, psid_len, psid_val);
++	}
++	printk("PSID Offset: %d\nPSID Length: %d\nPSID Value: 0x%x\n",
++	       psid_offset, psid_len, psid_val);
++	return 0;
++}
++
++static ssize_t nat_port_write_proc(struct file *file,
++				   const char __user *buffer,
++				   size_t count, loff_t *data)
++{
++	char *p0 = NULL, *p1 = NULL;
++	char psid_buf[64] = {0};
++
++	if (count >= sizeof(psid_buf))
++		return count;
++
++	if (copy_from_user(psid_buf, buffer, count))
++		return count;
++
++	p0 = strchr(psid_buf, '\n');
++	if (p0)
++		*p0 = 0;
++	p0 = psid_buf;
++	p1 = strchr(p0, ',');
++	if (!p1)
++		return count;
++	*p1++ = 0;
++	psid_offset = simple_strtoul(p0, NULL, 10);
++
++	p0 = p1;
++	p1 = strchr(p0, ',');
++	if (!p1)
++		return count;
++	*p1++ = 0;
++	psid_len = simple_strtoul(p0, NULL, 10);
++	psid_val = simple_strtoul(p1, NULL, 10);
++	printk("%d,%d,%x\n", psid_offset, psid_len, psid_val);
++	create_port_range_by_psid(psid_offset, psid_len, (unsigned short)psid_val);
++	return count;
++}
++
++static const struct proc_ops nat_port_file_fops = {
++	.proc_read  = nat_port_read_proc,
++	.proc_write = nat_port_write_proc,
++};
++#endif /* __MAPE_NAT_PORTS__ */
++
+ #ifdef CONFIG_XFRM
+ static void nf_nat_ipv4_decode_session(struct sk_buff *skb,
+ 				       const struct nf_conn *ct,
+@@ -422,13 +564,14 @@ static bool l4proto_in_range(const struct nf_conntrack_tuple *tuple,
+ 				 const union nf_conntrack_man_proto *max)
+ {
+ 	__be16 port;
++	int ret = 0;
+ 
+ 	switch (tuple->dst.protonum) {
+ 	case IPPROTO_ICMP:
+ 	case IPPROTO_ICMPV6:
+ 		return ntohs(tuple->src.u.icmp.id) >= ntohs(min->icmp.id) &&
+ 		       ntohs(tuple->src.u.icmp.id) <= ntohs(max->icmp.id);
+-	case IPPROTO_GRE: /* all fall though */
++	case IPPROTO_GRE: /* all fall through */
+ 	case IPPROTO_TCP:
+ 	case IPPROTO_UDP:
+ 	case IPPROTO_UDPLITE:
+@@ -438,7 +581,18 @@ static bool l4proto_in_range(const struct nf_conntrack_tuple *tuple,
+ 			port = tuple->src.u.all;
+ 		else
+ 			port = tuple->dst.u.all;
+-
++#ifdef __MAPE_NAT_PORTS__
++		/*
++		 * Sentinel value 10000:10000 means "validate against the
++		 * MAPE port set" rather than a normal min..max range check.
++		 */
++		if (ntohs(min->all) == 10000 && ntohs(max->all) == 10000) {
++			ret = search_value(ntohs(port), 0, port_num - 1);
++			if (ret >= 0)
++				return true;
++			return false;
++		}
++#endif
+ 		return ntohs(port) >= ntohs(min->all) &&
+ 		       ntohs(port) <= ntohs(max->all);
+ 	default:
+@@ -603,6 +757,14 @@ static void nf_nat_l4proto_unique_tuple(struct nf_conntrack_tuple *tuple,
+ 			range_size = 65536;
+ 		} else {
+ 			min = ntohs(range->min_proto.icmp.id);
++#ifdef __MAPE_NAT_PORTS__
++			if (ntohs(range->min_proto.icmp.id) == 10000 &&
++			    ntohs(range->max_proto.icmp.id) == 10000) {
++				min = 0;
++				range_size = port_num - 1;
++				goto find_free_id_mape;
++			}
++#endif
+ 			range_size = ntohs(range->max_proto.icmp.id) -
+ 				     ntohs(range->min_proto.icmp.id) + 1;
+ 		}
+@@ -629,8 +791,32 @@ static void nf_nat_l4proto_unique_tuple(struct nf_conntrack_tuple *tuple,
+ 		goto find_free_id;
+ #endif
+ 	case IPPROTO_UDP:
++#ifdef __MAPE_NAT_PORTS__
++		if(ntohs(range->min_proto.udp.port)==10000 && ntohs(range->max_proto.udp.port)==10000)
++		{
++			if (maniptype == NF_NAT_MANIP_SRC)
++				keyptr = &tuple->src.u.udp.port;
++			else
++				keyptr = &tuple->dst.u.udp.port;
++			min = 0;
++			range_size = port_num - 1;
++			goto find_free_id_mape;
++		}
++#endif
+ 	case IPPROTO_UDPLITE:
+ 	case IPPROTO_TCP:
++#ifdef __MAPE_NAT_PORTS__
++		if(ntohs(range->min_proto.tcp.port)==10000 && ntohs(range->max_proto.tcp.port)==10000)
++		{
++			if (maniptype == NF_NAT_MANIP_SRC)
++				keyptr = &tuple->src.u.tcp.port;
++			else
++				keyptr = &tuple->dst.u.tcp.port;
++			min = 0;
++			range_size = port_num - 1;
++			goto find_free_id_mape;
++		}
++#endif
+ 	case IPPROTO_SCTP:
+ 	case IPPROTO_DCCP:
+ 		if (maniptype == NF_NAT_MANIP_SRC)
+@@ -663,6 +849,19 @@ static void nf_nat_l4proto_unique_tuple(struct nf_conntrack_tuple *tuple,
+ 			range_size = 65535 - 1024 + 1;
+ 		}
+ 	} else {
++#ifdef __MAPE_NAT_PORTS__
++		/*
++		 * Sentinel 10000:10000 means "use MAPE port set".
++		 * keyptr is already set correctly above for all TCP/UDP
++		 * protocol cases before we reach this else branch.
++		 */
++		if (ntohs(range->min_proto.all) == 10000 &&
++		    ntohs(range->max_proto.all) == 10000) {
++			min = 0;
++			range_size = port_num - 1;
++			goto find_free_id_mape;
++		}
++#endif
+ 		min = ntohs(range->min_proto.all);
+ 		max = ntohs(range->max_proto.all);
+ 		if (unlikely(max < min))
+@@ -698,6 +897,39 @@ static void nf_nat_l4proto_unique_tuple(struct nf_conntrack_tuple *tuple,
+ 	attempts /= 2;
+ 	off = get_random_u16();
+ 	goto another_round;
++
++#ifdef __MAPE_NAT_PORTS__
++	/*
++	 * MAPE port selection path.
++	 *
++	 * Placed after the unconditional "goto another_round" above so the
++	 * compiler does not see unreachable code between labels.
++	 *
++	 * Key 6.6 differences from the original 5.15 patch:
++	 *   - off is u16 (was u32); use get_random_u16() not prandom_u32()
++	 *   - nf_nat_used_tuple_harder() used (supports TCP timewait eviction)
++	 *   - NF_NAT_MAX_ATTEMPTS replaces the removed max_attempts local var
++	 */
++find_free_id_mape:
++	off = get_random_u16();
++	attempts = range_size;
++	if (attempts > NF_NAT_MAX_ATTEMPTS)
++		attempts = NF_NAT_MAX_ATTEMPTS;
++
++another_round_mape:
++	for (i = 0; i < attempts; i++, off++) {
++		u16 index = off % range_size;
++
++		*keyptr = htons(mape_port_range[index]);
++		if (!nf_nat_used_tuple_harder(tuple, ct, attempts - i))
++			return;
++	}
++	if (attempts >= range_size || attempts < 16)
++		return;
++	attempts /= 2;
++	off = get_random_u16();
++	goto another_round_mape;
++#endif /* __MAPE_NAT_PORTS__ */
+ }
+ 
+ /* Manipulate the tuple into the range given. For NF_INET_POST_ROUTING,
+@@ -1357,7 +1589,9 @@ static int __init nf_nat_init(void)
+ 
+ 	WARN_ON(nf_nat_hook != NULL);
+ 	RCU_INIT_POINTER(nf_nat_hook, &nat_hook);
+-
++#ifdef __MAPE_NAT_PORTS__
++	nat_port_file = proc_create("nat_port", 0, NULL, &nat_port_file_fops);
++#endif
+ 	ret = register_nf_nat_bpf();
+ 	if (ret < 0) {
+ 		RCU_INIT_POINTER(nf_nat_hook, NULL);
+@@ -1382,6 +1616,9 @@ static void __exit nf_nat_cleanup(void)
+ 	synchronize_net();
+ 	kvfree(nf_nat_bysource);
+ 	unregister_pernet_subsys(&nat_net_ops);
++#ifdef __MAPE_NAT_PORTS__
++	remove_proc_entry("nat_port", NULL);
++#endif
+ }
+ 
+ MODULE_LICENSE("GPL");
+-- 
+2.34.1

@@ -84,6 +84,10 @@ DISTRO_FEATURES_append = " rrd"
 #Enable MAP-T
 DISTRO_FEATURES_append = " feature_mapt"
 DISTRO_FEATURES_append = " nat46"
+
+#Enable MAP-E: Uncomment below 1 line and comment above 2 lines(ie disable MAP-T)
+#DISTRO_FEATURES_append = " feature_mape"
+
 LINUXLIBCVERSION = "${@bb.utils.contains('DISTRO_FEATURES', 'kernel6-12', '6.12%', bb.utils.contains('DISTRO_FEATURES','kernel6-6', '6.6%', '5.4%',d), d)}"
 
 PREFERRED_VERSION_bluez5_kirkstone = "${@bb.utils.contains('DISTRO_FEATURES', 'em_extender', '5.66', '5.82',d)}"

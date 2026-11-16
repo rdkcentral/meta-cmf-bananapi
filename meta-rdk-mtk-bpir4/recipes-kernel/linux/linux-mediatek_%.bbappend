@@ -17,6 +17,7 @@ SRC_URI:append = " \
     ${@bb.utils.contains('DISTRO_FEATURES','kernel6-6', ' file://bluetooth_6_6.patch;apply=no', '', d)} \
     ${@bb.utils.contains('DISTRO_FEATURES','kernel6-12', ' file://enable_sdcard_v6.patch;apply=no', '', d)} \
     ${@bb.utils.contains('DISTRO_FEATURES','kernel6-12', ' file://bluetooth_v6.patch;apply=no', '', d)} \
+    ${@bb.utils.contains('DISTRO_FEATURES','feature_mape', bb.utils.contains('DISTRO_FEATURES','kernel6-6', ' file://0001-mape-nat-port-restriction_6_6.patch;apply=no', '', d), '', d)} \
 "
 SRC_URI:append:mt7988 = "${@bb.utils.contains('DISTRO_FEATURES', 'cellular_hybrid_support', bb.utils.contains('DISTRO_FEATURES','em_extender', ' ', ' file://rdkb_cfg/rdkb-usb.cfg', d), '', d)}"
 CMDLINE:append = " cgroup_enable=cpuset cgroup_enable=memory cgroup_memory=1 "
@@ -34,5 +35,13 @@ do_filogic_patches:append() {
              patch -p1 < ${WORKDIR}/bluetooth_v6.patch
          fi
          touch patch_applied_v6
+    fi
+
+    Enable_mape="${@bb.utils.contains('DISTRO_FEATURES','feature_mape','true','false',d)}"
+    if [ $Enable_mape = 'true' ] && [ $Enable_sd_6_6 = 'true' ]; then
+         if [ ! -e mape_nat_port_applied ]; then
+              patch -p1 -l --fuzz=3 < ${WORKDIR}/0001-mape-nat-port-restriction_6_6.patch
+              touch mape_nat_port_applied
+         fi
     fi
 }
