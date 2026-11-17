@@ -1,15 +1,17 @@
 FILESEXTRAPATHS_prepend := "${THISDIR}/files:"
 
-SRC_URI_append = "${CMF_GITHUB_ROOT}/bananapi-sysint;protocol=https;nobranch=1;destsuffix=git/devicebpi;name=sysintdevicebpi"
-SRCREV_sysintdevicebpi = "4ebc617660feedc84a184243167191ab7347814d"
+SRC_URI_append = "git://github.com/jauruthra-cpu/bananapi-sysint;protocol=https;nobranch=1;destsuffix=git/devicebpi;name=sysintdevicebpi"
+SRCREV_sysintdevicebpi = "d614cc4d14f783865a8c7b05060b1ac86a093974"
 SRCREV_FORMAT = "1.0.0"
 
-SRC_URI += "file://bpi_custom_device.properties \
+SRC_URI += "\
             file://uploadRDKBLogs.sh \
 "
 
 do_install_append () {
-   install -m 644 ${WORKDIR}/bpi_custom_device.properties ${D}${sysconfdir}/device.properties
+   # RDKBACCL-2166: BPI specific device properties come from bananapi-sysint (devicebpi/etc/device.properties)
+   for prop in $(cut -d= -f1 ${S}/devicebpi/etc/device.properties); do sed -i "/^$prop=/d" ${D}${sysconfdir}/device.properties; done
+   cat ${S}/devicebpi/etc/device.properties >> ${D}${sysconfdir}/device.properties
    ${@bb.utils.contains('DISTRO_FEATURES', 'OneWifi', 'echo "OneWiFiEnabled=true" >> ${D}${sysconfdir}/device.properties', '', d)}
    ${@bb.utils.contains('DISTRO_FEATURES', 'em_extender', 'sed -i "s/eth0/brlan0/g" ${D}/lib/rdk/startSSH.sh', '', d)}
 
