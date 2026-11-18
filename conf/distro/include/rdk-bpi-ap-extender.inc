@@ -45,3 +45,9 @@ DISTRO_FEATURES_append = " kernel6-6"
 
 #disabling barton from extender builds
 DISTRO_FEATURES_remove = "matter"
+
+#Enable Core RDKB Ext builds
+#CORE_RDKB_EXT_ENABLED = "1"
+
+#Enabling remotedebugger
+DISTRO_FEATURES:append = "${@bb.utils.contains('CORE_RDKB_EXT_ENABLED', '1', ' rrd', '', d)}"
