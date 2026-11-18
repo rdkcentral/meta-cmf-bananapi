@@ -76,3 +76,12 @@ IMAGE_INSTALL:remove = " ${@bb.utils.contains('DISTRO_FEATURES', 'Core-RDKB', bb
 IMAGE_INSTALL:remove = " ${@bb.utils.contains('DISTRO_FEATURES', 'Core-RDKB', ' packagegroup-rdk-ccsp-broadband', '', d)}"
 
 IMAGE_INSTALL:append = " ${@bb.utils.contains('DISTRO_FEATURES', 'Core-RDKB', bb.utils.contains('DISTRO_FEATURES', 'Optional-RDKB', ' packagegroup-rdk-core-required-broadband packagegroup-rdk-optional-broadband ', ' packagegroup-rdk-core-required-broadband', d), '', d)}"
+
+# Tier 1 components
+IMAGE_INSTALL:append = " ${@bb.utils.contains('CORE_RDKB_TIER-1_ENABLED', '1', 'packagegroup-rdk-core-tier-one-broadband', '', d)}"
+
+# Tier 2 components
+IMAGE_INSTALL:append = " ${@bb.utils.contains('CORE_RDKB_TIER-2_ENABLED', '1', 'packagegroup-rdk-core-tier-two-broadband', '', d)}"
+
+# Tier 3 components
+IMAGE_INSTALL:append = " ${@bb.utils.contains('CORE_RDKB_TIER-3_ENABLED', '1', 'packagegroup-rdk-core-tier-three-broadband', '', d)}"

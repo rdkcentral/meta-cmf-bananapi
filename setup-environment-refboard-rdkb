@@ -156,5 +156,15 @@ else # SD card image is default
 fi
 
 if [ "X$COMPONENT_TYPE" == "XRDKB_OPTIONAL_ENABLED" ]; then
-    sed -i '/RDKB_OPTIONAL_ENABLED/s/^#//' ${_TOPDIR}/meta-cmf-bananapi/conf/distro/include/rdk-bpi.inc
+    FILE="${_TOPDIR}/meta-cmf-bananapi/conf/distro/include/rdk-bpi.inc"
+
+    # Uncomment all RDKB_OPT_PKGS
+    sed -i '/^#.*RDKB_OPT_PKGS\[/s/^#//' "$FILE"
+
+    # Comment only SNMP and FW upgrade
+    sed -i '/RDKB_OPT_PKGS\[ccsp-snmp-pa\]/s/^/#/' "$FILE"
+    sed -i '/RDKB_OPT_PKGS\[fwupgrade-manager\]/s/^/#/' "$FILE"
+
+    # Uncomment RDKB_OPTIONAL_ENABLED
+    sed -i '/RDKB_OPTIONAL_ENABLED/s/^#//' "$FILE"
 fi

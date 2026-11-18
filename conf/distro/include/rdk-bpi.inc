@@ -90,6 +90,9 @@ PREFERRED_VERSION_bluez5_kirkstone = "${@bb.utils.contains('DISTRO_FEATURES', 'e
 
 #Enable Core RDKB builds
 #CORE_RDKB_ENABLED = "1"
+#CORE_RDKB_TIER-1_ENABLED = "1"
+#CORE_RDKB_TIER-2_ENABLED = "1"
+#CORE_RDKB_TIER-3_ENABLED = "1"
 
 #Enable RDKB Optional builds
 #RDKB_OPTIONAL_ENABLED = "1"
@@ -108,7 +111,6 @@ RDKB_OPTIONAL_LIST[vardepvalue] = "${RDKB_OPTIONAL_LIST}"
 #RDKB_OPT_PKGS[ieee1905] = "${@bb.utils.contains('DISTRO_FEATURES', 'with_alsap', 'ieee1905-em', '', d)}"
 #RDKB_OPT_PKGS[Telemetry_2] = "telemetry"
 #RDKB_OPT_PKGS[RFC] = "rfc"
-#RDKB_OPT_PKGS[dcmjsonparser] = "dcmjsonparser"
 #RDKB_OPT_PKGS[rdkcertconfig] = "rdkcertconfig"
 #RDKB_OPT_PKGS[webconfig] = "webconfig-framework ${@bb.utils.contains('DISTRO_FEATURES', 'webconfig_bin', 'webcfg', '', d)}"
 #RDKB_OPT_PKGS[rdk-libunpriv] = "libunpriv"
@@ -127,6 +129,8 @@ RDKB_OPT_PKGS[rdktelcovoicemanager] = "rdktelcovoicemanager"
 RDKB_OPT_PKGS[hal-voice-asterisk] = "hal-voice-asterisk asterisk"
 RDKB_OPT_PKGS[barton] = " cpcd otbr-agent bluez5-bluetoothd bt-host-cpc-hci-bridge barton"
 
+# When Core=1,Optional=0 : Shouldn't comment below lines as these PKGS should be removed.
+# When Core=1,Optional=1 : Below RDKB_OPT_PKGS should be commented unless we need.
 RDKB_OPT_PKGS[ccsp-snmp-pa] = "ccsp-snmp-pa ccsp-snmp-pa-ccsp net-snmp"
 RDKB_OPT_PKGS[fwupgrade-manager] = " rdk-fwupgrade-manager fw-upgrade"
 
@@ -135,7 +139,7 @@ RDKB_OPT_FEATURES[barton] = "matter bluetooth bluez5"
 RDKB_OPT_FEATURES[cpuprocanalyzer] = "CPUPROCANALYZER_BROADBAND"
 RDKB_OPT_FEATURES[ccsp-snmp-pa] = "snmppa"
 RDKB_OPT_FEATURES[usp-pa] = "usppa"
-RDKB_OPT_FEATURES[usp-pa] = "rdk-oss-ssa"
+RDKB_OPT_FEATURES[rdk-oss-ssa] = "rdk-oss-ssa"
 
 # All optional packages (keep in sync with RDKB_OPT_PKGS above). Any not installed by an active RDKB_OPT_PKGS line are removed
 RDKB_OPT_ALL_PKGS = "ccsp-adv-security breakpad-wrapper ccsp-xdns cpuprocanalyzer crashupload dcmjsonparser harvester ccsp-home-security ccsp-hotspot ccsp-hotspot-kmod ieee1905-em rdk-interdevicemanager ipoe-health-check json-hal-lib rdk-ledmanager mesh-agent notify-comp platformmanager rdk-fwupgrade-manager fw-upgrade rdk-ppp-manager rdkcertconfig libunpriv rdk-oss-ssa ecryptfs-utils rfc xupnp ccsp-snmp-pa ccsp-snmp-pa-ccsp net-snmp memstress syslog-helper telemetry test-and-diagnostic test-and-diagnostic-ccsp unified-wifi-mesh unified-wifi-mesh-cli usp-pa webconfig-framework webcfg lighttpd jst ccsp-webui-jst ccsp-webui-php ccsp-webui-bci-jst ccsp-webui-bci-php ccsp-webui-csrf ccsp-xconf cpcd otbr-agent bluez5-bluetoothd bt-host-cpc-hci-bridge barton dobby crun dsm hal-voice-asterisk asterisk parodus2ccsp parodus start-parodus wdmp-c rdktelcovoicemanager ccsp-tr069-pa ccsp-tr069-pa-ccsp rdk-speedtest-cli"
