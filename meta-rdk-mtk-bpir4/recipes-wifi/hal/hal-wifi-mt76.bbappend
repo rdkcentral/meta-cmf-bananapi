@@ -4,5 +4,6 @@ SRC_URI_remove = "git://git01.mediatek.com/filogic/rdk-b/rdkb_hal;protocol=https
 SRC_URI += "git://github.com/mediatek/rdkb_hal;protocol=https;branch=main;destsuffix=git/"
 SRC_URI += "file://LICENSE;subdir=git"
 SRC_URI += "file://6g_dml_mapping.patch"
+SRC_URI += "file://0001-wifi_setSSIDName-update-ssid.patch"
 
 CFLAGS_append = " -D_PLATFORM_BANANAPI_R4_  -D_WIFI_AX_SUPPORT_ "
