@@ -19,7 +19,7 @@ RDEPENDS:packagegroup-rdk-core-tier-two-broadband:append = " \
             rfc \
             rdkcertconfig \
             rdk-speedtest-cli \
-            memstree \
+            memstress \
             syslog-helper \
             bluez5 \
             " 
