@@ -1,3 +1,4 @@
+Upstream-Status: Pending
 Source: Backport from http://asuswrt-merlin.ng/
 diff -Naur kernel-source.org/include/linux/netfilter_ipv4/ipt_TRIGGER.h kernel-source/include/linux/netfilter_ipv4/ipt_TRIGGER.h
 --- kernel-source.org/include/linux/netfilter_ipv4/ipt_TRIGGER.h	1970-01-01 00:00:00.000000000 +0000

@@ -1,3 +1,4 @@
+Upstream-Status: Pending
 --- a/rdkb_hal/src/platform/platform_hal.c
 +++ b/rdkb_hal/src/platform/platform_hal.c
 @@ -20,11 +20,21 @@
