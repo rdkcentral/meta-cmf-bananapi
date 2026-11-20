@@ -3,7 +3,7 @@ Date: Nov 6, 2025 1:00 PM
 From:
 Subject: Fixed disassoc after multiple assoc requests
 Source: Comcast
-Upstream-Status:
+Upstream-Status: Pending
 Signed-off-by: Bogdan Bogush <bogdan_bogush@comcast.com>
 ##########################################
 diff -Naur git.orig/source/hostap-2.11/src/ap/ieee802_11.c git/source/hostap-2.11/src/ap/ieee802_11.c
