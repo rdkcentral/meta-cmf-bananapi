@@ -52,6 +52,9 @@ UNPACKDIR:kirkstone ?= "${WORKDIR}"
 
 #Enable Core RDKB Ext builds
 #CORE_RDKB_EXT_ENABLED = "1"
+#CORE_RDKB_EXT_TIER-1_ENABLED = "1"
+#CORE_RDKB_EXT_TIER-2_ENABLED = "1"
+#CORE_RDKB_EXT_TIER-3_ENABLED = "1"
 
 #Enabling remotedebugger
 DISTRO_FEATURES:append = "${@bb.utils.contains('CORE_RDKB_EXT_ENABLED', '1', ' rrd', '', d)}"
