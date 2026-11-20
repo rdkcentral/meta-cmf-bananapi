@@ -7,6 +7,8 @@ CFLAGS_append = " -DFEATURE_SINGLE_PHY"
 CFLAGS_remove = " -DONEWIFI_MULTIAP_APP_SUPPORT"
 EXTRA_OECONF_remove = " ONEWIFI_MULTIAP_APP_SUPPORT=true"
 
+DEPENDS:remove = "${@'mesh-agent' if bb.utils.contains('DISTRO_FEATURES', 'Core-RDKB', True, False, d) and 'mesh-agent' not in d.getVar('RDKB_OPT_PKGS_ENABLED').split() else ''}"
+
 EXTRA_OECONF_append = " ${@bb.utils.contains('DISTRO_FEATURES', 'OneWifi', ' PLATFORM_BANANAPI=true ', '', d)}"
 SRC_URI += " \
     file://checkwifi.sh \
@@ -28,11 +30,6 @@ do_install_append(){
     install -m 755 ${WORKDIR}/checkwifi.sh ${D}/usr/ccsp/wifi/
     install -m 755 ${WORKDIR}/onewifi_pre_*.sh ${D}/usr/ccsp/wifi/onewifi_pre_start.sh 
     install -m 644 ${WORKDIR}/wifi_defaults.txt ${D}/usr/ccsp/wifi/
-
-    DISTRO_BFT_ENABLED="${@bb.utils.contains('DISTRO_FEATURES','BuildFromTip','true','false',d)}"
-    if [ $DISTRO_BFT_ENABLED = 'true' ]; then
-       rm -r ${D}/usr/lib/libwifi_math_util*
-    fi
 }
 
 FILES_${PN} += " \
