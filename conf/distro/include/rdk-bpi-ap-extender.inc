@@ -37,5 +37,20 @@ DISTRO_FEATURES_append = " generic_mlo"
 DISTRO_FEATURES_append = " kernel6-6"
 #DISTRO_FEATURES_append = " kernel6-12"
 
-#Disable rdm-agent for reference platform
+#Disable RDM for reference platform
 #DISTRO_FEATURES_append = "RDM"
+
+#Enable below distro to build Easymesh and dependent Wi-Fi components from tip (AUTOREV) during CI validation
+#DISTRO_FEATURES_append = " BuildFromTip"
+
+#disabling barton from extender builds
+DISTRO_FEATURES_remove = "matter"
+
+#Enable Core RDKB Ext builds
+#CORE_RDKB_EXT_ENABLED = "1"
+#CORE_RDKB_EXT_TIER-1_ENABLED = "1"
+#CORE_RDKB_EXT_TIER-2_ENABLED = "1"
+#CORE_RDKB_EXT_TIER-3_ENABLED = "1"
+
+#Enabling remotedebugger
+DISTRO_FEATURES:append = "${@bb.utils.contains('CORE_RDKB_EXT_ENABLED', '1', ' rrd', '', d)}"

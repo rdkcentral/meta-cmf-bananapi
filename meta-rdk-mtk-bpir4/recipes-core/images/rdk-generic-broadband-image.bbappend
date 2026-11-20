@@ -13,6 +13,7 @@ IMAGE_INSTALL_append = " gptfdisk e2fsprogs-mke2fs util-linux util-linux-losetup
 
 #Router discovery tool
 IMAGE_INSTALL_append = " ndisc6"
+IMAGE_INSTALL_append = " meminsight"
 
 ROOTFS_POSTPROCESS_COMMAND_append = "add_busybox_fixes; "
 
@@ -67,6 +68,20 @@ do_filogic_gen_image(){
 }
 
 IMAGE_INSTALL_remove = "${@bb.utils.contains('DISTRO_FEATURES', 'ppp-enabled', '', 'pptp-linux rp-pppoe xl2tpd', d)}"
-IMAGE_INSTALL_append = "${@bb.utils.contains('DISTRO_FEATURES', 'EasyMesh',' unified-wifi-mesh unified-wifi-mesh-cli ','',d)}"
-IMAGE_INSTALL_append = "${@bb.utils.contains('DISTRO_FEATURES', 'with_alsap',' ieee1905-em ','',d)}"
 IMAGE_INSTALL_remove_onewifi += " mtkhnat-util"
+IMAGE_INSTALL:append = " ${@bb.utils.contains('DISTRO_FEATURES', 'cellular_hybrid_support', ' libimobiledevice', '', d)}"
+
+#Core / Optional RDKB
+IMAGE_INSTALL:remove = " ${@bb.utils.contains('DISTRO_FEATURES', 'Core-RDKB', bb.utils.contains('DISTRO_FEATURES', 'Optional-RDKB', ' ${RDKB_OPT_PKGS_DISABLED}', ' ${RDKB_OPT_PKGS_DISABLED}', d), '', d)}"
+IMAGE_INSTALL:remove = " ${@bb.utils.contains('DISTRO_FEATURES', 'Core-RDKB', ' packagegroup-rdk-ccsp-broadband', '', d)}"
+
+IMAGE_INSTALL:append = " ${@bb.utils.contains('DISTRO_FEATURES', 'Core-RDKB', bb.utils.contains('DISTRO_FEATURES', 'Optional-RDKB', ' packagegroup-rdk-core-required-broadband packagegroup-rdk-optional-broadband ', ' packagegroup-rdk-core-required-broadband', d), '', d)}"
+
+# Tier 1 components
+IMAGE_INSTALL:append = " ${@bb.utils.contains('CORE_RDKB_TIER-1_ENABLED', '1', 'packagegroup-rdk-core-tier-one-broadband', '', d)}"
+
+# Tier 2 components
+IMAGE_INSTALL:append = " ${@bb.utils.contains('CORE_RDKB_TIER-2_ENABLED', '1', 'packagegroup-rdk-core-tier-two-broadband', '', d)}"
+
+# Tier 3 components
+IMAGE_INSTALL:append = " ${@bb.utils.contains('CORE_RDKB_TIER-3_ENABLED', '1', 'packagegroup-rdk-core-tier-three-broadband', '', d)}"

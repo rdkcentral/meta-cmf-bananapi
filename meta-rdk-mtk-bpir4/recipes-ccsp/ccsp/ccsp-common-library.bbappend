@@ -49,7 +49,7 @@ do_install_append_class-target() {
 
    install -D -m 0644 ${S}/systemd_units/notifyComp.service ${D}${systemd_unitdir}/system/notifyComp.service
    install -D -m 0644 ${S}/systemd_units/gwprovapp.service ${D}${systemd_unitdir}/system/gwprovapp.service
-   sed -i "s/After=securemount.service/After=PsmSsp.service/g" ${D}${systemd_unitdir}/system/gwprovapp.service
+   sed -i "s/After=securemount.service/After=init-Lanbridge.service/g" ${D}${systemd_unitdir}/system/gwprovapp.service
    install -D -m 0644 ${WORKDIR}/gwprovapp.conf ${D}${systemd_unitdir}/system/gwprovapp.service.d/gwprovapp.conf
    rm ${D}${systemd_unitdir}/system/utopia.service
 
@@ -76,7 +76,6 @@ do_install_append_class-target() {
    fi
    sed -i '/IsErouterRunningStatus/,/fi/ s/^/#/' ${D}/usr/ccsp/ccspPAMCPCheck.sh
    sed -i '/ExecStart=/i ExecStartPre=/usr/bin/start_cron' ${D}/lib/systemd/system/RdkFwUpgradeManager.service
-   sed -i 's/ RdkWanManager.service//g' ${D}${systemd_unitdir}/system/CcspEthAgent.service
 }
 
 
@@ -85,7 +84,6 @@ SYSTEMD_SERVICE_${PN} += "${@bb.utils.contains('DISTRO_FEATURES', 'OneWifi', 'on
 SYSTEMD_SERVICE_${PN} += "${@bb.utils.contains('DISTRO_FEATURES', 'webconfig_bin', 'webconfig.service', '', d)}"
 SYSTEMD_SERVICE_${PN} += "${@bb.utils.contains('DISTRO_FEATURES', 'rdkb_wan_manager', 'RdkTelcoVoiceManager.service', '', d)}"
 SYSTEMD_SERVICE_${PN} += " CcspTelemetry.service"
-SYSTEMD_SERVICE_${PN} += " notifyComp.service"
 SYSTEMD_SERVICE_${PN} += "gwprovapp.service"
 SYSTEMD_SERVICE_${PN} += "wan-initialized.target"
 SYSTEMD_SERVICE_${PN} += "wan-initialized.path"

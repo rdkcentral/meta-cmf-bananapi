@@ -9,6 +9,8 @@ BT_BRIDGE_DIR = "${GSDK_DIR}/app/bluetooth/example_host/bt_host_cpc_hci_bridge"
 SRC_URI = "git://github.com/SiliconLabs/gecko_sdk.git;protocol=https;branch=gsdk_4.4;destsuffix=git/gsdk;name=gsdk"
 SRCREV_gsdk = "9ad9e19638a2d0ce01ce21d32f5049c5f1b21d70"
 
+export GIT_LFS_SKIP_SMUDGE = "1"
+
 SRC_URI += "file://bt-host-cpc-hci-bridge.service \
             file://bt-host-cpc-hci-bridge-attach.service \
            "

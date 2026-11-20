@@ -24,6 +24,8 @@ SRCREV_otbr = "dc6b912aa94320f2b2839260b2f18ee98379c5be"
 
 SRCREV_FORMAT = "gsdk_otbr"
 
+export GIT_LFS_SKIP_SMUDGE = "1"
+
 SRC_URI += "file://openthread-fix-build-errors.patch;patchdir=${GSDK_DIR} \
             file://adjust-otbr-configuration.patch;patchdir=${GSDK_DIR} \
             file://otbr-agent.service \
