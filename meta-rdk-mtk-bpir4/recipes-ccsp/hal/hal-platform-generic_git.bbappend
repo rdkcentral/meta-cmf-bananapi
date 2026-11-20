@@ -7,7 +7,6 @@ SRC_URI:kernel6-6 = " \
     ${CMF_GITHUB_ROOT}/hardware-abstraction-layer;protocol=https;${BRANCH_hardware_abstraction_layer};destsuffix=${BP};name=platformhal \
     "
 
-
 S = "${UNPACKDIR}/${BP}/source/platform"
 
 SRCREV = "31f5afb748ea66ec4f08f6f5b325a22f73223f02"
@@ -18,6 +17,7 @@ SRC_URI:append = " file://Add_ipv6_changes.patch"
 SRC_URI:append = " file://bpi_serial_no_fix.patch"
 SRC_URI:append = " file://hal-function-changes.patch"
 SRC_URI:append = " file://configurable-wan-platform.patch"
+SRC_URI:append = " file://rdkbaccl-2084-firmware-bankinfo.patch"
 
 do_configure:append() {
      #For trimming the spaces

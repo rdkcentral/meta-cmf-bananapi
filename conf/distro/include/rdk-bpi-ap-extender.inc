@@ -35,10 +35,11 @@ DISTRO_FEATURES:append = " generic_mlo"
 
 # Kernel 6.6
 DISTRO_FEATURES:append = " kernel6-6"
-PREFERRED_VERSION_linux-libc-headers:wrynose = "6.12"
 #DISTRO_FEATURES:append = " kernel6-12"
+PREFERRED_VERSION_linux-libc-headers:wrynose = "6.12"
 DISTRO_FEATURES:append = " rdkb_configurable_wan_interface"
-#Disable rdm-agent for reference platform
+
+#Disable RDM for reference platform
 #DISTRO_FEATURES:append = "RDM"
 
 #Enable below distro to build Easymesh and dependent Wi-Fi components from tip (AUTOREV) during CI validation
