@@ -3,6 +3,7 @@ require ccsp_common_bananapi.inc
 FILESEXTRAPATHS_prepend := "${THISDIR}/files:"
 
 SRC_URI_remove += "git://github.com/rdk-gdcs/lan_web.git;protocol=https;branch=main_branch_multiap_update;name=lan_web;destsuffix=lan_web"
+DEPENDS += " rdk-wifi-hal"
 CFLAGS_append = " -DFEATURE_SINGLE_PHY"
 CFLAGS_remove = " -DONEWIFI_MULTIAP_APP_SUPPORT"
 EXTRA_OECONF_remove = " ONEWIFI_MULTIAP_APP_SUPPORT=true"
