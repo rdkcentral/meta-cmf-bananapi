@@ -1,3 +1,9 @@
+FILESEXTRAPATHS_prepend := "${THISDIR}/files:"
+
+# Always enable PPP Manager / MultiWAN-capable pppoe_config.sh
+# (same idea as rdk-wanmanager.bb: EXTRA_OECONF += " --enable-multiwan=yes")
+SRC_URI_append = " file://0001-pppoe-config-pppmgr-multiwan-support.patch"
+
 do_install_append(){
 
    install -d ${D}${sbindir}

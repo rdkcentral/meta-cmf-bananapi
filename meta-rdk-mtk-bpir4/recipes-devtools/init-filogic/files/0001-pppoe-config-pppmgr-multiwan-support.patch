@@ -1,0 +1,171 @@
+--- a/init-service/pppoe_config.sh
++++ b/init-service/pppoe_config.sh
+@@ -1,9 +1,40 @@
+ #!/bin/bash
++# Supports:
++#   1) Legacy:  pppoe_config.sh <start|stop> [user] [password]
++#   2) PPPMgr:  pppoe_config.sh <user> <pass> <eth_if> <ppp_if> PPPoE|PPPoA <lcp> <lcp_retry> [mru]
+ source /etc/utopia/service.d/service_wan/ppp_helpers.sh
+ 
+ PPP_CONFIG_FILE=/etc/ppp/pppoe.conf
+ 
+-init_pppoe (){
++write_pppoe_conf () {
++    local eth_if="$1"
++    local ppp_if="$2"
++    local user="$3"
++    local lcp_interval="$4"
++    local lcp_failure="$5"
++    local mru="$6"
++    local default_route="yes"
++
++    if [ -z "$eth_if" ] || [ -z "$ppp_if" ] || [ -z "$user" ]; then
++        echo "$0: missing eth_if/ppp_if/user" >&2
++        return 1
++    fi
++
++    [ -z "$lcp_interval" ] && lcp_interval=$(syscfg get lcp_interval)
++    [ -z "$lcp_interval" ] && lcp_interval=30
++    [ -z "$lcp_failure" ] && lcp_failure=3
++    [ -z "$mru" ] && mru=$(syscfg get MaxMRUSize)
++    [ -z "$mru" ] && mru=1492
++
++    # MultiWAN: per-interface conf so parallel sessions do not share pppoe.conf/PIDFILE
++    if [ "${RDKB_MULTIWAN}" = "1" ]; then
++        PPP_CONFIG_FILE="/etc/ppp/${ppp_if}.conf"
++        # WanManager owns default-route policy across multiple WANs
++        default_route="no"
++    else
++        PPP_CONFIG_FILE=/etc/ppp/pppoe.conf
++    fi
++
+     prepare_pppd_ip_pre_up_script
+     prepare_pppd_ip_up_script
+     prepare_pppd_ipv6_up_script
+@@ -11,63 +42,74 @@
+     prepare_pppd_ipv6_down_script
+     prepare_pppd_options
+     prepare_pppd_secrets
+-    echo -n > $PPP_CONFIG_FILE
+ 
+-    PHY_NAME=`syscfg get wan_physical_ifname`
+-    echo "ETH='${PHY_NAME}'" >> $PPP_CONFIG_FILE
+-    CLIENT=`syscfg get wan_proto_username`
+-    IPV6CP=`syscfg get IPV6CPEn`
+-    IPCP=`syscfg get IPCPEn`
+-    PPP_IDLE_TIME=`syscfg get ppp_idle_time`
+-    MAXMRUSIZE=`syscfg get MaxMRUSize`
+-    DEFLCPINTERVAL=`syscfg get lcp_interval`
+-    echo "MRU=$MAXMRUSIZE" >> $PPP_CONFIG_FILE
+-    echo "USER=$CLIENT" >>$PPP_CONFIG_FILE
+-    echo "IFNAME='ppp0'" >>$PPP_CONFIG_FILE
+-    echo "DEMAND=no" >> $PPP_CONFIG_FILE
+-    echo "DNSTYPE=SERVER" >> $PPP_CONFIG_FILE
+-    echo "PEERDNS=yes" >> $PPP_CONFIG_FILE
+-    echo "DNS1=" >> $PPP_CONFIG_FILE
+-    echo "DNS2=" >> $PPP_CONFIG_FILE
+-    echo "DEFAULTROUTE=yes" >> $PPP_CONFIG_FILE
+-    echo "CONNECT_TIMEOUT=0" >> $PPP_CONFIG_FILE
+-    echo "CONNECT_POLL=2" >> $PPP_CONFIG_FILE
+-    CONCENTRATOR=`syscfg get wan_proto_acname`
+-    echo "ACNAME=$CONCENTRATOR" >> $PPP_CONFIG_FILE
+-    SERVICE=`syscfg get wan_proto_servicename`
+-    echo "SERVICENAME=$SERVICE" >> $PPP_CONFIG_FILE
+-    echo 'PING="."' >> $PPP_CONFIG_FILE
+-    echo "CF_BASE=`basename $CONFIG`" >> $PPP_CONFIG_FILE
+-    echo 'PIDFILE="/var/run/$CF_BASE-pppoe.pid"' >> $PPP_CONFIG_FILE
+-    echo "SYNCHRONOUS=no" >> $PPP_CONFIG_FILE
+-    echo "CLAMPMSS=1412" >> $PPP_CONFIG_FILE
+-    echo "LCP_INTERVAL=$DEFLCPINTERVAL" >> $PPP_CONFIG_FILE
+-    echo "LCP_FAILURE=3" >> $PPP_CONFIG_FILE
+-    echo "PPPOE_TIMEOUT=80" >> $PPP_CONFIG_FILE
+-    echo "FIREWALL=NONE" >> $PPP_CONFIG_FILE
+-    echo 'LINUX_PLUGIN="/usr/lib/pppd/2.4.8/rp-pppoe.so"' >> $PPP_CONFIG_FILE
+-    echo 'PPPOE_EXTRA=""' >> $PPP_CONFIG_FILE
+-    echo 'PPPD_EXTRA=""' >> $PPP_CONFIG_FILE
++    echo -n > "$PPP_CONFIG_FILE"
++    echo "ETH='${eth_if}'" >> "$PPP_CONFIG_FILE"
++    echo "MRU=${mru}" >> "$PPP_CONFIG_FILE"
++    echo "USER=${user}" >> "$PPP_CONFIG_FILE"
++    echo "IFNAME='${ppp_if}'" >> "$PPP_CONFIG_FILE"
++    echo "DEMAND=no" >> "$PPP_CONFIG_FILE"
++    echo "DNSTYPE=SERVER" >> "$PPP_CONFIG_FILE"
++    echo "PEERDNS=yes" >> "$PPP_CONFIG_FILE"
++    echo "DNS1=" >> "$PPP_CONFIG_FILE"
++    echo "DNS2=" >> "$PPP_CONFIG_FILE"
++    echo "DEFAULTROUTE=${default_route}" >> "$PPP_CONFIG_FILE"
++    echo "CONNECT_TIMEOUT=0" >> "$PPP_CONFIG_FILE"
++    echo "CONNECT_POLL=2" >> "$PPP_CONFIG_FILE"
++    echo "ACNAME=$(syscfg get wan_proto_acname)" >> "$PPP_CONFIG_FILE"
++    echo "SERVICENAME=$(syscfg get wan_proto_servicename)" >> "$PPP_CONFIG_FILE"
++    echo 'PING="."' >> "$PPP_CONFIG_FILE"
++    echo 'CF_BASE=`basename $CONFIG`' >> "$PPP_CONFIG_FILE"
++    echo 'PIDFILE="/var/run/$CF_BASE-pppoe.pid"' >> "$PPP_CONFIG_FILE"
++    echo "SYNCHRONOUS=no" >> "$PPP_CONFIG_FILE"
++    echo "CLAMPMSS=1412" >> "$PPP_CONFIG_FILE"
++    echo "LCP_INTERVAL=${lcp_interval}" >> "$PPP_CONFIG_FILE"
++    echo "LCP_FAILURE=${lcp_failure}" >> "$PPP_CONFIG_FILE"
++    echo "PPPOE_TIMEOUT=80" >> "$PPP_CONFIG_FILE"
++    echo "FIREWALL=NONE" >> "$PPP_CONFIG_FILE"
++    echo 'LINUX_PLUGIN=' >> "$PPP_CONFIG_FILE"
++    echo 'PPPOE_EXTRA=""' >> "$PPP_CONFIG_FILE"
++    echo "PPPD_EXTRA=\"ifname ${ppp_if}\"" >> "$PPP_CONFIG_FILE"
+ }
+ 
+-if [ "$1" == "start" ]; then
+-    if [ -n "$2" ]; then
+-        echo "wan_proto_username"
+-        syscfg set wan_proto_username $2
+-    fi
+-    if [ -n "$3" ]; then
+-        echo "wan_proto_username"
+-        syscfg set wan_proto_password $3
+-    fi
++# PPP Manager ABI
++if [ "$5" = "PPPoE" ] || [ "$5" = "PPPoA" ]; then
++    USER_NAME="$1"
++    PASSWORD="$2"
++    ETH_IF="$3"
++    PPP_IF="$4"
++    LCP_INTERVAL="$6"
++    LCP_FAILURE="$7"
++    MRU="$8"
++
++    [ -n "$USER_NAME" ] && syscfg set wan_proto_username "$USER_NAME"
++    [ -n "$PASSWORD" ] && syscfg set wan_proto_password "$PASSWORD"
++    [ -n "$MRU" ] && syscfg set MaxMRUSize "$MRU"
++    [ -n "$LCP_INTERVAL" ] && syscfg set lcp_interval "$LCP_INTERVAL"
++
++    write_pppoe_conf "$ETH_IF" "$PPP_IF" "$USER_NAME" "$LCP_INTERVAL" "$LCP_FAILURE" "$MRU"
++    exit $?
++fi
++
++if [ "$1" = "start" ]; then
++    [ -n "$2" ] && syscfg set wan_proto_username "$2"
++    [ -n "$3" ] && syscfg set wan_proto_password "$3"
+     pppoe-stop
+-    sleep 2    
+-    init_pppoe
++    sleep 2
++    PHY_NAME=$(syscfg get wan_physical_ifname)
++    # Prefer real NIC; do not use PPP ifname as ETH
++    case "$PHY_NAME" in
++        ppp*|pppoe*) PHY_NAME=eth1 ;;
++    esac
++    write_pppoe_conf "$PHY_NAME" "ppp0" "$(syscfg get wan_proto_username)" "" "" ""
+     pppoe-start
+-    iptables -t nat -D POSTROUTING -o ppp+ -j MASQUERADE
++    iptables -t nat -D POSTROUTING -o ppp+ -j MASQUERADE 2>/dev/null
+     iptables -t nat -I POSTROUTING -o ppp+ -j MASQUERADE
+-elif [ "$1" == "stop" ]; then
++elif [ "$1" = "stop" ]; then
+     pppoe-stop
+-    iptables -t nat -D POSTROUTING -o ppp+ -j MASQUERADE
+-else 
+-    echo "Useage: $0 <start/stop> <user> <password>"        
++    iptables -t nat -D POSTROUTING -o ppp+ -j MASQUERADE 2>/dev/null
++else
++    echo "Usage: $0 <start|stop> [user] [password]"
++    echo "   or: $0 <user> <pass> <eth_if> <ppp_if> PPPoE|PPPoA <lcp> <lcp_retry> [mru]"
++    exit 1
+ fi
