@@ -1,0 +1,29 @@
+Source: Manigandan Gopalakrishnan<Manigandan_Gopalakrishnan@comcast.com>
+Subject: Changes needed for vlan-manager integration
+
+diff -Naur ethsw.orig/rdkb_hal/src/ethsw/ccsp_hal_ethsw.c ethsw/rdkb_hal/src/ethsw/ccsp_hal_ethsw.c
+--- ethsw.orig/rdkb_hal/src/ethsw/ccsp_hal_ethsw.c	2026-11-23 05:32:45.712529176 +0000
++++ ethsw/rdkb_hal/src/ethsw/ccsp_hal_ethsw.c	2026-11-23 05:42:27.291355671 +0000
+@@ -1188,17 +1188,15 @@
+ 
+ INT GWP_GetEthWanLinkStatus()
+ {
+-    int link = 0;
+     char path[32] = {0};
+ 
++#ifdef FEATURE_RDKB_VLAN_MANAGER /* link status of lan0 has to be monitored*/
++    snprintf(path, sizeof(path), "/sys/class/net/%s/carrier", ETH_WAN_IFNAME);
++#else
+     sprintf(path, "/sys/class/net/%s/carrier",g_virtualIfName);
+-    link = is_interface_link(path);
++#endif
+ 
+-    if(link){
+-        return 1;
+-    }else{
+-        return 0; 
+-    }
++    return is_interface_link(path);
+ }
+ 
+ #if defined(FEATURE_RDKB_WAN_MANAGER)
