@@ -1,0 +1,74 @@
+From c19b761319b4ba8f5f6ff86b0d8bd0483864ff1c Mon Sep 17 00:00:00 2001
+From: Sundram Patel <sundram.p@tataelxsi.co.in>
+Date: Thu, 27 Aug 2026 14:43:38 +0530
+Subject: [PATCH] ACL_DENY Status code 33 in Auth/Assoc Frames
+
+Wi-Fi EasyMesh 6.0 Section 11.6 (Client Association Control Mechanism)
+states that when a Multi-AP Agent rejects an authentication or
+(re-)association request as a result of a Client Association Control
+Request (CACR), it should set the status code to 33
+(WLAN_STATUS_DENIED_INSUFFICIENT_BANDWIDTH).
+
+The EasyMesh CACR implementation uses hostapd deny ACL entries to block
+specified STA(s) from associating to a target BSS. During authentication
+or association processing, hostapd rejects those STA(s) through the ACL
+deny path. Without this change, hostapd responds with
+WLAN_STATUS_UNSPECIFIED_FAILURE, which does not align with the EasyMesh
+recommendation.
+
+Update ACL-based authentication and association rejection handling to use
+status code 33, enabling CACR-triggered rejections to return the status
+code recommended by EasyMesh 6.0 Section 11.6.
+
+Ref: RDKBWIFI-434 [RDKB JIRA]
+
+Upstream-Status: Pending
+
+Signed-off-by: Sundram Patel <sundram.p@tataelxsi.co.in>
+---
+ src/ap/ieee802_11.c | 12 ++++++++++++
+ 1 file changed, 12 insertions(+)
+
+diff --git a/src/ap/ieee802_11.c b/src/ap/ieee802_11.c
+index 7620fdf20..04075e74f 100644
+--- a/src/ap/ieee802_11.c
++++ b/src/ap/ieee802_11.c
+@@ -3413,7 +3413,11 @@ static void handle_auth(struct hostapd_data *hapd,
+ 		wpa_msg(hapd->msg_ctx, MSG_DEBUG,
+ 			"Ignore Authentication frame from " MACSTR
+ 			" due to ACL reject", MAC2STR(sa));
++#ifdef EASY_MESH_NODE
++		resp = WLAN_STATUS_DENIED_INSUFFICIENT_BANDWIDTH;
++#else
+ 		resp = WLAN_STATUS_UNSPECIFIED_FAILURE;
++#endif
+ 		goto fail;
+ 	}
+ 	ubus_resp = hostapd_ubus_handle_event(hapd, &req);
+@@ -3435,7 +3439,11 @@ static void handle_auth(struct hostapd_data *hapd,
+ 			wpa_msg(hapd->msg_ctx, MSG_DEBUG,
+ 				"Ignore Authentication frame from " MACSTR
+ 				" due to ACL reject", MAC2STR(mgmt->sa));
++#ifdef EASY_MESH_NODE
++			resp = WLAN_STATUS_DENIED_INSUFFICIENT_BANDWIDTH;
++#else
+ 			resp = WLAN_STATUS_UNSPECIFIED_FAILURE;
++#endif
+ 			goto fail;
+ 		}
+ 		if (res == HOSTAPD_ACL_PENDING)
+@@ -6099,7 +6107,11 @@ static void handle_assoc(struct hostapd_data *hapd,
+ 					"Ignore Association Request frame from "
+ 					MACSTR " due to ACL reject",
+ 					MAC2STR(mgmt->sa));
++#ifdef EASY_MESH_NODE
++				resp = WLAN_STATUS_DENIED_INSUFFICIENT_BANDWIDTH;
++#else
+ 				resp = WLAN_STATUS_UNSPECIFIED_FAILURE;
++#endif
+ 				goto fail;
+ 			}
+ 			if (acl_res == HOSTAPD_ACL_PENDING)
+-- 
+2.34.1
+

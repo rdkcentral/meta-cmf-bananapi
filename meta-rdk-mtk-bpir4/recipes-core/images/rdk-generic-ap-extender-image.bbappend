@@ -180,3 +180,16 @@ addtask hash_rootfs after do_image_complete before do_filogic_gen_image
 python __anonymous () {
     d.appendVarFlag('do_filogic_gen_image', 'depends', ' linux-mediatek:do_deploy')
 }
+
+# Core RDKB Ext Build
+IMAGE_INSTALL:remove = " ${@bb.utils.contains('CORE_RDKB_EXT_ENABLED', '1', 'packagegroup-ap-extender', '', d)}"
+IMAGE_INSTALL:append = " ${@bb.utils.contains('CORE_RDKB_EXT_ENABLED', '1', 'packagegroup-rdk-ap-core-required-extender', '', d)}"
+
+# Tier 1 components
+IMAGE_INSTALL:append = " ${@bb.utils.contains('CORE_RDKB_EXT_TIER-1_ENABLED', '1', 'packagegroup-rdk-ap-core-tier-one-extender', '', d)}"
+
+# Tier 2 components
+IMAGE_INSTALL:append = " ${@bb.utils.contains('CORE_RDKB_EXT_TIER-2_ENABLED', '1', 'packagegroup-rdk-ap-core-tier-two-extender', '', d)}"
+
+# Tier 3 components
+IMAGE_INSTALL:append = " ${@bb.utils.contains('CORE_RDKB_EXT_TIER-3_ENABLED', '1', 'packagegroup-rdk-ap-core-tier-three-extender', '', d)}"
