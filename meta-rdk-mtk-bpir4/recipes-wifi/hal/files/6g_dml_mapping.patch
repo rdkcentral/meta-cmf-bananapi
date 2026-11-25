@@ -1,4 +1,5 @@
 SOURCE:RDKM
+Upstream-Status: Pending
 
 diff --git a/wifi_hal.c b/wifi_hal.c
 index 0effd53..d644269 100644

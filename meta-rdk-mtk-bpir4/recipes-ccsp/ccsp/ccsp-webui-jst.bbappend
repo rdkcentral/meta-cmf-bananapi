@@ -1,6 +1,6 @@
 include ccsp_common_bananapi.inc
 
-do_install_append () {
+do_install:append () {
                 if ${@bb.utils.contains('DISTRO_FEATURES', 'OneWifi', 'true', 'false', d)}; then
                    install -m 0755 ${S}/../xb6/jst/wireless_network_configuration_onewifi.jst ${D}/usr/www2/wireless_network_configuration.jst
                    install -m 0755 ${S}/../xb6/jst/wireless_network_configuration_edit_onewifi.jst ${D}/usr/www2/wireless_network_configuration_edit.jst
@@ -24,6 +24,7 @@ do_install_append () {
                 sed -i "/getInstanceIDs(\"Device.Hosts.Host.\")/a \$hostIDs=\$hostIDs[count(\$hostIDs)-2];" ${D}/usr/www2/managed_devices_add_computer_blocked.jst
                 sed -i "s/\$clients_RSSI\[strtoupper(\$Host\[\$i.toString()\]\['PhysAddress'\])\]/\$Host\[\$i\]\['X_CISCO_COM_RSSI'\]/g" ${D}/usr/www2/connected_devices_computers.jst
                 sed -i '/<?%if (strpos($partnerId, "sky-") !== false)/ s/sky-/RDKM/' ${D}/usr/www2/wireless_network_configuration_edit.jst
+
                 rm -f  ${D}/usr/www2/cmn/syndication/device_pause_screen/device_pause_screen_comcast.js
 
                 sed -i \

@@ -1,3 +1,4 @@
+Upstream-Status: Pending
 Index: platform/rdkb_hal/src/platform/platform_hal.c
 ===================================================================
 --- platform.orig/rdkb_hal/src/platform/platform_hal.c
