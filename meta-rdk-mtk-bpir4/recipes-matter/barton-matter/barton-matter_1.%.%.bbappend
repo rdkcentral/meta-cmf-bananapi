@@ -9,13 +9,13 @@ SRC_URI += " \
     file://zzz_generated.tar.gz \
 "
 
-MATTER_ZAP_FILE = "${WORKDIR}/barton.zap"
+MATTER_ZAP_FILE = "${UNPACKDIR}/barton.zap"
 # Adding the zzz_generated tarball to the SRC_URI will unpack it into WORKDIR
-MATTER_ZZZ_GENERATED = "${WORKDIR}/zzz_generated"
+MATTER_ZZZ_GENERATED = "${UNPACKDIR}/zzz_generated"
 
 # Set persistent storage location for production use
 MATTER_CONF_DIR = "/nvram/icontrol"
-MATTER_IDL_FILE = "${WORKDIR}/barton.matter"
+MATTER_IDL_FILE = "${UNPACKDIR}/barton.matter"
 do_configure[network] = "1"
 
 do_configure:append() {

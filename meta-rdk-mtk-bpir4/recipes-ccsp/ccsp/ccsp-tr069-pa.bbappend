@@ -2,7 +2,7 @@ include ccsp_common_bananapi.inc
 
 LDFLAGS += "-Wl,--no-as-needed -lulog"
 
-do_install_append () {
+do_install:append () {
     # Config files and scripts
     install -m 644 ${S}/config/ccsp_tr069_pa_certificate_cfg_arm.xml ${D}/usr/ccsp/tr069pa/ccsp_tr069_pa_certificate_cfg.xml
     install -m 644 ${S}/config/ccsp_tr069_pa_cfg_arm.xml ${D}/usr/ccsp/tr069pa/ccsp_tr069_pa_cfg.xml
@@ -21,12 +21,12 @@ do_install_append () {
     echo "5555" > ${D}/usr/ccsp/tr069pa/sharedkey
 }
 
-FILES_${PN}-ccsp += " \
+FILES:${PN}-ccsp += " \
     ${prefix}/ccsp/tr069pa/CcspTr069PaSsp \
     ${prefix}/ccsp/tr069pa/url \
 "
 
-FILES_${PN} += " \
+FILES:${PN} += " \
     /fss/gw/usr/ccsp/ \
     /fss/gw/version.txt \
     /etc/url \
