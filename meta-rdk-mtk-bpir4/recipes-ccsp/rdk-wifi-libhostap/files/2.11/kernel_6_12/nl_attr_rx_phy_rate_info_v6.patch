@@ -2,6 +2,7 @@
 From: NarendraVarma_Dandu@comcast.com
 Date: Jan 10, 2025 1:00 AM
 Source: Comcast
+Upstream-Status: Pending
 ##########################################
 
 diff -Naur git.orig/source/hostap-2.11/src/drivers/nl80211_copy.h git/source/hostap-2.11/src/drivers/nl80211_copy.h

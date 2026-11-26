@@ -1,19 +1,18 @@
 DESCRIPTION = "OpenThread Border Router Agent"
 HOMEPAGE = "https://github.com/openthread/ot-br-posix"
 
-
 LICENSE = "BSD-3-Clause"
 LIC_FILES_CHKSUM = "file://LICENSE;md5=87109e44b2fda96a8991f27684a7349c \
                     file://third_party/openthread/repo/LICENSE;md5=543b6fe90ec5901a683320a36390c65f \
 "
 
 # OTBR and openthread dir paths inside the gecko sdk
-GSDK_DIR="${WORKDIR}/git/gsdk"
+GSDK_DIR="${UNPACKDIR}/git/gsdk"
 GSDK_OTBR_DIR="${GSDK_DIR}/util/third_party/ot-br-posix"
 GSDK_OT_DIR="${GSDK_DIR}/util/third_party/openthread"
 
 # Openthread repo path inside the OTBR repo
-OTBR_DIR="${WORKDIR}/git/otbr"
+OTBR_DIR="${UNPACKDIR}/git/otbr"
 OTBR_OT_DIR="${OTBR_DIR}/third_party/openthread/repo"
 
 SRC_URI = "git://github.com/SiliconLabs/gecko_sdk.git;protocol=https;branch=gsdk_4.4;destsuffix=git/gsdk;name=gsdk"
@@ -31,13 +30,24 @@ SRC_URI += "file://openthread-fix-build-errors.patch;patchdir=${GSDK_DIR} \
             file://otbr-agent.service \
             file://otbr-agent.path \
 "
+CXXFLAGS += "-Wno-error=attributes"
+ERROR_QA:remove = "patch-fuzz"
 
 S = "${GSDK_OTBR_DIR}"
 
 DEPENDS += "mdns boost iproute2 jsoncpp ncurses readline cpcd pkgconfig protobuf protobuf-c-native dbus libnetfilter-queue libnetfilter-conntrack"
-RDEPENDS_${PN} = "cpcd (= 4.4.1.0-r0)"
+RDEPENDS:${PN} = "cpcd (= 4.4.1.0-r0)"
 
 inherit cmake systemd pkgconfig
+
+OTBR_PREFIX_MAP:wrynose = " -ffile-prefix-map=${WORKDIR}=/usr/src/debug/${PN}/${PV}"
+CFLAGS:append = "${OTBR_PREFIX_MAP}"
+
+EXTRA_OECMAKE:append:wrynose = " \
+    -DOT_POSIX_FACTORY_CONFIG=${sysconfdir}/openthread/openthread.conf.example \
+    -DOT_POSIX_PRODUCT_CONFIG=${sysconfdir}/openthread/openthread.conf.example \
+"
+CXXFLAGS:append = "${OTBR_PREFIX_MAP}"
 
 # Adding otbr version on to version.txt file
 inherit add-version
@@ -102,10 +112,10 @@ update_otbr() {
     ln -sf ${OTBR_OT_DIR} ${GSDK_OT_DIR}
 }
 
-do_install_append() {
+do_install:append() {
     install -d ${D}${systemd_system_unitdir}
-    install -m 0644 ${WORKDIR}/otbr-agent.service ${D}${systemd_system_unitdir}
-    install -m 0644 ${WORKDIR}/otbr-agent.path ${D}${systemd_system_unitdir}
+    install -m 0644 ${UNPACKDIR}/otbr-agent.service ${D}${systemd_system_unitdir}
+    install -m 0644 ${UNPACKDIR}/otbr-agent.path ${D}${systemd_system_unitdir}
 
     install -d ${D}${libdir}
     install -m 0644 ${WORKDIR}/build/src/dbus/common/*.a ${D}${libdir}
@@ -123,8 +133,8 @@ do_install_append() {
     cp -R --no-dereference --preserve=mode,links ${OTBR_OT_DIR}/include/openthread ${D}${includedir}/otbr/
 }
 
-FILES_${PN} += "${systemd_system_unitdir}/"
+FILES:${PN} += "${systemd_system_unitdir}/"
 
 # IMPORTANT! Do not add otbr-agent.service to the SYSTEMD_SERVICE define below. We don't want it automatically
 # started. It will be started by otbr-agent.path
-SYSTEMD_SERVICE_${PN} = "otbr-agent.path"
+SYSTEMD_SERVICE:${PN} = "otbr-agent.path"

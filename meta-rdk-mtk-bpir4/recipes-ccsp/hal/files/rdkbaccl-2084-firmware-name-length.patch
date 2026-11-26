@@ -1,3 +1,4 @@
+Upstream-Status: Pending
 diff --git a/include/platform_hal.h b/include/platform_hal.h
 --- a/include/platform_hal.h
 +++ b/include/platform_hal.h
