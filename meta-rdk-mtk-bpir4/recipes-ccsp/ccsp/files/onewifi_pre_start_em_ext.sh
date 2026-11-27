@@ -94,9 +94,4 @@ new_mac_mld1="$prefix_mld1:$new_byte_mld1"
 ip link set dev "mld1" down
 ip link set dev "mld1" address "$new_mac_mld1"
 
-#To update al_mac addr in EasymesgCfg.json
-al_mac_addr=`cat /nvram/EasymeshCfg.json | grep AL_MAC_ADDR  | cut -d '"' -f4`
-al_mac=`iw dev wifi1.3 info | grep addr | cut -d ' ' -f2`
-sed -i "s/$al_mac_addr/$al_mac/g" /nvram/EasymeshCfg.json
-
 exit 0
