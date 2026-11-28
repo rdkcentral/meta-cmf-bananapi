@@ -59,6 +59,7 @@ IMAGE_INSTALL += " \
     strongswan \
     libpcap \
     tcpdump \
+    crashupload \
     ${@bb.utils.contains_any('DISTRO_FEATURES','kernel6-6 kernel6-12','linux-firmware-mt7988  fitblk','',d)} \
     ${@bb.utils.contains_any('DISTRO_FEATURES','kernel6-6 kernel6-12','','perf',d)} \
     ${@bb.utils.contains('DISTRO_FEATURES','mt76','packagegroup-filogic-mt76','',d)} \
